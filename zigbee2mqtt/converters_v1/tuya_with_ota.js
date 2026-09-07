@@ -37,7 +37,6 @@ const tuyaModels = [
     "TS0001_power",
     "TS0001_switch_1_gang",
     "TS0001_switch_module",
-    "TS0001_switch_module_1",
     "TS0002",
     "TS0002_basic",
     "TS0002_limited",
@@ -55,13 +54,11 @@ const tuyaModels = [
     "TS0012_switch_module",
     "TS0013",
     "TS0013_switch_module",
-    "TS0014",
     "TS0041",
     "TS0042",
     "TS0043",
     "TS0044",
     "TS0046",
-    "TS004F",
     "TS011F_din_smart_relay",
     "TS011F_plug_1",
     "TS011F_plug_2",
@@ -93,9 +90,6 @@ const moesModels = [
     "SR-ZS",
     "ZG-101ZL",
     "ZS-EUB_1gang",
-    "ZT-B-EU1",
-    "ZT-B-EU2",
-    "ZT-B-EU3",
 ];
 
 for (let definition of moesDefinitions) {

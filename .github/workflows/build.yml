@@ -1,0 +1,82 @@
+# Workflow simplificado ConnectCasa
+# Compila APENAS os devices que você escolher (só Telink — sem Silabs, sem Java)
+# Salvar como: .github/workflows/build-connectcasa.yml no seu fork
+
+name: Build ConnectCasa
+
+on:
+  workflow_dispatch:
+    inputs:
+      boards:
+        description: 'Boards do device_db.yaml, separados por espaço'
+        required: true
+        default: 'MODULE_GIRIER_A_TS0003'
+
+# Permite que o workflow faça push dos binários no repositório
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Instalar dependências do sistema
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y make python3 python3-venv yq unzip wget
+
+    - name: Cache das ferramentas Telink
+      uses: actions/cache@v4
+      with:
+        path: telink_tools
+        key: telink-tools-v3.7.2.0
+
+    - name: Instalar SDK + toolchain Telink e ambiente Python
+      run: |
+        make telink/tools/all
+        make setup_venv
+
+    - name: Limpar index OTA (catálogo só com seus devices)
+      run: |
+        source .venv/bin/activate
+        make tools/clean_z2m_index
+
+    - name: Compilar boards selecionadas
+      run: |
+        source .venv/bin/activate
+        for B in ${{ inputs.boards }}; do
+          TYPE=$(yq -r ".${B}.device_type" device_db.yaml)
+          MCU_FAMILY=$(yq -r ".${B}.mcu_family" device_db.yaml)
+          if [ "$MCU_FAMILY" != "Telink" ]; then
+            echo "AVISO: $B não é Telink ($MCU_FAMILY) — pulando."
+            continue
+          fi
+          echo "===== $B (router) ====="
+          BOARD=$B DEVICE_TYPE=router make board/build || exit 1
+          ls -l bin/router/$B/
+          if [ "$TYPE" = "end_device" ]; then
+            echo "===== $B (end_device) ====="
+            BOARD=$B DEVICE_TYPE=end_device make board/build || exit 1
+            ls -l bin/end_device/${B}_END_DEVICE/
+          fi
+        done
+
+    - name: Gerar converters do Z2M
+      run: |
+        source .venv/bin/activate
+        make tools/update_converters
+
+    - name: Commit e push dos binários
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add bin/ zigbee2mqtt/
+        git diff --cached --quiet || git commit -m "Build ConnectCasa: ${{ inputs.boards }}"
+        git push

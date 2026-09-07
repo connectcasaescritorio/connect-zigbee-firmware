@@ -10,6 +10,15 @@ typedef void (*ev_button_multi_press_callback_t)(void *, uint8_t);
 
 #define DEBOUNCE_DELAY_MS    50
 
+// Power-up settling window: live-referenced input circuits (RC networks on
+// switch terminals) can emit a delayed edge a few hundred ms after boot,
+// which would be interpreted as a user action and toggle relays (random
+// "lights on after power outage"). During this window, input changes are
+// adopted silently as the new resting state, without firing events.
+#ifndef BOOT_INPUT_SETTLE_MS
+#define BOOT_INPUT_SETTLE_MS    1000
+#endif
+
 typedef struct {
     hal_gpio_pin_t                   pin;
     uint8_t                          pressed_when_high;

@@ -58,6 +58,14 @@ void _btn_update_callback(void *arg) {
 
 void btn_update_debounced(button_t *button, uint8_t is_pressed,
                           uint32_t changed_at) {
+    if (changed_at < BOOT_INPUT_SETTLE_MS) {
+        // Boot settling window: adopt the state silently (no events), so
+        // power-up transients on input circuits cannot toggle relays.
+        button->pressed      = is_pressed;
+        button->long_pressed = is_pressed;
+        printf("Ignoring input change during boot settle window\r\n");
+        return;
+    }
     if (!button->pressed && is_pressed) {
         printf("Press detected\r\n");
         button->pressed_at_ms = changed_at;

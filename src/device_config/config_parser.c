@@ -139,6 +139,9 @@ void parse_config() {
             buttons[buttons_cnt].multi_press_duration_ms = 800;
             buttons[buttons_cnt].debounce_delay_ms       = debounce_ms;
             buttons[buttons_cnt].on_long_press           = on_reset_clicked;
+
+            if (entry[3] == 'd')
+                buttons[buttons_cnt].pressed_when_high = 1;
             buttons_cnt++;
         } else if (entry[0] == 'L') {
             hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);
@@ -218,7 +221,10 @@ void parse_config() {
             relays[relays_cnt].pin     = pin;
             relays[relays_cnt].on_high = 1;
 
-            if (entry[3] != '\0') {
+            if (entry[3] == 'i') {
+                // Inverted relay driver (active-low), e.g. RC3i
+                relays[relays_cnt].on_high = 0;
+            } else if (entry[3] != '\0') {
                 pin = hal_gpio_parse_pin(entry + 3);
                 hal_gpio_init(pin, 0, HAL_GPIO_PULL_NONE);
                 relays[relays_cnt].off_pin     = pin;

@@ -34,53 +34,6 @@ extern uint8_t switch_clusters_cnt;
 
 void switch_cluster_apply_mode(zigbee_switch_cluster *cluster, uint8_t mode);
 
-// ===== Mode ritual (field configuration via the wall input) =====
-// 7 rapid presses on any input, then HOLD the 8th press for a total of
-// 10 seconds: flips ALL inputs between toggle (interruptor) and momentary
-// (pulsador). Deliberate enough that no client ever does it by accident,
-// and it never collides with the factory reset (which needs 10 presses).
-#define MODE_RITUAL_PRESSES      7
-#define MODE_RITUAL_HOLD_MS      10000
-
-static hal_task_t             mode_ritual_task;
-static zigbee_switch_cluster *mode_ritual_cluster   = NULL;
-static uint8_t                mode_ritual_task_init = 0;
-
-static void mode_ritual_confirm(void *arg) {
-    zigbee_switch_cluster *cluster = mode_ritual_cluster;
-
-    if (cluster == NULL || cluster->button == NULL) {
-        return;
-    }
-    // Still held, still a long press, and the click burst really happened
-    if (!cluster->button->pressed || !cluster->button->long_pressed ||
-        cluster->button->multi_press_cnt < MODE_RITUAL_PRESSES) {
-        return;
-    }
-
-    uint8_t mode;
-    uint8_t blinks;
-
-    if (switch_clusters_cnt == 0) {
-        return;
-    }
-    if (switch_clusters[0].mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE) {
-        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
-        blinks = 2;
-    } else {
-        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
-        blinks = 4;
-    }
-
-    printf("Mode ritual: flipping all %d inputs to mode %d\r\n",
-           switch_clusters_cnt, mode);
-    for (uint8_t i = 0; i < switch_clusters_cnt; i++) {
-        switch_cluster_apply_mode(&switch_clusters[i], mode);
-    }
-    if (network_indicator.leds[0] != NULL) {
-        led_blink(network_indicator.leds[0], 200, 200, blinks);
-    }
-}
 
 
 
@@ -481,22 +434,6 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
 }
 
 void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
-    if (cluster->button->multi_press_cnt >= MODE_RITUAL_PRESSES) {
-        // 7+ rapid presses and now holding: schedule the 10s confirmation
-        if (!mode_ritual_task_init) {
-            mode_ritual_task.handler = mode_ritual_confirm;
-            mode_ritual_task.arg     = NULL;
-            hal_tasks_init(&mode_ritual_task);
-            mode_ritual_task_init = 1;
-        }
-        mode_ritual_cluster = cluster;
-        uint32_t elapsed = cluster->button->long_press_duration_ms;
-        hal_tasks_schedule(&mode_ritual_task,
-                           MODE_RITUAL_HOLD_MS > elapsed
-                           ? MODE_RITUAL_HOLD_MS - elapsed
-                           : 0);
-    }
-
     if (cluster->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE) {
         // Toggle does not support modes (RISE, SHORT, LONG)
         return;

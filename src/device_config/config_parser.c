@@ -77,24 +77,14 @@ uint32_t parse_int(const char *s);
 char *seek_until(char *cursor, char needle);
 char *extract_next_entry(char **cursor);
 
-// ===== BUILD DIAGNOSTICO 1.1.9: resets NEUTRALIZADOS =====
-// Qualquer reset real que ainda ocorra vem de FORA do codigo da aplicacao.
-// Assinaturas: on_reset_clicked = 10 piscadas rapidas;
-//              on_multi_press_reset = 3 piscadas lentas.
 void on_reset_clicked(void *_) {
-    printf("DIAG: on_reset_clicked disparou (10 piscadas, SEM reset)\r\n");
-    if (network_indicator.leds[0] != NULL) {
-        led_blink(network_indicator.leds[0], 150, 150, 10);
-    }
+    hal_factory_reset();
 }
 
 void on_multi_press_reset(void *_, uint8_t press_count) {
     if (g_multi_press_reset_count != 0 &&
         press_count >= g_multi_press_reset_count) {
-        printf("DIAG: on_multi_press_reset disparou (3 piscadas, SEM reset)\r\n");
-        if (network_indicator.leds[0] != NULL) {
-            led_blink(network_indicator.leds[0], 600, 400, 3);
-        }
+        hal_factory_reset();
     }
 }
 
@@ -149,6 +139,8 @@ void parse_config() {
             buttons[buttons_cnt].multi_press_duration_ms = 800;
             buttons[buttons_cnt].debounce_delay_ms       = debounce_ms;
             buttons[buttons_cnt].on_long_press           = on_reset_clicked;
+            buttons[buttons_cnt].on_multi_press_end =
+                switch_cluster_field_config_end;
 
             if (entry[3] == 'd')
                 buttons[buttons_cnt].pressed_when_high = 1;

@@ -138,17 +138,13 @@ def test_classic_mode_unchanged(device: Device, relay_button_pair: RelayButtonPa
         == MULTISTATE_NOT_PRESSED
 
 
-# ============ Field configuration =============================
-# B (onboard) button is ISOLATED: clicks do nothing; only a 10s hold resets.
-# Mode flip ritual lives on the WALL INPUT: 7 rapid presses, then hold the
-# 8th press for a total of 10s -> flips all inputs toggle <-> momentary.
+# ============ Field configuration via onboard button ============
+# Double click on the B (onboard) button flips ALL inputs between toggle
+# (interruptor) and momentary (pulsador). Single click does nothing.
+# Factory reset: only a 10s hold on B, or 10 rapid presses on an input.
 
 B_BUTTON_PIN = "B7"
 B_WINDOW_RESOLVE_MS = 900  # B-token window is 800ms
-S_WINDOW_MS = 500
-
-RITUAL_PRESSES = 7
-RITUAL_HOLD_MS = 10000
 
 
 @pytest.fixture()
@@ -170,60 +166,41 @@ def read_switch_mode(device: Device, endpoint: int) -> int:
     )
 
 
-def do_ritual(device: Device, pin: str, presses: int, hold_ms: int) -> None:
-    for _ in range(presses):
-        device.click_button(pin)
-        device.step_time(100)
-    device.press_button(pin)
-    # Advance in slices so timer-chained logic (long press -> ritual timer)
-    # fires at realistic times, like on real hardware
-    for _ in range(hold_ms // 500):
-        device.step_time(500)
-    device.release_button(pin)
-    device.step_time(S_WINDOW_MS + 100)
-
-
-def test_onboard_button_clicks_do_nothing(
+def test_onboard_single_click_does_nothing(
     device: Device, relay_button_pair: RelayButtonPair
 ):
     before = read_switch_mode(device, relay_button_pair.switch_endpoint)
     device.click_button(B_BUTTON_PIN)
     device.step_time(B_WINDOW_RESOLVE_MS)
+    assert read_switch_mode(device, relay_button_pair.switch_endpoint) == before
+
+
+def test_onboard_double_click_flips_mode(
+    device: Device, relay_button_pair: RelayButtonPair
+):
+    # Default is toggle -> first double click flips to momentary
     device.click_button(B_BUTTON_PIN)
     device.step_time(100)
     device.click_button(B_BUTTON_PIN)
     device.step_time(B_WINDOW_RESOLVE_MS)
-    assert read_switch_mode(device, relay_button_pair.switch_endpoint) == before
-
-
-def test_mode_ritual_flips_all_inputs(
-    device: Device, relay_button_pair: RelayButtonPair
-):
-    # Default is toggle -> ritual flips to momentary
-    do_ritual(device, relay_button_pair.button_pin, RITUAL_PRESSES,
-              RITUAL_HOLD_MS + 500)
     assert read_switch_mode(device, relay_button_pair.switch_endpoint) \
         == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY
 
-    # Ritual again flips back to toggle
-    do_ritual(device, relay_button_pair.button_pin, RITUAL_PRESSES,
-              RITUAL_HOLD_MS + 500)
+    # Second double click flips back to toggle
+    device.click_button(B_BUTTON_PIN)
+    device.step_time(100)
+    device.click_button(B_BUTTON_PIN)
+    device.step_time(B_WINDOW_RESOLVE_MS)
     assert read_switch_mode(device, relay_button_pair.switch_endpoint) \
         == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE
 
 
-def test_mode_ritual_needs_enough_presses(
+def test_onboard_short_hold_does_not_flip(
     device: Device, relay_button_pair: RelayButtonPair
 ):
     before = read_switch_mode(device, relay_button_pair.switch_endpoint)
-    do_ritual(device, relay_button_pair.button_pin, 3, RITUAL_HOLD_MS + 500)
-    assert read_switch_mode(device, relay_button_pair.switch_endpoint) == before
-
-
-def test_mode_ritual_needs_full_hold(
-    device: Device, relay_button_pair: RelayButtonPair
-):
-    before = read_switch_mode(device, relay_button_pair.switch_endpoint)
-    do_ritual(device, relay_button_pair.button_pin, RITUAL_PRESSES, 2000)
-    device.step_time(RITUAL_HOLD_MS)
+    device.press_button(B_BUTTON_PIN)
+    device.step_time(3000)
+    device.release_button(B_BUTTON_PIN)
+    device.step_time(B_WINDOW_RESOLVE_MS)
     assert read_switch_mode(device, relay_button_pair.switch_endpoint) == before

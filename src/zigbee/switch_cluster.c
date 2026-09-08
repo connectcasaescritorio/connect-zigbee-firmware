@@ -553,22 +553,14 @@ void switch_cluster_field_config_end(void *unused, uint8_t count) {
         return;
     }
 
-    if (switch_clusters[0].mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE) {
-        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
-        blinks = 2;
-    } else {
-        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
-        blinks = 4;
-    }
-
-    printf("Field config: setting all %d inputs to mode %d\r\n",
-           switch_clusters_cnt, mode);
-    for (uint8_t i = 0; i < switch_clusters_cnt; i++) {
-        switch_cluster_apply_mode(&switch_clusters[i], mode);
-    }
-
+    // ===== BUILD DIAGNOSTICO (1.1.7-diag): apenas pisca, nao configura =====
+    // Bisseccao do reset em duplo clique: se piscar 6x sem resetar, o
+    // culpado esta no apply_mode/NVM; se resetar, esta no caminho da task.
+    (void)mode;
+    (void)blinks;
+    printf("Field config DIAG: blink only\r\n");
     if (network_indicator.leds[0] != NULL) {
-        led_blink(network_indicator.leds[0], 200, 200, blinks);
+        led_blink(network_indicator.leds[0], 120, 120, 6);
     }
 }
 

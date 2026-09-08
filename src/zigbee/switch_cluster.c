@@ -529,9 +529,6 @@ void switch_cluster_apply_mode(zigbee_switch_cluster *cluster, uint8_t mode) {
     } else {
         cluster->button->pressed_when_high = 0;
     }
-    hal_zigbee_notify_attribute_changed(cluster->endpoint,
-                                        ZCL_CLUSTER_ON_OFF_SWITCH_CONFIG,
-                                        ZCL_ATTR_ONOFF_CONFIGURATION_SWITCH_MODE);
     switch_cluster_store_attrs_to_nv(cluster);
 }
 
@@ -545,18 +542,23 @@ void switch_cluster_field_config_end(void *unused, uint8_t count) {
     uint8_t mode;
     uint8_t blinks;
 
-    if (count == 1) {
-        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
-        blinks = 2;
-    } else if (count == 2) {
-        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
-        blinks = 4;
-    } else {
+    // Double click on the onboard button FLIPS the type of all inputs
+    // (pulsador <-> interruptor). Single click does nothing, so curious
+    // fingers are harmless. Factory reset is only via 10s hold.
+    if (count != 2) {
         return;
     }
 
     if (switch_clusters_cnt == 0) {
         return;
+    }
+
+    if (switch_clusters[0].mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE) {
+        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
+        blinks = 2;
+    } else {
+        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
+        blinks = 4;
     }
 
     printf("Field config: setting all %d inputs to mode %d\r\n",

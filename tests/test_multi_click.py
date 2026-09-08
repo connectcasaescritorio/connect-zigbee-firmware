@@ -163,42 +163,42 @@ def read_switch_mode(device: Device, endpoint: int) -> int:
     )
 
 
-def test_field_config_single_click_sets_all_momentary(
+def test_field_config_single_click_does_nothing(
     device: Device, relay_button_pair: RelayButtonPair
 ):
+    before = read_switch_mode(device, relay_button_pair.switch_endpoint)
     device.click_button(B_BUTTON_PIN)
     device.step_time(B_WINDOW_RESOLVE_MS)
-
-    assert read_switch_mode(device, relay_button_pair.switch_endpoint) \
-        == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY
+    assert read_switch_mode(device, relay_button_pair.switch_endpoint) == before
 
 
-def test_field_config_double_click_sets_all_toggle(
+def test_field_config_double_click_flips_mode(
     device: Device, relay_button_pair: RelayButtonPair
 ):
-    # Start from momentary so the change is observable
-    device.click_button(B_BUTTON_PIN)
-    device.step_time(B_WINDOW_RESOLVE_MS)
-    assert read_switch_mode(device, relay_button_pair.switch_endpoint) \
-        == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY
-
+    # Default mode is toggle -> first double click flips to momentary
     device.click_button(B_BUTTON_PIN)
     device.step_time(100)
     device.click_button(B_BUTTON_PIN)
     device.step_time(B_WINDOW_RESOLVE_MS)
+    assert read_switch_mode(device, relay_button_pair.switch_endpoint) \
+        == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY
 
+    # Second double click flips back to toggle
+    device.click_button(B_BUTTON_PIN)
+    device.step_time(100)
+    device.click_button(B_BUTTON_PIN)
+    device.step_time(B_WINDOW_RESOLVE_MS)
     assert read_switch_mode(device, relay_button_pair.switch_endpoint) \
         == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE
 
 
-def test_field_config_long_press_does_not_configure(
+def test_field_config_short_hold_does_not_reset_or_configure(
     device: Device, relay_button_pair: RelayButtonPair
 ):
     before = read_switch_mode(device, relay_button_pair.switch_endpoint)
-    # Long press on the onboard button is the reset path, not field config;
-    # keep it short of an actual full reset flow but past the click window
+    # A 3s hold: far from the 10s reset threshold, and a hold is not a click
     device.press_button(B_BUTTON_PIN)
-    device.step_time(2500)
+    device.step_time(3000)
     device.release_button(B_BUTTON_PIN)
     device.step_time(B_WINDOW_RESOLVE_MS)
     assert read_switch_mode(device, relay_button_pair.switch_endpoint) == before

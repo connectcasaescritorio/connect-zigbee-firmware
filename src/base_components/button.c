@@ -48,6 +48,19 @@ void _btn_gpio_callback(hal_gpio_pin_t pin, void *arg) {
 void _btn_update_callback(void *arg) {
     button_t *button = (button_t *)arg;
 
+    // Re-read the REAL pin level instead of trusting the IRQ-latched state.
+    // Slow/dirty edges (e.g. active-high buttons on weak internal pulls) can
+    // desync edge interrupts; a missed release would leave the long-press
+    // timer armed and fire a factory reset. Reading the pin now (debounced
+    // by the task delay) makes every update self-correcting.
+    uint8_t raw_state = hal_gpio_read(button->pin);
+
+    if (raw_state != button->debounce_last_state) {
+        // We missed an edge: resync and treat this moment as the change
+        button->debounce_last_state  = raw_state;
+        button->debounce_last_change = hal_millis();
+    }
+
     btn_update_debounced(button,
                          button->debounce_last_state == button->pressed_when_high,
                          button->debounce_last_change);

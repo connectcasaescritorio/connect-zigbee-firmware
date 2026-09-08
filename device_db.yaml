@@ -1741,7 +1741,7 @@ MODULE_MOES_ZM4LT1_TS0001:
   alt_config_str: null
   build: true
   category: module
-  config_str: afgzktgb;TS0001-MS;BD3d;LD7i;SC0u;RC3i;
+  config_str: afgzktgb;TS0001-MS;BD3u;LD7i;SC0u;RC3;
   device_type: router
   firmware_image_type: 43575
   human_name: Moes ZM4LT1

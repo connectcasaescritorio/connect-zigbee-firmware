@@ -5569,3 +5569,29 @@ SWITCH_ZEMISMART_TS0601_6GANG:
   store: https://www.zemismart.com/products/tb26-6
   threads: https://github.com/romasku/tuya-zigbee-switch/issues/209
   tuya_module: ZTU
+SWITCH_CONNECT_4X2_3CH_TS0003:
+  alt_config_str: null
+  build: true
+  category: switch
+  config_str: njgrxsrf;TS0003-CC;IB1;IC4;SB5u;RC3;SB4u;RD2;SC1u;RC2;M;P0;
+  device_type: router
+  firmware_image_type: 47125
+  human_name: ConnectCasa 4x2 3ch
+  info: Interruptor 4x2 3 canais exclusivo ConnectCasa
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0003
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_njgrxsrf
+  store: null
+  threads: null
+  tuya_module: ZT3L  

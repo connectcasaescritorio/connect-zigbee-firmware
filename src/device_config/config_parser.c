@@ -77,14 +77,24 @@ uint32_t parse_int(const char *s);
 char *seek_until(char *cursor, char needle);
 char *extract_next_entry(char **cursor);
 
+// ===== BUILD DIAGNOSTICO 1.1.9: resets NEUTRALIZADOS =====
+// Qualquer reset real que ainda ocorra vem de FORA do codigo da aplicacao.
+// Assinaturas: on_reset_clicked = 10 piscadas rapidas;
+//              on_multi_press_reset = 3 piscadas lentas.
 void on_reset_clicked(void *_) {
-    hal_factory_reset();
+    printf("DIAG: on_reset_clicked disparou (10 piscadas, SEM reset)\r\n");
+    if (network_indicator.leds[0] != NULL) {
+        led_blink(network_indicator.leds[0], 150, 150, 10);
+    }
 }
 
 void on_multi_press_reset(void *_, uint8_t press_count) {
     if (g_multi_press_reset_count != 0 &&
         press_count >= g_multi_press_reset_count) {
-        hal_factory_reset();
+        printf("DIAG: on_multi_press_reset disparou (3 piscadas, SEM reset)\r\n");
+        if (network_indicator.leds[0] != NULL) {
+            led_blink(network_indicator.leds[0], 600, 400, 3);
+        }
     }
 }
 

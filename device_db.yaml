@@ -3697,34 +3697,32 @@ SWITCH_BSEED_TOUCH_BACKLIGHT_TS0001:
   store: https://www.aliexpress.com/item/1005004187227246.html
   threads: https://github.com/romasku/tuya-zigbee-switch/discussions/221
   tuya_module: ZTU
-SWITCH_BSEED_TOUCH_BACKLIGHT_TS0002:
+SWITCH_CONNECT_4X2_TS0002:
   alt_config_str: null
   build: true
   category: switch
-  config_str: l9brjwau;TS0002-BSDB;LD4i;SB5u;RC3;IC1;SD3u;RC2;ID7;M;
+  config_str: l9brjwau;TS0002-BSDB;IB1;IC4;SB5u;RC3;SB4u;RD2;M;P0;
   device_type: router
   firmware_image_type: 43581
-  human_name: BSEED dim-backlight 2-gang touch switch
-  info: Backlight on D4i, netled on C4. Left indicator hard-wired?
+  human_name: ConnectCasa 4x2 2ch
+  info: Interruptor 4x2 exclusivo ConnectCasa - ritual anti-despareamento
   mcu: TLSR8258
   mcu_family: Telink
   neutral: required
   old_manufacturer_names: null
-  old_zb_models:
-  - TS0002-BS-1
+  old_zb_models: null
   output: relay
   override_z2m_device: null
   power: mains
-  status: mostly_supported
+  status: fully_supported
   stock_converter_manufacturer: Tuya
   stock_converter_model: TS0002
   stock_image_type: 54179
   stock_manufacturer_id: 4417
   stock_manufacturer_name: _TZ3000_l9brjwau
-  stock_model_name: TS0002
-  store: https://www.aliexpress.com/item/1005003843553626.html
-  threads: https://github.com/romasku/tuya-zigbee-switch/issues/246
-  tuya_module: ZTU
+  store: null
+  threads: null
+  tuya_module: ZT3L
 SWITCH_BSEED_TOUCH_BACKLIGHT_TS0003:
   alt_config_str: null
   build: true

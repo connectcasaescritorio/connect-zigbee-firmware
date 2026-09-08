@@ -1,4 +1,5 @@
 #include "relay_cluster.h"
+#include "device_config/device_params_nv.h"
 #include "cluster_common.h"
 #include "consts.h"
 #include "device_config/nvm_items.h"
@@ -166,12 +167,15 @@ void sync_indicator_led(zigbee_relay_cluster *cluster) {
         return;
     }
 
-    if (cluster->indicator_led_mode != ZCL_ONOFF_INDICATOR_MODE_MANUAL) {
-        if (cluster->indicator_led_mode == ZCL_ONOFF_INDICATOR_MODE_SAME) {
-            cluster->indicator_state = cluster->relay->on;
-        } else {
-            cluster->indicator_state = !cluster->relay->on;
-        }
+    // Product backlight logic (ConnectCasa): one device-level mode governs
+    // all key backlights. 0 = off, 1 = traditional (blue at rest, off when
+    // the relay is on - hardware red takes over), 2 = rosa (always on).
+    if (g_backlight_mode == BACKLIGHT_MODE_OFF) {
+        cluster->indicator_state = 0;
+    } else if (g_backlight_mode == BACKLIGHT_MODE_ROSA) {
+        cluster->indicator_state = 1;
+    } else {
+        cluster->indicator_state = !cluster->relay->on;
     }
 
     cluster->indicator_state ? led_on(cluster->indicator_led)

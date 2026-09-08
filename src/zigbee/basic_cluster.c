@@ -8,6 +8,7 @@
 #include "device_config/device_params_nv.h"
 #include "device_config/nvm_items.h"
 #include "device_config/reset.h"
+#include "relay_cluster.h"
 #include "hal/nvm.h"
 #include "hal/tasks.h"
 #include <stddef.h>
@@ -44,6 +45,10 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     }
     if (attribute_id == ZCL_ATTR_BASIC_MULTI_PRESS_RESET_COUNT) {
         device_params_set_multi_press_reset_count(g_multi_press_reset_count);
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_BACKLIGHT_MODE) {
+        device_params_set_backlight_mode(g_backlight_mode);
+        update_relay_clusters(); // re-aplica o backlight nos LEDs
     }
 }
 
@@ -86,14 +91,16 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, device_config_str);
     SETUP_ATTR(12, ZCL_ATTR_BASIC_MULTI_PRESS_RESET_COUNT, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_multi_press_reset_count);
+    SETUP_ATTR(13, ZCL_ATTR_BASIC_BACKLIGHT_MODE, ZCL_DATA_TYPE_ENUM8,
+               ATTR_WRITABLE, g_backlight_mode);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(13, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(14, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 14 : 13;
+        network_indicator.has_dedicated_led ? 15 : 14;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

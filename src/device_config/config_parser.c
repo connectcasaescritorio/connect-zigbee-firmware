@@ -291,6 +291,11 @@ void parse_config() {
         } else if (entry[0] == 'i') {
             uint32_t image_type = parse_int(entry + 1);
             hal_zigbee_set_image_type(image_type);
+        } else if (entry[0] == 'P') {
+            // Factory default for multi-press reset count (0 = disabled).
+            // User NV setting (written via Z2M) still wins: it is loaded
+            // later, during basic cluster init.
+            g_multi_press_reset_count = parse_int(entry + 1);
         } else if (entry[0] == 'M') {
             for (int index = 0; index < switch_clusters_cnt; index++) {
                 switch_clusters[index].mode =

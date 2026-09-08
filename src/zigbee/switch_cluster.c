@@ -10,6 +10,7 @@ extern network_indicator_t network_indicator;
 
 #include "hal/printf_selector.h"
 #include "hal/system.h"
+#include "hal/zigbee.h"
 #include "hal/tasks.h"
 #include "relay_cluster.h"
 #include "zigbee_commands.h"
@@ -33,6 +34,35 @@ extern zigbee_switch_cluster switch_clusters[];
 extern uint8_t switch_clusters_cnt;
 
 void switch_cluster_apply_mode(zigbee_switch_cluster *cluster, uint8_t mode);
+
+// ===== Reset ritual (anti-despareamento ConnectCasa) =====
+// The ONLY deliberate physical factory reset: 7 rapid presses on any key,
+// with the 7th press HELD until 10 seconds total. ESD glitches and painters
+// cannot reproduce this; combined with P0 (instant multipress reset off)
+// it makes accidental unpairing impossible by design.
+#define RESET_RITUAL_PRESSES    7
+#define RESET_RITUAL_HOLD_MS    10000
+
+static hal_task_t             reset_ritual_task;
+static zigbee_switch_cluster *reset_ritual_cluster   = NULL;
+static uint8_t                reset_ritual_task_init = 0;
+
+static void reset_ritual_confirm(void *arg) {
+    zigbee_switch_cluster *cluster = reset_ritual_cluster;
+
+    if (cluster == NULL || cluster->button == NULL) {
+        return;
+    }
+    if (!cluster->button->pressed || !cluster->button->long_pressed ||
+        cluster->button->multi_press_cnt < RESET_RITUAL_PRESSES) {
+        return;
+    }
+
+    printf("Reset ritual completed: factory reset\r\n");
+    hal_factory_reset();
+}
+
+
 
 
 
@@ -434,6 +464,21 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
 }
 
 void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
+    if (cluster->button->multi_press_cnt >= RESET_RITUAL_PRESSES) {
+        if (!reset_ritual_task_init) {
+            reset_ritual_task.handler = reset_ritual_confirm;
+            reset_ritual_task.arg     = NULL;
+            hal_tasks_init(&reset_ritual_task);
+            reset_ritual_task_init = 1;
+        }
+        reset_ritual_cluster = cluster;
+        uint32_t elapsed = cluster->button->long_press_duration_ms;
+        hal_tasks_schedule(&reset_ritual_task,
+                           RESET_RITUAL_HOLD_MS > elapsed
+                           ? RESET_RITUAL_HOLD_MS - elapsed
+                           : 0);
+    }
+
     if (cluster->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE) {
         // Toggle does not support modes (RISE, SHORT, LONG)
         return;

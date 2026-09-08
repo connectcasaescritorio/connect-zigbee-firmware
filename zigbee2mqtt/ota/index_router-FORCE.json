@@ -1,16 +1,44 @@
 [
   {
-    "fileName": "tlc_switch-1.1.12-7d383ba-forced.zigbee",
+    "fileName": "tlc_switch-1.1.12-3686be9-forced.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 182146,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/SWITCH_CONNECT_4X2_TS0002/tlc_switch-1.1.12-7d383ba-forced.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/SWITCH_CONNECT_4X2_3CH_TS0003/tlc_switch-1.1.12-3686be9-forced.zigbee",
+    "imageType": 47125,
+    "manufacturerCode": 4417,
+    "sha512": "68cda26c66bc6a3435d5bb008c3751420d55976cf437512109c45c189c7e940a65fabc4ffa25b48502459d49ffdd034f47a91782fdfc30f7debdf3ff20cdc7f6",
+    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "manufacturerName": [
+      "_TZ3000_njgrxsrf",
+      "njgrxsrf"
+    ]
+  },
+  {
+    "fileName": "tlc_switch-1.1.12-3686be9-forced.zigbee",
+    "fileVersion": 4294967295,
+    "fileSize": 182146,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/SWITCH_CONNECT_4X2_TS0002/tlc_switch-1.1.12-3686be9-forced.zigbee",
     "imageType": 43581,
     "manufacturerCode": 4417,
-    "sha512": "a1053bb9de916b1fd9f36b135d6f6576af3cad5660d06fcb396ec6f8925388c8f558128e67847e1870565c3ef99d1c8e433ed449dcd4e1811154051769b537ae",
+    "sha512": "6eb0d6918c14b6ba7d2d2e68449ab0a434a789dc3d9eacb9afe63063f81f5c19abfeaaba02a55ea9938d484af8f035827b536970b0f58b4ef442543fd50f448e",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3000_l9brjwau",
       "l9brjwau"
+    ]
+  },
+  {
+    "fileName": "tlc_switch-1.1.12-3686be9-forced.zigbee",
+    "fileVersion": 4294967295,
+    "fileSize": 182130,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/MODULE_MOES_ZM4LT1_TS0001/tlc_switch-1.1.12-3686be9-forced.zigbee",
+    "imageType": 43575,
+    "manufacturerCode": 4417,
+    "sha512": "ec79803effec4022248af9ad6beaf4940c7a08b1b6f7f002f6219cb0d71889cb8bedafa328c8279b065e9c180d0fb172c9942c487b766a9356bfb95f50f97563",
+    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "manufacturerName": [
+      "_TZ3000_afgzktgb",
+      "afgzktgb"
     ]
   }
 ]

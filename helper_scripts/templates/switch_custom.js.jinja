@@ -85,6 +85,17 @@ const romasku = {
             description: "When turn on/off binded device",
             entityCategory: "config",
         }),
+    multiClick: (name, endpointName) =>
+        binary({
+            name,
+            endpointName,
+            valueOn: ["ON", 1],
+            valueOff: ["OFF", 0],
+            cluster: "genOnOffSwitchCfg",
+            attribute: { ID: 0xff06, type: 0x30 }, // Enum8
+            description: "Multi-click mode (ESPHome-style): relay acts only on a confirmed single click; double/triple/hold are pure scene events",
+            entityCategory: "config",
+        }),
     longPressDuration: (name, endpointName) =>
         numeric({
             name,
@@ -112,7 +123,7 @@ const romasku = {
             name,
             endpointName,
             access: "STATE_GET",
-            lookup: { released: 0, press: 1, long_press: 2, position_on: 3, position_off: 4 },
+            lookup: { released: 0, press: 1, long_press: 2, position_on: 3, position_off: 4, single: 5, double: 6, triple: 7 },
             cluster: "genMultistateInput",
             attribute: "presentValue",
             description: "Action of the switch: 'released' or 'press' or 'long_press'",
@@ -432,6 +443,7 @@ const definitions = [
             romasku.relayMode("{{switchName}}_relay_mode", "{{switchName}}"),
             romasku.relayIndex("{{switchName}}_relay_index", "{{switchName}}", {{device.relayNames | length}}),
             {% endif %}
+            romasku.multiClick("{{switchName}}_multi_click", "{{switchName}}"),
             romasku.bindedMode("{{switchName}}_binded_mode", "{{switchName}}"),
             romasku.longPressDuration("{{switchName}}_long_press_duration", "{{switchName}}"),
             romasku.levelMoveRate("{{switchName}}_level_move_rate", "{{switchName}}"),

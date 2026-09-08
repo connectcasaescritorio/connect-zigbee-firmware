@@ -37,6 +37,10 @@ typedef struct {
     ev_button_callback_t             on_long_press;
     ev_button_callback_t             on_release;
     ev_button_multi_press_callback_t on_multi_press;
+    // Fired once when a click sequence ends (multi_press window expires
+    // after the last release, no long press involved). Receives the count.
+    ev_button_multi_press_callback_t on_multi_press_end;
+    hal_task_t                       multi_press_end_task;
     void *                           callback_param;
 } button_t;
 

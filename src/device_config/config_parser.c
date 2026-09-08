@@ -139,6 +139,8 @@ void parse_config() {
             buttons[buttons_cnt].multi_press_duration_ms = 800;
             buttons[buttons_cnt].debounce_delay_ms       = debounce_ms;
             buttons[buttons_cnt].on_long_press           = on_reset_clicked;
+            buttons[buttons_cnt].on_multi_press_end =
+                switch_cluster_field_config_end;
 
             if (entry[3] == 'd')
                 buttons[buttons_cnt].pressed_when_high = 1;
@@ -194,7 +196,7 @@ void parse_config() {
 
             buttons[buttons_cnt].pin = pin;
             buttons[buttons_cnt].long_press_duration_ms  = 800;
-            buttons[buttons_cnt].multi_press_duration_ms = 800;
+            buttons[buttons_cnt].multi_press_duration_ms = 500;
             buttons[buttons_cnt].debounce_delay_ms       = debounce_ms;
             buttons[buttons_cnt].on_multi_press          = on_multi_press_reset;
 
@@ -246,14 +248,14 @@ void parse_config() {
 
             buttons[buttons_cnt].pin = open_pin;
             buttons[buttons_cnt].long_press_duration_ms  = 800;
-            buttons[buttons_cnt].multi_press_duration_ms = 800;
+            buttons[buttons_cnt].multi_press_duration_ms = 500;
             buttons[buttons_cnt].debounce_delay_ms       = debounce_ms;
             buttons[buttons_cnt].on_multi_press          = on_multi_press_reset;
             button_t *open_button = &buttons[buttons_cnt++];
 
             buttons[buttons_cnt].pin = close_pin;
             buttons[buttons_cnt].long_press_duration_ms  = 800;
-            buttons[buttons_cnt].multi_press_duration_ms = 800;
+            buttons[buttons_cnt].multi_press_duration_ms = 500;
             buttons[buttons_cnt].debounce_delay_ms       = debounce_ms;
             buttons[buttons_cnt].on_multi_press          = on_multi_press_reset;
             button_t *close_button = &buttons[buttons_cnt++];

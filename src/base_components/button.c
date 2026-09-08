@@ -7,6 +7,7 @@
 
 void _btn_gpio_callback(hal_gpio_pin_t pin, void *arg);
 void _btn_update_callback(void *arg);
+void _btn_multi_press_end_callback(void *arg);
 void btn_update_debounced(button_t *button, uint8_t is_pressed,
                           uint32_t changed_at);
 
@@ -24,6 +25,9 @@ void btn_init(button_t *button) {
     button->update_task.handler = _btn_update_callback;
     button->update_task.arg     = button;
     hal_tasks_init(&button->update_task);
+    button->multi_press_end_task.handler = _btn_multi_press_end_callback;
+    button->multi_press_end_task.arg     = button;
+    hal_tasks_init(&button->multi_press_end_task);
     hal_gpio_callback(button->pin, _btn_gpio_callback, button);
 }
 
@@ -68,11 +72,11 @@ void btn_update_debounced(button_t *button, uint8_t is_pressed,
     }
     if (!button->pressed && is_pressed) {
         printf("Press detected\r\n");
+        hal_tasks_unschedule(&button->multi_press_end_task);
         button->pressed_at_ms = changed_at;
         button->pressed       = true;
-        if (button->on_press != NULL) {
-            button->on_press(button->callback_param);
-        }
+        // Count the press BEFORE notifying, so on_press handlers can see the
+        // up-to-date multi_press_cnt (needed for click-burst suppression).
         if (changed_at - button->released_at_ms < button->multi_press_duration_ms) {
             button->multi_press_cnt += 1;
             printf("Multi press detected: %d\r\n", button->multi_press_cnt);
@@ -82,13 +86,24 @@ void btn_update_debounced(button_t *button, uint8_t is_pressed,
         } else {
             button->multi_press_cnt = 1;
         }
+        if (button->on_press != NULL) {
+            button->on_press(button->callback_param);
+        }
     } else if (button->pressed && !is_pressed) {
+        uint8_t was_long_press = button->long_pressed;
         printf("Release detected\r\n");
         button->released_at_ms = changed_at;
         button->pressed        = false;
         button->long_pressed   = false;
         if (button->on_release != NULL) {
             button->on_release(button->callback_param);
+        }
+        if (was_long_press) {
+            // A hold is not a click sequence
+            button->multi_press_cnt = 0;
+        } else if (button->on_multi_press_end != NULL) {
+            hal_tasks_schedule(&button->multi_press_end_task,
+                               button->multi_press_duration_ms);
         }
     }
     button->pressed = is_pressed;
@@ -102,4 +117,15 @@ void btn_update_debounced(button_t *button, uint8_t is_pressed,
             button->on_long_press(button->callback_param);
         }
     }
+}
+
+void _btn_multi_press_end_callback(void *arg) {
+    button_t *button = (button_t *)arg;
+
+    if (button->on_multi_press_end != NULL && button->multi_press_cnt > 0) {
+        printf("Multi press sequence ended: %d\r\n", button->multi_press_cnt);
+        button->on_multi_press_end(button->callback_param,
+                                   button->multi_press_cnt);
+    }
+    button->multi_press_cnt = 0;
 }

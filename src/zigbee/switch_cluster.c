@@ -1,4 +1,7 @@
 #include "switch_cluster.h"
+#include "base_components/network_indicator.h"
+
+extern network_indicator_t network_indicator;
 #include "base_components/relay.h"
 #include "cluster_common.h"
 #include "consts.h"
@@ -13,13 +16,16 @@
 
 const uint8_t  multistate_out_of_service = 0;
 const uint8_t  multistate_flags          = 0;
-const uint16_t multistate_num_of_states  = 3;
+const uint16_t multistate_num_of_states  = 7;
 
 #define MULTISTATE_NOT_PRESSED     0
 #define MULTISTATE_PRESS           1
 #define MULTISTATE_LONG_PRESS      2
 #define MULTISTATE_POSITION_ON     3
 #define MULTISTATE_POSITION_OFF    4
+#define MULTISTATE_SINGLE          5
+#define MULTISTATE_DOUBLE          6
+#define MULTISTATE_TRIPLE          7
 
 extern zigbee_relay_cluster relay_clusters[];
 extern uint8_t relay_clusters_cnt;
@@ -29,6 +35,8 @@ extern uint8_t switch_clusters_cnt;
 void switch_cluster_on_button_press(zigbee_switch_cluster *cluster);
 void switch_cluster_on_button_release(zigbee_switch_cluster *cluster);
 void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster);
+void switch_cluster_on_button_multi_press_end(zigbee_switch_cluster *cluster,
+                                              uint8_t count);
 static bool switch_cluster_has_valid_relay(
     const zigbee_switch_cluster *cluster);
 
@@ -98,6 +106,8 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster,
         (ev_button_callback_t)switch_cluster_on_button_release;
     cluster->button->on_long_press =
         (ev_button_callback_t)switch_cluster_on_button_long_press;
+    cluster->button->on_multi_press_end =
+        (ev_button_multi_press_callback_t)switch_cluster_on_button_multi_press_end;
     cluster->button->callback_param = cluster;
 
     SETUP_ATTR(0, ZCL_ATTR_ONOFF_CONFIGURATION_SWITCH_TYPE, ZCL_DATA_TYPE_ENUM8,
@@ -117,11 +127,13 @@ void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster,
                ZCL_DATA_TYPE_UINT8, ATTR_WRITABLE, cluster->level_move_rate);
     SETUP_ATTR(7, ZCL_ATTR_ONOFF_CONFIGURATION_SWITCH_BINDING_MODE,
                ZCL_DATA_TYPE_ENUM8, ATTR_WRITABLE, cluster->binded_mode);
+    SETUP_ATTR(8, ZCL_ATTR_ONOFF_CONFIGURATION_SWITCH_MULTI_CLICK,
+               ZCL_DATA_TYPE_ENUM8, ATTR_WRITABLE, cluster->multi_click);
 
     // Configuration
     endpoint->clusters[endpoint->cluster_count].cluster_id =
         ZCL_CLUSTER_ON_OFF_SWITCH_CONFIG;
-    endpoint->clusters[endpoint->cluster_count].attribute_count = 8;
+    endpoint->clusters[endpoint->cluster_count].attribute_count = 9;
     endpoint->clusters[endpoint->cluster_count].attributes      = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server       = 1;
     endpoint->cluster_count++;
@@ -357,12 +369,17 @@ void switch_cluster_on_button_press(zigbee_switch_cluster *cluster) {
         return;
     }
 
-    if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE) {
-        switch_cluster_relay_action_on(cluster);
-    }
+    // In multi-click mode relay/binding act only when the click sequence
+    // resolves as a SINGLE click (ESPHome-style semantics): double/triple
+    // are pure scene events that never touch the light.
+    if (!cluster->multi_click) {
+        if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE) {
+            switch_cluster_relay_action_on(cluster);
+        }
 
-    if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE) {
-        switch_cluster_binding_action_on(cluster);
+        if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE) {
+            switch_cluster_binding_action_on(cluster);
+        }
     }
 
     cluster->multistate_state = MULTISTATE_PRESS;
@@ -392,11 +409,13 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
     }
 
     if (cluster->multistate_state != MULTISTATE_LONG_PRESS) {
-        if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
-            switch_cluster_relay_action_on(cluster);
-        }
-        if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
-            switch_cluster_binding_action_on(cluster);
+        if (!cluster->multi_click) {
+            if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
+                switch_cluster_relay_action_on(cluster);
+            }
+            if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
+                switch_cluster_binding_action_on(cluster);
+            }
         }
     } else {
         // This is end of long press, send zcl_level stop
@@ -428,6 +447,37 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
     switch_cluster_level_control(cluster);
 
     cluster->multistate_state = MULTISTATE_LONG_PRESS;
+    hal_zigbee_notify_attribute_changed(cluster->endpoint,
+                                        ZCL_CLUSTER_MULTISTATE_INPUT_BASIC,
+                                        ZCL_ATTR_MULTISTATE_INPUT_PRESENT_VALUE);
+}
+
+void switch_cluster_on_button_multi_press_end(zigbee_switch_cluster *cluster,
+                                              uint8_t count) {
+    if (cluster->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE) {
+        return;  // Rocker switches have position semantics, no multi-click
+    }
+    if (!cluster->multi_click) {
+        return;  // Classic behavior: no resolved click events
+    }
+
+    if (count == 1) {
+        // The confirmed single click is the moment the relay/bindings act
+        // (unless detached / long-only modes).
+        if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE ||
+            cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_SHORT) {
+            switch_cluster_relay_action_on(cluster);
+        }
+        if (cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_RISE ||
+            cluster->binded_mode == ZCL_ONOFF_CONFIGURATION_BINDED_MODE_SHORT) {
+            switch_cluster_binding_action_on(cluster);
+        }
+        cluster->multistate_state = MULTISTATE_SINGLE;
+    } else if (count == 2) {
+        cluster->multistate_state = MULTISTATE_DOUBLE;
+    } else {
+        cluster->multistate_state = MULTISTATE_TRIPLE;
+    }
     hal_zigbee_notify_attribute_changed(cluster->endpoint,
                                         ZCL_CLUSTER_MULTISTATE_INPUT_BASIC,
                                         ZCL_ATTR_MULTISTATE_INPUT_PRESENT_VALUE);
@@ -465,14 +515,59 @@ void switch_cluster_on_write_attr(zigbee_switch_cluster *cluster,
         }
     }
     if (attribute_id == ZCL_ATTR_ONOFF_CONFIGURATION_SWITCH_MODE) {
-        synchronize_multistate_state(cluster);
-        if (cluster->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY_NC) {
-            cluster->button->pressed_when_high = 1;
-        } else {
-            cluster->button->pressed_when_high = 0;
-        }
+        switch_cluster_apply_mode(cluster, cluster->mode);
+        return;
     }
     switch_cluster_store_attrs_to_nv(cluster);
+}
+
+void switch_cluster_apply_mode(zigbee_switch_cluster *cluster, uint8_t mode) {
+    cluster->mode = mode;
+    synchronize_multistate_state(cluster);
+    if (cluster->mode == ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY_NC) {
+        cluster->button->pressed_when_high = 1;
+    } else {
+        cluster->button->pressed_when_high = 0;
+    }
+    hal_zigbee_notify_attribute_changed(cluster->endpoint,
+                                        ZCL_CLUSTER_ON_OFF_SWITCH_CONFIG,
+                                        ZCL_ATTR_ONOFF_CONFIGURATION_SWITCH_MODE);
+    switch_cluster_store_attrs_to_nv(cluster);
+}
+
+// Field configuration: installer clicks the onboard (pairing) button to set
+// the type of ALL inputs without any server: 1 click = momentary (pulsador),
+// 2 clicks = toggle (interruptor). Confirmed by network LED blinks:
+// momentary = 2 blinks, toggle = 4 blinks.
+void switch_cluster_field_config_end(void *unused, uint8_t count) {
+    (void)unused;
+
+    uint8_t mode;
+    uint8_t blinks;
+
+    if (count == 1) {
+        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
+        blinks = 2;
+    } else if (count == 2) {
+        mode   = ZCL_ONOFF_CONFIGURATION_SWITCH_TYPE_TOGGLE;
+        blinks = 4;
+    } else {
+        return;
+    }
+
+    if (switch_clusters_cnt == 0) {
+        return;
+    }
+
+    printf("Field config: setting all %d inputs to mode %d\r\n",
+           switch_clusters_cnt, mode);
+    for (uint8_t i = 0; i < switch_clusters_cnt; i++) {
+        switch_cluster_apply_mode(&switch_clusters[i], mode);
+    }
+
+    if (network_indicator.leds[0] != NULL) {
+        led_blink(network_indicator.leds[0], 200, 200, blinks);
+    }
 }
 
 zigbee_switch_cluster_config nv_config_buffer;
@@ -486,6 +581,7 @@ void switch_cluster_store_attrs_to_nv(zigbee_switch_cluster *cluster) {
         cluster->button->long_press_duration_ms;
     nv_config_buffer.level_move_rate = cluster->level_move_rate;
     nv_config_buffer.binded_mode     = cluster->binded_mode;
+    nv_config_buffer.multi_click     = cluster->multi_click;
     hal_nvm_write(NV_ITEM_SWITCH_CLUSTER_DATA(cluster->switch_idx),
                   sizeof(zigbee_switch_cluster_config),
                   (uint8_t *)&nv_config_buffer);
@@ -508,6 +604,7 @@ void switch_cluster_load_attrs_from_nv(zigbee_switch_cluster *cluster) {
         nv_config_buffer.button_long_press_duration;
     cluster->level_move_rate = nv_config_buffer.level_move_rate;
     cluster->binded_mode     = nv_config_buffer.binded_mode;
+    cluster->multi_click     = nv_config_buffer.multi_click;
 
     // Validate relay_index to prevent out-of-bounds access
     if (relay_clusters_cnt == 0) {

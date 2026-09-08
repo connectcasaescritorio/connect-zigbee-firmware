@@ -9314,7 +9314,6 @@ const definitions = [
     {
         zigbeeModel: [
             "TS0002-BSDB",
-            "TS0002-BS-1",
         ],
         model: "TS0002",
         vendor: "Tuya-custom",
@@ -9323,7 +9322,6 @@ const definitions = [
             deviceEndpoints({ endpoints: {"switch_left": 1, "switch_right": 2, "relay_left": 3, "relay_right": 4, } }),
             romasku.deviceConfig("device_config", "switch_left"),
             romasku.multiPressResetCount("multi_press_reset_count", "switch_left"),
-            romasku.networkIndicator("network_led", "switch_left"),
             onOff({ endpointNames: ["relay_left", "relay_right"] }),
             romasku.pressAction("switch_left_press_action", "switch_left"),
             romasku.switchMode("switch_left_mode", "switch_left"),

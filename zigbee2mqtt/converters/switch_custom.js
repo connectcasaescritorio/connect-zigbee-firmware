@@ -14882,6 +14882,7 @@ const definitions = [
             deviceEndpoints({ endpoints: {"switch_left": 1, "switch_middle": 2, "switch_right": 3, "relay_left": 4, "relay_middle": 5, "relay_right": 6, } }),
             romasku.deviceConfig("device_config", "switch_left"),
             romasku.multiPressResetCount("multi_press_reset_count", "switch_left"),
+            romasku.networkIndicator("network_led", "switch_left"),
             onOff({ endpointNames: ["relay_left", "relay_middle", "relay_right"] }),
             romasku.pressAction("switch_left_press_action", "switch_left"),
             romasku.switchMode("switch_left_mode", "switch_left"),
@@ -14914,6 +14915,8 @@ const definitions = [
             romasku.relayIndicator("relay_left_indicator", "relay_left"),
             romasku.relayIndicatorMode("relay_middle_indicator_mode", "relay_middle"),
             romasku.relayIndicator("relay_middle_indicator", "relay_middle"),
+            romasku.relayIndicatorMode("relay_right_indicator_mode", "relay_right"),
+            romasku.relayIndicator("relay_right_indicator", "relay_right"),
         ],
         meta: { multiEndpoint: true },
         configure: async (device, coordinatorEndpoint, logger) => {
@@ -14978,6 +14981,14 @@ const definitions = [
                 },
             ]);
             await endpoint5.configureReporting("genOnOff", [
+                {
+                    attribute: {ID: 0xff02, type: 0x10}, // Boolean
+                    minimumReportInterval: 0,
+                    maximumReportInterval: constants.repInterval.MAX,
+                    reportableChange: 1,
+                },
+            ]);
+            await endpoint6.configureReporting("genOnOff", [
                 {
                     attribute: {ID: 0xff02, type: 0x10}, // Boolean
                     minimumReportInterval: 0,

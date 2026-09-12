@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.1.15-883f1fd.zigbee",
+    "fileName": "tlc_switch-1.1.15-32c318f.zigbee",
     "fileVersion": 286601216,
     "fileSize": 182450,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/SWITCH_CONNECT_4X2_3CH_TS0003/tlc_switch-1.1.15-883f1fd.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/SWITCH_CONNECT_4X2_3CH_TS0003/tlc_switch-1.1.15-32c318f.zigbee",
     "imageType": 47125,
     "manufacturerCode": 4417,
-    "sha512": "f90c54cf4cb3ebeb6a2575ca0fe99eb9cd1d63a2d1d562a4d2e747b7dcd364a828b3b89847b822abbee7a4cf1799beca4906717101a32d825f86bd0f72ca1585",
+    "sha512": "ef3db2f334622f1189a86d64f48e3eac146eebeae4a0494cc90bedca73752e9b5491fd752cc2ef9a69a676e411f89147457ae992346b6c716bd23aa5ce9bbad4",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3000_njgrxsrf",
@@ -14,13 +14,13 @@
     ]
   },
   {
-    "fileName": "tlc_switch-1.1.15-883f1fd-from_tuya.zigbee",
+    "fileName": "tlc_switch-1.1.15-32c318f-from_tuya.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 182450,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/SWITCH_CONNECT_4X2_3CH_TS0003/tlc_switch-1.1.15-883f1fd-from_tuya.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/SWITCH_CONNECT_4X2_3CH_TS0003/tlc_switch-1.1.15-32c318f-from_tuya.zigbee",
     "imageType": 54179,
     "manufacturerCode": 4417,
-    "sha512": "dd0ca80841a11edcafcd5b8ef5ea3e929b665667ed8a0ccec8433a79f92dbb1feba97a244b259bc96e8b7e298ed091bdca2bad738e90d3b5bed6bb0509b48646",
+    "sha512": "efef8d6bff842efa4b7a525d6c4fe54de6c6c0635da34fab6fd3a1f3e919d0d4ce79c92f52328d620b321648508c801be32b425b22f9bbaf236a2f7b7a92308a",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3000_njgrxsrf",

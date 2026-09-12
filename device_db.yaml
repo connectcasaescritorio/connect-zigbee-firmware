@@ -5573,7 +5573,7 @@ SWITCH_CONNECT_4X2_3CH_TS0003:
   alt_config_str: null
   build: true
   category: switch
-  config_str: njgrxsrf;TS0003-CC;IB1;IC4;SB5u;RC3;SB4u;RD2;SC1u;RC2;M;P0;
+  config_str: njgrxsrf;TS0003-CC;LB1;IC2;ID7;IC4;SB5u;RC3;SB7u;RD2;SB4u;RC0;M;P0;
   device_type: router
   firmware_image_type: 47125
   human_name: ConnectCasa 4x2 3ch

@@ -35,6 +35,39 @@ extern uint8_t switch_clusters_cnt;
 
 void switch_cluster_apply_mode(zigbee_switch_cluster *cluster, uint8_t mode);
 
+// ===== Scene feedback (ConnectCasa) =====
+// When a key is DETACHED (pure scene mode) and resolves a double, triple
+// or hold gesture, its blue LED blinks 6x confirming the scene fired.
+// After the blink, backlight logic is re-applied to the LEDs.
+#define SCENE_BLINK_TIMES     6
+#define SCENE_BLINK_ON_MS     150
+#define SCENE_BLINK_OFF_MS    150
+
+static hal_task_t scene_resync_task;
+static uint8_t    scene_resync_init = 0;
+
+static void scene_resync(void *arg) {
+    update_relay_clusters(); // re-applies backlight to all indicator LEDs
+}
+
+static void scene_feedback_blink(zigbee_switch_cluster *cluster) {
+    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED ||
+        cluster->indicator_led == NULL) {
+        return;
+    }
+    led_blink(cluster->indicator_led, SCENE_BLINK_ON_MS, SCENE_BLINK_OFF_MS,
+              SCENE_BLINK_TIMES);
+    if (!scene_resync_init) {
+        scene_resync_task.handler = scene_resync;
+        scene_resync_task.arg     = NULL;
+        hal_tasks_init(&scene_resync_task);
+        scene_resync_init = 1;
+    }
+    hal_tasks_schedule(&scene_resync_task,
+                       (SCENE_BLINK_ON_MS + SCENE_BLINK_OFF_MS) *
+                       SCENE_BLINK_TIMES + 300);
+}
+
 // ===== Reset ritual (anti-despareamento ConnectCasa) =====
 // The ONLY deliberate physical factory reset: 7 rapid presses on any key,
 // with the 7th press HELD until 10 seconds total. ESD glitches and painters
@@ -524,8 +557,10 @@ void switch_cluster_on_button_multi_press_end(zigbee_switch_cluster *cluster,
         }
         cluster->multistate_state = MULTISTATE_SINGLE;
     } else if (count == 2) {
+        scene_feedback_blink(cluster);
         cluster->multistate_state = MULTISTATE_DOUBLE;
     } else {
+        scene_feedback_blink(cluster);
         cluster->multistate_state = MULTISTATE_TRIPLE;
     }
     hal_zigbee_notify_attribute_changed(cluster->endpoint,

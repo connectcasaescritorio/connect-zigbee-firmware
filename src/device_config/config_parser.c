@@ -32,7 +32,8 @@ void peripherals_init(void);
 network_indicator_t network_indicator = {
     .leds                        = { NULL, NULL, NULL, NULL },
     .has_dedicated_led           = 0,
-    .manual_state_when_connected = 1,
+    .manual_state_when_connected = 0, // ConnectCasa: apagado quando
+                                      // conectado; pisca so no pareamento
 };
 
 led_t   leds[5];

@@ -106,3 +106,47 @@ def test_reset_ritual_needs_full_hold(product: Device):
     do_ritual(product, "A0", 6, 2000)
     product.step_time(RITUAL_HOLD_MS)
     assert product.status()["joined"] == str(HAL_ZIGBEE_NETWORK_JOINED)
+
+
+# ============ Scene feedback: 6 piscadas na cena desacoplada ============
+
+ZCL_CLUSTER_ONOFF_SWITCH_CFG = 0x0007
+ATTR_RELAY_MODE = 0xFF01
+ATTR_MULTI_CLICK = 0xFF06
+RELAY_MODE_DETACHED = 0
+
+
+def _detach_with_multiclick(dev: Device, ep: int) -> None:
+    dev.write_zigbee_attr(ep, ZCL_CLUSTER_ONOFF_SWITCH_CFG,
+                          ATTR_RELAY_MODE, RELAY_MODE_DETACHED)
+    dev.write_zigbee_attr(ep, ZCL_CLUSTER_ONOFF_SWITCH_CFG,
+                          ATTR_MULTI_CLICK, 1)
+
+
+def test_scene_double_blinks_indicator_when_detached(product: Device):
+    _detach_with_multiclick(product, 1)
+    # Duplo clique na tecla 1 (A0); indicador dela = A4
+    product.click_button("A0")
+    product.step_time(100)
+    product.click_button("A0")
+    product.step_time(600)  # resolucao (janela 500)
+    # Durante a piscada, o LED deve estar alternando: amostrar alguns pontos
+    estados = []
+    for _ in range(6):
+        estados.append(product.get_gpio("A4", refresh=True))
+        product.step_time(150)
+    assert True in estados and False in estados, f"sem piscada: {estados}"
+    # Apos a piscada + resync, backlight tradicional volta (rele1 off -> A4 on)
+    product.step_time(2500)
+    assert product.get_gpio("A4", refresh=True) == True
+
+
+def test_scene_double_does_not_blink_when_attached(product: Device):
+    # Tecla acoplada (default press_start): duplo NAO pisca em modo multiclick OFF
+    product.click_button("A0")
+    product.step_time(100)
+    product.click_button("A0")
+    product.step_time(300)
+    # Rele alternou 2x (modo classico) e LED segue backlight sem rajada longa
+    product.step_time(2000)
+    assert product.get_gpio("A4", refresh=True) == True

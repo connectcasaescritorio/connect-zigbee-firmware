@@ -10,6 +10,7 @@
 #include "device_config/reset.h"
 #include "relay_cluster.h"
 #include "hal/nvm.h"
+#include "hal/printf_selector.h"
 #include "hal/tasks.h"
 #include <stddef.h>
 

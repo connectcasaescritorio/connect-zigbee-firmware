@@ -43,7 +43,25 @@ void process_device_type_change() {
     }
 }
 
+// ===== FAXINEIRO EMBUTIDO (1.1.15) =====
+// Primeiro boot pos-OTA: limpa TODA a NVM e reinicia com a config
+// baked oficial de fabrica. Trava NV_ITEM_JANITOR_DONE = execucao unica.
+#define NV_ITEM_JANITOR_DONE    98
+
 void app_init(void) {
+    uint8_t janitor_done = 0;
+    if (hal_nvm_read(NV_ITEM_JANITOR_DONE, sizeof(janitor_done),
+                     &janitor_done) != HAL_NVM_SUCCESS) {
+        printf("JANITOR 1.1.15: wiping ALL NVM\r\n");
+        hal_nvm_clear_all();
+        janitor_done = 1;
+        hal_nvm_write(NV_ITEM_JANITOR_DONE, sizeof(janitor_done),
+                      &janitor_done);
+        hal_factory_reset();
+        hal_system_reset();
+        return;
+    }
+
     handle_version_changes();
     parse_config(); // Does most of the setup, including all callbacks
                     // registration

@@ -32,6 +32,8 @@ extern network_indicator_t network_indicator;
 void basic_cluster_store_attrs_to_nv();
 void basic_cluster_load_attrs_from_nv();
 
+static uint8_t g_factory_wipe = 0;
+
 void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     basic_cluster_store_attrs_to_nv();
     if (attribute_id == ZCL_ATTR_BASIC_DEVICE_CONFIG) {
@@ -49,6 +51,13 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     if (attribute_id == ZCL_ATTR_BASIC_BACKLIGHT_MODE) {
         device_params_set_backlight_mode(g_backlight_mode);
         update_relay_clusters(); // re-aplica o backlight nos LEDs
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_FACTORY_WIPE) {
+        if (g_factory_wipe == FACTORY_WIPE_MAGIC) {
+            printf("FACTORY WIPE via Zigbee: full NVM clean\r\n");
+            schedule_full_reset(500);
+        }
+        g_factory_wipe = 0;
     }
 }
 
@@ -93,14 +102,16 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, g_multi_press_reset_count);
     SETUP_ATTR(13, ZCL_ATTR_BASIC_BACKLIGHT_MODE, ZCL_DATA_TYPE_ENUM8,
                ATTR_WRITABLE, g_backlight_mode);
+    SETUP_ATTR(14, ZCL_ATTR_BASIC_FACTORY_WIPE, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_factory_wipe);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(14, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(15, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 15 : 14;
+        network_indicator.has_dedicated_led ? 16 : 15;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

@@ -45,6 +45,8 @@
 #define ZCL_ATTR_BASIC_STATUS_LED_STATE           0xff01
 #define ZCL_ATTR_BASIC_MULTI_PRESS_RESET_COUNT    0xff02
 #define ZCL_ATTR_BASIC_BACKLIGHT_MODE             0xff03
+#define ZCL_ATTR_BASIC_FACTORY_WIPE               0xff04
+#define FACTORY_WIPE_MAGIC                        90
 
 // Power Configuration cluster
 

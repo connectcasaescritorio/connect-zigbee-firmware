@@ -43,25 +43,7 @@ void process_device_type_change() {
     }
 }
 
-// ===== BUILD FAXINEIRO 1.1.13 (temporario) =====
-// Primeiro boot: limpa TODA a NVM (configs, rede, tudo) e reinicia.
-// A trava NV_ITEM_JANITOR_DONE garante execucao unica (sem loop).
-#define NV_ITEM_JANITOR_DONE    99
-
 void app_init(void) {
-    uint8_t janitor_done = 0;
-    if (hal_nvm_read(NV_ITEM_JANITOR_DONE, sizeof(janitor_done),
-                     &janitor_done) != HAL_NVM_SUCCESS) {
-        printf("JANITOR: wiping ALL NVM to factory state\r\n");
-        hal_nvm_clear_all();
-        janitor_done = 1;
-        hal_nvm_write(NV_ITEM_JANITOR_DONE, sizeof(janitor_done),
-                      &janitor_done);
-        hal_factory_reset();
-        hal_system_reset();
-        return;
-    }
-
     handle_version_changes();
     parse_config(); // Does most of the setup, including all callbacks
                     // registration

@@ -34,6 +34,13 @@ void basic_cluster_store_attrs_to_nv();
 void basic_cluster_load_attrs_from_nv();
 
 static uint8_t g_factory_wipe = 0;
+static uint8_t g_bridge_state_attr = 0;
+static uint16_t g_bridge_rx_attr = 0;
+
+void basic_cluster_update_bridge_diag(uint8_t state, uint16_t rx_frames) {
+    g_bridge_state_attr = state;
+    g_bridge_rx_attr = rx_frames;
+}
 
 void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     basic_cluster_store_attrs_to_nv();
@@ -105,14 +112,18 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, g_backlight_mode);
     SETUP_ATTR(14, ZCL_ATTR_BASIC_FACTORY_WIPE, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_factory_wipe);
+    SETUP_ATTR(15, ZCL_ATTR_BASIC_BRIDGE_STATE, ZCL_DATA_TYPE_UINT8,
+               0, g_bridge_state_attr);
+    SETUP_ATTR(16, ZCL_ATTR_BASIC_BRIDGE_RX_FRAMES, ZCL_DATA_TYPE_UINT16,
+               0, g_bridge_rx_attr);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(15, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(17, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 16 : 15;
+        network_indicator.has_dedicated_led ? 18 : 17;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

@@ -7,6 +7,7 @@
 static bridge_tx_t    g_tx = 0;
 static bridge_dp_cb_t g_on_dp = 0;
 static bridge_state_t g_state = BR_ST_BOOT;
+static uint16_t g_rx_frames = 0;
 static uint16_t g_tick = 0;
 static uint16_t g_last_hb_tick = 0;
 static char g_product[96];
@@ -18,7 +19,17 @@ static void send_cmd(uint8_t cmd, const uint8_t *data, uint16_t len) {
 }
 
 static void on_frame(const tuya_frame_t *f) {
+    g_rx_frames++;
     switch (f->command) {
+    case TUYA_CMD_RESET:
+    case 0x05: {
+        // MCU pediu reset/pareamento (segurar 5s). Politica ConnectCasa:
+        // ACK diplomatico + reafirmar "conectado" — o radio NAO despareia.
+        send_cmd(f->command, 0, 0);
+        uint8_t st = 0x04;
+        send_cmd(TUYA_CMD_WIFI_STATE, &st, 1);
+        break;
+    }
     case TUYA_CMD_HEARTBEAT:
         if (g_state == BR_ST_WAIT_HEARTBEAT) {
             g_state = BR_ST_WAIT_PRODUCT;
@@ -100,6 +111,7 @@ void bridge_tick_100ms(void) {
 }
 
 bridge_state_t bridge_state(void) { return g_state; }
+uint16_t bridge_rx_frame_count(void) { return g_rx_frames; }
 const char *bridge_product_info(void) { return g_product; }
 
 void bridge_set_dp_bool(uint8_t dp_id, uint8_t value) {

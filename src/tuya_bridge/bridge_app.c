@@ -5,6 +5,7 @@
 #include "hal/printf_selector.h"
 #include "zigbee/relay_cluster.h"
 #include "zigbee/switch_cluster.h"
+#include "zigbee/basic_cluster.h"
 
 // ============================================================
 // ConnectCasa tuya_mcu_bridge - aplicacao da ponte
@@ -50,6 +51,8 @@ static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {
 
 static void tick(void *arg) {
     bridge_tick_100ms();
+    basic_cluster_update_bridge_diag((uint8_t)bridge_state(),
+                                     bridge_rx_frame_count());
     hal_tasks_schedule(&g_tick_task, 100);
 }
 

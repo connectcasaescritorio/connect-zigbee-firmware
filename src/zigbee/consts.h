@@ -47,6 +47,8 @@
 #define ZCL_ATTR_BASIC_BACKLIGHT_MODE             0xff03
 #define ZCL_ATTR_BASIC_FACTORY_WIPE               0xff04
 #define FACTORY_WIPE_MAGIC                        90
+#define ZCL_ATTR_BASIC_BRIDGE_STATE               0xff05
+#define ZCL_ATTR_BASIC_BRIDGE_RX_FRAMES           0xff06
 
 // Power Configuration cluster
 

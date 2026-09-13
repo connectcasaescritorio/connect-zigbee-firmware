@@ -30,6 +30,7 @@ void bridge_rx(const uint8_t *bytes, uint16_t len);
 void bridge_tick_100ms(void);
 
 bridge_state_t bridge_state(void);
+uint16_t bridge_rx_frame_count(void);
 const char *bridge_product_info(void);  // JSON da MCU (apos handshake)
 
 // Comandos de saida (ponte -> MCU)

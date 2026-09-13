@@ -62,6 +62,19 @@ int main(void) {
     for (int i = 0; i < 151; i++) bridge_tick_100ms();
     assert(mcu_rx_len > 0 && mcu_rx[3] == TUYA_CMD_HEARTBEAT);
 
-    printf("bridge_core: 7/7 cenarios OK (handshake completo + DPs + heartbeat)\n");
+    // MCU pede RESET (segurar 5s) -> ponte ACKa e reafirma conectado
+    mcu_rx_len = 0;
+    mcu_reply(0x04, 0, 0);
+    assert(mcu_rx[3] == 0x04);              // ACK do reset
+    assert(mcu_rx_len > 8);                  // + segundo frame
+    // segundo frame: wifi_state=4
+    int f2 = -1;
+    for (int i = 6; i < mcu_rx_len - 1; i++) {
+        if (mcu_rx[i] == 0x55 && mcu_rx[i+1] == 0xAA) { f2 = i; break; }
+    }
+    assert(f2 > 0);
+    assert(mcu_rx[f2+3] == 0x03 && mcu_rx[f2+6] == 0x04);
+
+    printf("bridge_core: 8/8 cenarios OK (handshake + DPs + heartbeat + reset diplomatico)\n");
     return 0;
 }

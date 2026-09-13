@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.2.3-be6c728-forced.zigbee",
+    "fileName": "tlc_switch-1.2.4-cce42cd-forced.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 185986,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.2.3-be6c728-forced.zigbee",
+    "fileSize": 186194,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.2.4-cce42cd-forced.zigbee",
     "imageType": 47150,
     "manufacturerCode": 4417,
-    "sha512": "e5bf193a148786c21c4524055f5ee1fffe1f0fbcade2d63e67f564c987a6a4923f127d46cb4ead125ec77c953bf31b697fa5a744b7e439ebdf096a5ae08cd506",
+    "sha512": "3d4e53649c6052158e7870fb11d9b5935043b2fb797eedae39170a88569e6af8b25a6ebb27266ea32ef57732e7e0fbd2f07760ea9ae6cec083bfc6caa6187ddd",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZE284_3kjidznp",

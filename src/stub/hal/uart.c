@@ -24,3 +24,6 @@ void stub_uart_inject_rx(const uint8_t *bytes, uint16_t len) {
 }
 
 void hal_uart_process(void) {}
+
+unsigned short hal_uart_tx_hw_count(void) { return 0; }
+unsigned short hal_uart_tx_fb_count(void) { return 0; }

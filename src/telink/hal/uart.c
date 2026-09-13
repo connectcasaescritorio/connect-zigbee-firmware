@@ -57,15 +57,39 @@ static void tx_byte_bitbang(uint8_t b) {
     irq_restore(r);
 }
 
-static u8 g_hw_tx_buf[192] __attribute__((aligned(4)));
+// TX direto no periferico com buffer ESTATICO (formato DMA do 8258:
+// 4 bytes de tamanho LE + dados). Sem alocador do stack, sem estado
+// do driver — o caminho mais curto entre nos e a MCU.
+static u8 g_hw_tx_buf[196] __attribute__((aligned(4)));
+static u16 g_tx_hw_count = 0;
+static u16 g_tx_fb_count = 0;
+
+u16 hal_uart_tx_hw_count(void) { return g_tx_hw_count; }
+u16 hal_uart_tx_fb_count(void) { return g_tx_fb_count; }
 
 void hal_uart_send(const uint8_t *bytes, uint16_t len) {
-    // 115200 exige precisao de hardware; bit-bang fica de reserva
-    if (len > sizeof(g_hw_tx_buf)) return;
-    memcpy(g_hw_tx_buf, bytes, len);
-    if (!drv_uart_tx_start(g_hw_tx_buf, len)) {
-        for (uint16_t i = 0; i < len; i++) tx_byte_bitbang(bytes[i]);
+    if (len > sizeof(g_hw_tx_buf) - 4) return;
+
+    // Espera a transmissao anterior terminar (timeout ~20ms)
+    u32 guard = 0;
+    while (uart_tx_is_busy() && guard < 20000) {
+        sleep_us(1);
+        guard++;
     }
+    if (uart_tx_is_busy()) {
+        // Periferico travado: fallback bit-bang (timing 9600 apenas)
+        g_tx_fb_count++;
+        for (uint16_t i = 0; i < len; i++) tx_byte_bitbang(bytes[i]);
+        return;
+    }
+
+    g_hw_tx_buf[0] = (u8)(len);
+    g_hw_tx_buf[1] = (u8)(len >> 8);
+    g_hw_tx_buf[2] = 0;
+    g_hw_tx_buf[3] = 0;
+    memcpy(g_hw_tx_buf + 4, bytes, len);
+    uart_dma_send(g_hw_tx_buf);
+    g_tx_hw_count++;
 }
 
 void hal_uart_process(void) {

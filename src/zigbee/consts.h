@@ -51,6 +51,7 @@
 #define ZCL_ATTR_BASIC_BRIDGE_RX_FRAMES           0xff06
 #define ZCL_ATTR_BASIC_BRIDGE_LAST_CMD            0xff07
 #define ZCL_ATTR_BASIC_BRIDGE_LAST_FRAME          0xff08
+#define ZCL_ATTR_BASIC_BRIDGE_TX_COUNTS           0xff09
 
 // Power Configuration cluster
 

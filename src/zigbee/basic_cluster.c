@@ -39,6 +39,12 @@ static uint16_t g_bridge_rx_attr = 0;
 static uint8_t g_bridge_last_cmd_attr = 0;
 static uint8_t g_bridge_frame_pascal[66];
 
+static uint16_t g_bridge_tx_counts = 0;
+
+void basic_cluster_update_bridge_tx(uint16_t counts) {
+    g_bridge_tx_counts = counts;
+}
+
 void basic_cluster_update_bridge_frame(const char *hex) {
     uint8_t n = 0;
     while (hex[n] && n < 64) {
@@ -135,14 +141,16 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                0, g_bridge_last_cmd_attr);
     SETUP_ATTR(18, ZCL_ATTR_BASIC_BRIDGE_LAST_FRAME, ZCL_DATA_TYPE_CHAR_STR,
                0, g_bridge_frame_pascal);
+    SETUP_ATTR(19, ZCL_ATTR_BASIC_BRIDGE_TX_COUNTS, ZCL_DATA_TYPE_UINT16,
+               0, g_bridge_tx_counts);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(19, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(20, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 20 : 19;
+        network_indicator.has_dedicated_led ? 21 : 20;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

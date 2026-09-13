@@ -40,7 +40,7 @@ static uint8_t g_suppress_dp_tx = 0;  // evita eco DP<->cluster
 static hal_task_t g_tick_task;
 
 // Auto-baud: cicla as velocidades Tuya ate o handshake fechar
-static const uint32_t BAUDS[] = {9600, 115200};
+static const uint32_t BAUDS[] = {115200, 9600}; // spec: 115200 fixo
 static uint8_t g_baud_idx = 0;
 static uint16_t g_ticks_in_state = 0;
 #define BAUD_SWITCH_TICKS 40   // 4s sem handshake -> proxima velocidade

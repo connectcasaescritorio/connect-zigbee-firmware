@@ -3,9 +3,9 @@
 
 static tuya_frame_cb_t g_on_frame = 0;
 
-// Maquina de estados do parser
 static enum {
-    ST_H1, ST_H2, ST_VER, ST_CMD, ST_LEN_HI, ST_LEN_LO, ST_DATA, ST_CHK
+    ST_H1, ST_H2, ST_VER, ST_SEQ_HI, ST_SEQ_LO, ST_CMD,
+    ST_LEN_HI, ST_LEN_LO, ST_DATA, ST_CHK
 } g_state = ST_H1;
 
 static tuya_frame_t g_frame;
@@ -15,6 +15,8 @@ static uint8_t  g_sum = 0;
 void tuya_serial_init(tuya_frame_cb_t on_frame) {
     g_on_frame = on_frame;
     g_state = ST_H1;
+    g_data_pos = 0;
+    g_sum = 0;
 }
 
 static void reset_parser(void) {
@@ -35,7 +37,13 @@ void tuya_serial_feed(const uint8_t *bytes, uint16_t len) {
             else reset_parser();
             break;
         case ST_VER:
-            g_frame.version = b; g_sum += b; g_state = ST_CMD;
+            g_frame.version = b; g_sum += b; g_state = ST_SEQ_HI;
+            break;
+        case ST_SEQ_HI:
+            g_frame.seq = ((uint16_t)b) << 8; g_sum += b; g_state = ST_SEQ_LO;
+            break;
+        case ST_SEQ_LO:
+            g_frame.seq |= b; g_sum += b; g_state = ST_CMD;
             break;
         case ST_CMD:
             g_frame.command = b; g_sum += b; g_state = ST_LEN_HI;
@@ -64,12 +72,14 @@ void tuya_serial_feed(const uint8_t *bytes, uint16_t len) {
     }
 }
 
-uint16_t tuya_serial_build(uint8_t *out, uint8_t version, uint8_t command,
+uint16_t tuya_serial_build(uint8_t *out, uint16_t seq, uint8_t command,
                            const uint8_t *data, uint16_t data_len) {
     uint16_t n = 0;
     out[n++] = 0x55;
     out[n++] = 0xAA;
-    out[n++] = version;
+    out[n++] = TUYA_ZB_VER;
+    out[n++] = (uint8_t)(seq >> 8);
+    out[n++] = (uint8_t)(seq & 0xFF);
     out[n++] = command;
     out[n++] = (uint8_t)(data_len >> 8);
     out[n++] = (uint8_t)(data_len & 0xFF);
@@ -80,25 +90,9 @@ uint16_t tuya_serial_build(uint8_t *out, uint8_t version, uint8_t command,
     return n;
 }
 
-uint16_t tuya_serial_build_dp_bool(uint8_t *out, uint8_t dp_id, uint8_t value) {
-    uint8_t d[5] = {dp_id, TUYA_DP_TYPE_BOOL, 0x00, 0x01, value ? 1 : 0};
-    return tuya_serial_build(out, 0x00, TUYA_CMD_DP_CMD, d, 5);
-}
-
-uint16_t tuya_serial_build_dp_enum(uint8_t *out, uint8_t dp_id, uint8_t value) {
-    uint8_t d[5] = {dp_id, TUYA_DP_TYPE_ENUM, 0x00, 0x01, value};
-    return tuya_serial_build(out, 0x00, TUYA_CMD_DP_CMD, d, 5);
-}
-
-uint16_t tuya_serial_build_dp_value(uint8_t *out, uint8_t dp_id, uint32_t value) {
-    uint8_t d[8] = {dp_id, TUYA_DP_TYPE_VALUE, 0x00, 0x04,
-                    (uint8_t)(value >> 24), (uint8_t)(value >> 16),
-                    (uint8_t)(value >> 8), (uint8_t)(value)};
-    return tuya_serial_build(out, 0x00, TUYA_CMD_DP_CMD, d, 8);
-}
-
-int tuya_dp_next(const tuya_frame_t *frame, uint16_t *offset, tuya_dp_t *dp) {
-    uint16_t off = *offset;
+int tuya_dp_next_from(const tuya_frame_t *frame, uint16_t start_offset,
+                      uint16_t *offset, tuya_dp_t *dp) {
+    uint16_t off = (*offset < start_offset) ? start_offset : *offset;
     if (off + 4 > frame->data_len) return 0;
     dp->id   = frame->data[off];
     dp->type = frame->data[off + 1];

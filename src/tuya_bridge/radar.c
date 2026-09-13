@@ -23,8 +23,10 @@ static const radar_pin_t CAND[] = {
 };
 #define NCAND (sizeof(CAND)/sizeof(CAND[0]))
 
-static const u8 HEARTBEAT[] = {0x55, 0xAA, 0x00, 0x00, 0x00, 0x00, 0xFF};
-#define BIT_US 104  // 9600
+// Product query v0x02 seq=1: 55 AA 02 00 01 01 00 00 chk(=0x03... calc)
+static const u8 HEARTBEAT[] = {0x55, 0xAA, 0x02, 0x00, 0x01, 0x01,
+                               0x00, 0x00, 0x03};
+#define BIT_US 104  // 9600 na sonda (bit-bang preciso; 115200 fica p/ ponte)
 
 static u8 g_tx_idx = 0;
 static u8 g_found = 0;

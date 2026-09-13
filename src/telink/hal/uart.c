@@ -1,6 +1,7 @@
 #include "hal/uart.h"
 #include "tl_common.h"
 #include "drivers/drv_uart.h"
+#include <string.h>
 
 // ============================================================
 // UART hibrida ConnectCasa (TLSR8258/ZTU):
@@ -53,9 +54,14 @@ static void tx_byte_bitbang(uint8_t b) {
     irq_restore(r);
 }
 
+static u8 g_hw_tx_buf[192] __attribute__((aligned(4)));
+
 void hal_uart_send(const uint8_t *bytes, uint16_t len) {
-    for (uint16_t i = 0; i < len; i++) {
-        tx_byte_bitbang(bytes[i]);
+    // 115200 exige precisao de hardware; bit-bang fica de reserva
+    if (len > sizeof(g_hw_tx_buf)) return;
+    memcpy(g_hw_tx_buf, bytes, len);
+    if (!drv_uart_tx_start(g_hw_tx_buf, len)) {
+        for (uint16_t i = 0; i < len; i++) tx_byte_bitbang(bytes[i]);
     }
 }
 

@@ -59,8 +59,13 @@ int main(void) {
     mcu_rx_len = 0;
     bridge_set_dp_bool(25, 1);
     bridge_tick_100ms();
-    assert(mcu_rx[5]==0x08 && mcu_rx[8]==25 && mcu_rx[9]==0x01 && mcu_rx[12]==1);
-    printf("5. DP command (0x08) OK\n");
+    // Poliglota: primeiro 0x06, depois 0x08, mesmo payload DP
+    assert(mcu_rx[5]==0x06 && mcu_rx[8]==25 && mcu_rx[12]==1);
+    int g2 = -1;
+    for (int i = 13; i < mcu_rx_len - 1; i++)
+        if (mcu_rx[i]==0x55 && mcu_rx[i+1]==0xAA) { g2 = i; break; }
+    assert(g2 > 0 && mcu_rx[g2+5]==0x08 && mcu_rx[g2+8]==25);
+    printf("5. DP command poliglota (0x06+0x08) OK\n");
 
     // Reset 5s da MCU (0x03 data 1): ACK diplomatico + status conectado
     mcu_rx_len = 0;
@@ -80,6 +85,16 @@ int main(void) {
     assert(dps == 3 && last_dp.id == 26);
     printf("7. DP com endereco (tolerancia) OK\n");
 
-    printf("bridge v2: 7/7 no dialeto Zigbee oficial\n");
+    // MCU real: reporta DP em 0x06 -> parse + ACK 0x06 mesma seq
+    bridge_tick_100ms();  // drena ACK pendente do teste 7
+    mcu_rx_len = 0;
+    uint8_t rep06[] = {24, 0x01, 0x00, 0x01, 0x00};
+    mcu_reply(13, 0x06, rep06, sizeof(rep06));
+    bridge_tick_100ms();
+    assert(dps == 4 && last_dp.id == 24);
+    assert(mcu_rx[5]==0x06 && mcu_rx[4]==13);
+    printf("8. report em 0x06 (dialeto real) OK\n");
+
+    printf("bridge v2: 8/8 poliglota\n");
     return 0;
 }

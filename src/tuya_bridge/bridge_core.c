@@ -96,15 +96,23 @@ static void on_frame(const tuya_frame_t *f) {
         assert_connected();
         break;
     }
+    case 0x05:
+    case 0x06:
+    case TUYA_CMD_SYNC_NOTIFY:
     case TUYA_CMD_DP_REPORT: {
-        // ACK obrigatorio (mesma seq, resultado 0x00)
-        uint8_t ok = 0x00;
-        send_cmd_seq(f->seq, TUYA_CMD_DP_REPORT, &ok, 1);
-        parse_dp_frame(f);
+        // Poliglota: a MCU real usa 0x06 para reports (estilo classico).
+        // Qualquer verbo de DP: ACK no MESMO verbo/seq + parse tolerante.
+        if (f->data_len >= 4) {
+            uint8_t ok = 0x00;
+            send_cmd_seq(f->seq, f->command, &ok, 1);
+            parse_dp_frame(f);
+            // Ela fala: aproveita a atencao e corteja de novo
+            if (g_state < BR_ST_OPERATIONAL) {
+                send_cmd(TUYA_CMD_PRODUCT_QUERY, 0, 0);
+            }
+        }
         break;
     }
-    case TUYA_CMD_SYNC_NOTIFY:
-        break;  // ACK do sync
     default:
         break;
     }
@@ -174,6 +182,8 @@ static void queue_dp(uint8_t dp_id, uint8_t type,
     d[n++] = (uint8_t)(vlen >> 8);
     d[n++] = (uint8_t)(vlen & 0xFF);
     for (uint16_t i = 0; i < vlen; i++) d[n++] = val[i];
+    // Poliglota: manda nos dois verbos de comando (0x06 classico + 0x08 spec)
+    send_cmd(0x06, d, n);
     send_cmd(TUYA_CMD_DP_COMMAND, d, n);
 }
 

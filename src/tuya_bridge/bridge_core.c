@@ -96,9 +96,32 @@ static void parse_dp_frame(const tuya_frame_t *f) {
     }
 }
 
+static char g_last_hex[64];
+
+static void record_hex(const tuya_frame_t *f) {
+    static const char H[] = "0123456789ABCDEF";
+    uint16_t n = 0;
+    // ver seq cmd len + primeiros dados (ate caber)
+    uint8_t hdr[6] = {f->version, (uint8_t)(f->seq >> 8), (uint8_t)f->seq,
+                      f->command, (uint8_t)(f->data_len >> 8),
+                      (uint8_t)f->data_len};
+    for (uint8_t i = 0; i < 6 && n < sizeof(g_last_hex) - 3; i++) {
+        g_last_hex[n++] = H[hdr[i] >> 4];
+        g_last_hex[n++] = H[hdr[i] & 0xF];
+    }
+    for (uint16_t i = 0; i < f->data_len && n < sizeof(g_last_hex) - 3; i++) {
+        g_last_hex[n++] = H[f->data[i] >> 4];
+        g_last_hex[n++] = H[f->data[i] & 0xF];
+    }
+    g_last_hex[n] = 0;
+}
+
+const char *bridge_last_frame_hex(void) { return g_last_hex; }
+
 static void on_frame(const tuya_frame_t *f) {
     g_rx_frames++;
     g_last_rx_cmd = f->command;
+    record_hex(f);
     switch (f->command) {
     case 0x00:
         // Heartbeat respondido (dialeto classico): emenda o produto

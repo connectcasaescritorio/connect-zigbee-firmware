@@ -81,6 +81,7 @@ static void tick(void *arg) {
         (uint8_t)((g_baud_idx << 4) | (uint8_t)bridge_state()),
         bridge_rx_frame_count());
     basic_cluster_update_bridge_last_cmd(bridge_last_rx_cmd());
+    basic_cluster_update_bridge_frame(bridge_last_frame_hex());
     hal_tasks_schedule(&g_tick_task, 100);
 }
 

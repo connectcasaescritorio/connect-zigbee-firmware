@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.4.5-23d22e9.zigbee",
-    "fileVersion": 335884288,
+    "fileName": "tlc_switch-1.4.6-6691f86.zigbee",
+    "fileVersion": 335949824,
     "fileSize": 188690,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.4.5-23d22e9.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.4.6-6691f86.zigbee",
     "imageType": 47150,
     "manufacturerCode": 4417,
-    "sha512": "453122bd3c2c9352948bd8cd6ffc7c4c882c1e66bcd09b9e9a478d1436bc3c033ddd77d589960be217e20bc0ae50a0c17c7a67be078faa6fbabac354dda1f08f",
+    "sha512": "d23076c3becf65f25ee7f91b5c265f45367b3afaf447772d99264dab9e35db24b462a2d6114e12258525a75651ec268b1673a1e80cb4411c6020af8d871394b7",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZE284_3kjidznp",
@@ -14,13 +14,13 @@
     ]
   },
   {
-    "fileName": "tlc_switch-1.4.5-23d22e9-from_tuya.zigbee",
+    "fileName": "tlc_switch-1.4.6-6691f86-from_tuya.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 188690,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.4.5-23d22e9-from_tuya.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.4.6-6691f86-from_tuya.zigbee",
     "imageType": 54179,
     "manufacturerCode": 4417,
-    "sha512": "eb00a80f2615bfdcd00f8d63657abf5803b106b1f6625f38efb0e30fd37f51b1852cc9596da2be2061e0c9c7c5017437b376e030a04a1cdfa7857bff68b520e0",
+    "sha512": "d4c61ada184bbf3dc17a27e15b99d7108abdfc25507d95b09de0bc50d1d872bb8e886a594c070ba6e4cd3d45ee7f4b2ce9b034193d16054da8fc9c2839951b37",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZE284_3kjidznp",

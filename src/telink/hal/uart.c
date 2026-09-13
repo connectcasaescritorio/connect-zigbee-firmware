@@ -14,10 +14,10 @@
 #define BRIDGE_TX_PIN   GPIO_PB1
 
 static hal_uart_rx_cb_t g_rx_cb = 0;
-// Buffer PEQUENO de proposito: no 8258 a IRQ de DMA RX dispara ao ENCHER
-// o buffer. 16 bytes = chunks de ~12 = latencia ~1ms @115200 (streaming).
-// O parser e byte-a-byte; alinhamento de frame e irrelevante.
-static u8 g_rx_dma_buf[16] __attribute__((aligned(4)));
+// 8258: a DMA RX entrega PACOTES inteiros (disparo por fim de recepcao)
+// e o buffer precisa caber o maior pacote. 144 e o tamanho correto.
+// (16 causou overflow em todo frame — regressao da 1.4.5, revertida.)
+static u8 g_rx_dma_buf[144] __attribute__((aligned(4)));
 static u32 g_bit_us = 104;  // 9600 -> ~104us por bit
 
 static void uart_rx_irq_handler_cb(void) {

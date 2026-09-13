@@ -196,3 +196,32 @@ def test_backlight_desligado_led_termina_apagado(product: Device):
     assert _saw_blink(product, "A4")
     product.step_time(2500)  # resync
     assert product.get_gpio("A4", refresh=True) == False, "deve terminar apagado"
+
+
+# ============ Lei de linha: ritual so existe com P0 ============
+
+MODULE_CFG = "A;B;BC2u;LD2i;SA0u;RB0;SA1u;RB1;"  # SEM P0 = linha modulo
+
+
+@pytest.fixture()
+def module():
+    with StubProc(device_config=MODULE_CFG) as proc:
+        yield Device(proc)
+
+
+def test_modulo_sem_ritual(module: Device):
+    from tests.test_network_join import HAL_ZIGBEE_NETWORK_JOINED
+    do_ritual(module, "A0", 6, RITUAL_HOLD_MS + 500)
+    assert module.status()["joined"] == str(HAL_ZIGBEE_NETWORK_JOINED), \
+        "modulo (sem P0) NAO pode ter o ritual"
+
+
+def test_modulo_reset_por_10_pulsos(module: Device):
+    from tests.test_network_join import HAL_ZIGBEE_NETWORK_JOINED
+    assert module.status()["joined"] == str(HAL_ZIGBEE_NETWORK_JOINED)
+    for _ in range(10):
+        module.click_button("A0")
+        module.step_time(100)
+    module.step_time(500)
+    assert module.status()["joined"] != str(HAL_ZIGBEE_NETWORK_JOINED), \
+        "modulo: 10 pulsos devem resetar (sem abrir a caixa)"

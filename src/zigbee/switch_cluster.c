@@ -6,6 +6,7 @@ extern network_indicator_t network_indicator;
 #include "cluster_common.h"
 #include "consts.h"
 #include "device_config/nvm_items.h"
+#include "device_config/device_params_nv.h"
 #include "hal/nvm.h"
 
 #include "hal/printf_selector.h"
@@ -485,7 +486,11 @@ void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
         scene_feedback_blink(cluster);
     }
 
-    if (cluster->button->multi_press_cnt >= RESET_RITUAL_PRESSES) {
+    // Reset ritual is the physical reset of the TOUCH line (P0 products:
+    // instant pulse-reset disabled at factory). MODULE line keeps the
+    // classic pulse-reset instead and must NOT have the ritual.
+    if (g_multi_press_reset_count == 0 &&
+        cluster->button->multi_press_cnt >= RESET_RITUAL_PRESSES) {
         if (!reset_ritual_task_init) {
             reset_ritual_task.handler = reset_ritual_confirm;
             reset_ritual_task.arg     = NULL;

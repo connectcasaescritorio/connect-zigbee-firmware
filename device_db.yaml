@@ -3697,11 +3697,38 @@ SWITCH_BSEED_TOUCH_BACKLIGHT_TS0001:
   store: https://www.aliexpress.com/item/1005004187227246.html
   threads: https://github.com/romasku/tuya-zigbee-switch/discussions/221
   tuya_module: ZTU
+SWITCH_CONNECT_4X2_1CH_TS0001:
+  alt_config_str: null
+  build: true
+  category: switch
+  config_str: connect1;TS0001-CC;LB1;ID7;SB7u;RC3;M;P0;
+  device_type: router
+  firmware_image_type: 47135
+  human_name: ConnectCasa 4x2 1ch
+  info: Interruptor 4x2 1 canal ConnectCasa - pinout oficial de fabrica
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: fully_supported
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0001
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_PENDENTE
+  store: null
+  threads: null
+  tuya_module: ZT3L
+  
 SWITCH_CONNECT_4X2_TS0002:
   alt_config_str: null
   build: true
   category: switch
-  config_str: l9brjwau;TS0002-BSDB;IB1;IC4;SB5u;RC3;SB4u;RD2;M;P0;
+  config_str: l9brjwau;TS0002-BSDB;LB1;IC2;IC4;SB5u;RC3;SB4u;RD2;M;P0;
   device_type: router
   firmware_image_type: 43581
   human_name: ConnectCasa 4x2 2ch

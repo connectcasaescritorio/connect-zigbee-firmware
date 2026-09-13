@@ -37,14 +37,17 @@ void hal_uart_init(uint32_t baudrate, hal_uart_rx_cb_t rx_cb) {
     drv_uart_init(baudrate, g_rx_dma_buf, sizeof(g_rx_dma_buf),
                   uart_rx_irq_handler_cb);
 
-    // TX: retomar o PB1 como GPIO de saida, idle alto (linha UART)
+    // PB1 fica MUXADO NA UART (drv_uart_pin_set ja o plugou).
+    // NUNCA tomar o pino como GPIO aqui: isso desconecta o periferico
+    // e o DMA transmite para o vacuo (o fantasma do TX das 1.2.4-1.4.7).
+}
+
+static void tx_byte_bitbang(uint8_t b) {
+    // Fallback raro: tomar o pino, transmitir, DEVOLVER ao periferico
     gpio_set_func(BRIDGE_TX_PIN, AS_GPIO);
     gpio_set_input_en(BRIDGE_TX_PIN, 0);
     gpio_set_output_en(BRIDGE_TX_PIN, 1);
     gpio_write(BRIDGE_TX_PIN, 1);
-}
-
-static void tx_byte_bitbang(uint8_t b) {
     u8 r = irq_disable();
     gpio_write(BRIDGE_TX_PIN, 0);            // start bit
     sleep_us(g_bit_us);
@@ -55,6 +58,8 @@ static void tx_byte_bitbang(uint8_t b) {
     gpio_write(BRIDGE_TX_PIN, 1);            // stop bit
     sleep_us(g_bit_us);
     irq_restore(r);
+    // Devolve o pino ao periferico UART
+    drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7);
 }
 
 // TX direto no periferico com buffer ESTATICO (formato DMA do 8258:

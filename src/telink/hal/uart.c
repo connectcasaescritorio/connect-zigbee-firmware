@@ -33,3 +33,7 @@ void hal_uart_send(const uint8_t *bytes, uint16_t len) {
     memcpy(g_tx_buf, bytes, len);
     drv_uart_tx_start(g_tx_buf, len);
 }
+
+void hal_uart_process(void) {
+    drv_uart_exceptionProcess();
+}

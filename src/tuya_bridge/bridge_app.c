@@ -56,6 +56,7 @@ static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {
 }
 
 static void tick(void *arg) {
+    hal_uart_process();
     bridge_tick_100ms();
 
     // Auto-baud: sem operacao apos 4s, tenta a proxima velocidade

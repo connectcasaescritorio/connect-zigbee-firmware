@@ -22,3 +22,5 @@ void hal_uart_send(const uint8_t *bytes, uint16_t len) {
 void stub_uart_inject_rx(const uint8_t *bytes, uint16_t len) {
     if (g_rx_cb) g_rx_cb(bytes, len);
 }
+
+void hal_uart_process(void) {}

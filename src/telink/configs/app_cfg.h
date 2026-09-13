@@ -16,7 +16,9 @@
 /* UART Configuration */
 #endif
 #define DEBUG_BAUDRATE       115200   /* UART baud rate */
-#define DEBUG_INFO_TX_PIN    GPIO_PB1 /* Debug output pin */
+/* ConnectCasa: debug NO PINO SWS (PA7) - pratica padrao Telink/pvvx.
+ * PB1 e TX de UART real na linha ponte (DP para MCU Tuya): jamais debug. */
+#define DEBUG_INFO_TX_PIN    GPIO_PA7 /* Debug output pin (SWS) */
 
 /* Power Management */
 #ifndef PM_ENABLE

@@ -36,6 +36,10 @@ SOURCES := \
 	$(SRC_DIR)/zigbee/poll_control_cluster.c \
 	$(SRC_DIR)/stub/main.c \
 	$(SRC_DIR)/stub/hal/gpio.c \
+	$(SRC_DIR)/stub/hal/uart.c \
+	$(SRC_DIR)/tuya_bridge/tuya_serial.c \
+	$(SRC_DIR)/tuya_bridge/bridge_core.c \
+	$(SRC_DIR)/tuya_bridge/bridge_app.c \
 	$(SRC_DIR)/stub/hal/system.c \
 	$(SRC_DIR)/stub/hal/timer.c \
 	$(SRC_DIR)/stub/hal/tasks.c \

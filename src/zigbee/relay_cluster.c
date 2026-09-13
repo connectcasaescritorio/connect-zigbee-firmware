@@ -26,6 +26,11 @@ hal_zigbee_cmd_result_t relay_cluster_level_callback_trampoline(uint8_t endpoint
                                                                 void *cmd_payload,
                                                                 uint16_t cmd_payload_len);
 
+static uint8_t relay_cluster_index_of(zigbee_relay_cluster *cluster) {
+    extern zigbee_relay_cluster relay_clusters[];
+    return (uint8_t)(cluster - relay_clusters);
+}
+
 void relay_cluster_on_relay_change(zigbee_relay_cluster *cluster,
                                    uint8_t state);
 void relay_cluster_on_write_attr(zigbee_relay_cluster *cluster,
@@ -185,12 +190,18 @@ void sync_indicator_led(zigbee_relay_cluster *cluster) {
                                         ZCL_ATTR_ONOFF_INDICATOR_STATE);
 }
 
+#include "tuya_bridge/bridge_app.h"
+
+static uint8_t relay_cluster_index_of(zigbee_relay_cluster *cluster);
+
 void relay_cluster_on(zigbee_relay_cluster *cluster) {
+    bridge_on_relay_change(relay_cluster_index_of(cluster), 1);
     relay_on(cluster->relay);
     sync_indicator_led(cluster);
 }
 
 void relay_cluster_off(zigbee_relay_cluster *cluster) {
+    bridge_on_relay_change(relay_cluster_index_of(cluster), 0);
     relay_off(cluster->relay);
     sync_indicator_led(cluster);
 }

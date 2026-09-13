@@ -5622,3 +5622,29 @@ SWITCH_CONNECT_4X2_3CH_TS0003:
   store: null
   threads: null
   tuya_module: ZT3L  
+BRIDGE_PAINEL_3CH_CENAS:
+  alt_config_str: null
+  build: true
+  category: switch
+  config_str: 3kjidznp;TS0601-BR;SB4u;RC1;SB5u;RD3;SC0u;RB6;M;P0;
+  device_type: router
+  firmware_image_type: 47150
+  human_name: Ponte Painel 3ch Cenas
+  info: Ponte ConnectCasa - painel 3 canais + 3 cenas (MCU Tuya via UART)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0601
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZE284_3kjidznp
+  store: null
+  threads: null
+  tuya_module: ZTU

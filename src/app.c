@@ -6,6 +6,8 @@
 #include "hal/printf_selector.h"
 #include "hal/system.h"
 #include "hal/zigbee.h"
+#include "tuya_bridge/bridge_app.h"
+#include "zigbee/basic_cluster.h"
 #include "hal/zigbee_ota.h"
 #include "zigbee/battery_cluster.h"
 #include "zigbee/general_commands.h"
@@ -45,7 +47,18 @@ void process_device_type_change() {
 
 void app_init(void) {
     handle_version_changes();
-    parse_config(); // Does most of the setup, including all callbacks
+    parse_config();
+
+    {
+        // Modo ponte Tuya: ativado quando o modelo termina em -BR
+        // (basic_cluster.modelId e pascal-string: [0]=len, [1..]=texto)
+        extern zigbee_basic_cluster basic_cluster;
+        uint8_t L = basic_cluster.modelId[0];
+        const char *mm = (const char *)&basic_cluster.modelId[1];
+        if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'B' && mm[L-1] == 'R') {
+            bridge_app_init();
+        }
+    } // Does most of the setup, including all callbacks
                     // registration
     hal_zigbee_init_ota();
     init_global_attr_write_callback();

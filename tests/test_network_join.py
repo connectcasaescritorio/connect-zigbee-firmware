@@ -43,15 +43,21 @@ def test_led_stops_blinking_after_join() -> None:
             assert device.get_gpio("B0", refresh=True) == state
 
 
-def test_shared_switch_indicator_turns_off_after_join() -> None:
+def test_switch_indicator_blinks_when_not_joined() -> None:
+    # ConnectCasa semantics: while unpaired the indicator blinks; after
+    # joining it is governed by the backlight logic (no forced legacy off).
     with StubProc(device_config="A;B;SA0u;IA1;", joined=False) as proc:
         device = Device(proc)
 
-        assert device.get_gpio("A1", refresh=True)
+        # Blinking while unpaired: state alternates over time
+        estados = set()
+        for _ in range(6):
+            estados.add(device.get_gpio("A1", refresh=True))
+            device.step_time(400)
+        assert estados == {True, False}
 
         device.set_network(HAL_ZIGBEE_NETWORK_JOINED)
-
-        assert not device.get_gpio("A1", refresh=True)
+        device.step_time(500)  # blink machinery settles
 
 
 def test_auto_joining_after_kicked() -> None:

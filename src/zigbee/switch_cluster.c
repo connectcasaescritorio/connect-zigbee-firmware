@@ -111,16 +111,10 @@ static bool switch_cluster_has_valid_relay(
 zigbee_switch_cluster *switch_cluster_by_endpoint[10];
 
 static void sync_switch_indicator_led(zigbee_switch_cluster *cluster) {
-    if (cluster->indicator_led == NULL) {
-        return;
-    }
-
-    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED &&
-        switch_cluster_has_valid_relay(cluster)) {
-        return;
-    }
-
-    led_off(cluster->indicator_led);
+    // ConnectCasa: the backlight logic (relay_cluster) governs ALL indicator
+    // LEDs, including detached keys. The legacy "detached = LED off" rule is
+    // retired; scene feedback blinks are the only switch-side LED action.
+    (void)cluster;
 }
 
 void update_switch_clusters() {
@@ -134,19 +128,9 @@ static bool switch_cluster_has_valid_relay(const zigbee_switch_cluster *cluster)
 }
 
 static void switch_cluster_flash_indicator(zigbee_switch_cluster *cluster) {
-    if (cluster->indicator_led == NULL) {
-        return;
-    }
-    // Skip flash when relay is attached — the relay toggle itself changes the
-    // indicator, and the blink would race with sync_indicator_led.
-    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED &&
-        switch_cluster_has_valid_relay(cluster)) {
-        return;
-    }
-    // Only flash when LED is idle (not in "not connected" forever-blink)
-    if (cluster->indicator_led->blink_times_left == 0) {
-        led_blink(cluster->indicator_led, 50, 50, 1);
-    }
+    // Retired (ConnectCasa): press-flash conflicted with backlight logic.
+    // Scene feedback (6x blink on double/triple/hold) replaced it.
+    (void)cluster;
 }
 
 void switch_cluster_store_attrs_to_nv(zigbee_switch_cluster *cluster);

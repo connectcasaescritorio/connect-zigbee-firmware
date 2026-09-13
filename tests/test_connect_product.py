@@ -108,7 +108,10 @@ def test_reset_ritual_needs_full_hold(product: Device):
     assert product.status()["joined"] == str(HAL_ZIGBEE_NETWORK_JOINED)
 
 
-# ============ Scene feedback: 6 piscadas na cena desacoplada ============
+# ============ Gesture feedback (regras finais ConnectCasa) ============
+# Cena (detached): single/double/triple/hold TODOS piscam.
+# Normal + multiclick: single = rele sem piscada; double/triple/hold piscam.
+# Pos-piscada: o LED termina no estado que o backlight mandar.
 
 ZCL_CLUSTER_ONOFF_SWITCH_CFG = 0x0007
 ATTR_RELAY_MODE = 0xFF01
@@ -116,37 +119,80 @@ ATTR_MULTI_CLICK = 0xFF06
 RELAY_MODE_DETACHED = 0
 
 
-def _detach_with_multiclick(dev: Device, ep: int) -> None:
+def _set_modes(dev: Device, ep: int, detached: bool, multiclick: bool) -> None:
+    if detached:
+        dev.write_zigbee_attr(ep, ZCL_CLUSTER_ONOFF_SWITCH_CFG,
+                              ATTR_RELAY_MODE, RELAY_MODE_DETACHED)
     dev.write_zigbee_attr(ep, ZCL_CLUSTER_ONOFF_SWITCH_CFG,
-                          ATTR_RELAY_MODE, RELAY_MODE_DETACHED)
-    dev.write_zigbee_attr(ep, ZCL_CLUSTER_ONOFF_SWITCH_CFG,
-                          ATTR_MULTI_CLICK, 1)
+                          ATTR_MULTI_CLICK, 1 if multiclick else 0)
 
 
-def test_scene_double_blinks_indicator_when_detached(product: Device):
-    _detach_with_multiclick(product, 1)
-    # Duplo clique na tecla 1 (A0); indicador dela = A4
+def _saw_blink(dev: Device, pin: str, samples: int = 6) -> bool:
+    estados = set()
+    for _ in range(samples):
+        estados.add(dev.get_gpio(pin, refresh=True))
+        dev.step_time(150)
+    return estados == {True, False}
+
+
+def test_cena_single_pisca(product: Device):
+    _set_modes(product, 1, detached=True, multiclick=True)
     product.click_button("A0")
-    product.step_time(100)
-    product.click_button("A0")
-    product.step_time(600)  # resolucao (janela 500)
-    # Durante a piscada, o LED deve estar alternando: amostrar alguns pontos
-    estados = []
-    for _ in range(6):
-        estados.append(product.get_gpio("A4", refresh=True))
-        product.step_time(150)
-    assert True in estados and False in estados, f"sem piscada: {estados}"
-    # Apos a piscada + resync, backlight tradicional volta (rele1 off -> A4 on)
+    product.step_time(450)
+    assert _saw_blink(product, "A4"), "single em cena deve piscar"
     product.step_time(2500)
-    assert product.get_gpio("A4", refresh=True) == True
+    assert product.get_gpio("A4", refresh=True) == True  # backlight ligado volta
 
 
-def test_scene_double_does_not_blink_when_attached(product: Device):
-    # Tecla acoplada (default press_start): duplo NAO pisca em modo multiclick OFF
+def test_cena_double_pisca(product: Device):
+    _set_modes(product, 1, detached=True, multiclick=True)
     product.click_button("A0")
     product.step_time(100)
     product.click_button("A0")
-    product.step_time(300)
-    # Rele alternou 2x (modo classico) e LED segue backlight sem rajada longa
-    product.step_time(2000)
-    assert product.get_gpio("A4", refresh=True) == True
+    product.step_time(450)
+    assert _saw_blink(product, "A4")
+
+
+def test_cena_hold_pisca(product: Device):
+    _set_modes(product, 1, detached=True, multiclick=True)
+    product.press_button("A0")
+    for _ in range(3):
+        product.step_time(500)
+    assert _saw_blink(product, "A4"), "hold em cena deve piscar"
+    product.release_button("A0")
+
+
+def test_normal_multiclick_single_NAO_pisca_e_liga_rele(product: Device):
+    _set_modes(product, 1, detached=False, multiclick=True)
+    product.click_button("A0")
+    product.step_time(450)  # resolucao 350
+    assert product.get_gpio("B0", refresh=True) == True, "rele deve ligar"
+    # LED segue o backlight tradicional (rele on -> A4 off), SEM rajada
+    estados = [product.get_gpio("A4", refresh=True)]
+    for _ in range(4):
+        product.step_time(200)
+        estados.append(product.get_gpio("A4", refresh=True))
+    assert all(e == False for e in estados), f"sem piscada no single normal: {estados}"
+
+
+def test_normal_multiclick_double_pisca_sem_rele(product: Device):
+    _set_modes(product, 1, detached=False, multiclick=True)
+    product.click_button("A0")
+    product.step_time(100)
+    product.click_button("A0")
+    product.step_time(450)
+    assert product.get_gpio("B0", refresh=True) == False, "double nao toca o rele"
+    assert _saw_blink(product, "A4")
+
+
+def test_backlight_desligado_led_termina_apagado(product: Device):
+    # Regra C: com backlight OFF, pisca e TERMINA apagado
+    product.write_zigbee_attr(1, 0x0000, 0xFF03, 0)  # backlight desligado
+    _set_modes(product, 1, detached=True, multiclick=True)
+    product.click_button("A0")
+    product.step_time(100)
+    product.click_button("A0")
+    product.step_time(450)
+    assert _saw_blink(product, "A4")
+    product.step_time(2500)  # resync
+    assert product.get_gpio("A4", refresh=True) == False, "deve terminar apagado"

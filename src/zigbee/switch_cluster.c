@@ -51,8 +51,7 @@ static void scene_resync(void *arg) {
 }
 
 static void scene_feedback_blink(zigbee_switch_cluster *cluster) {
-    if (cluster->relay_mode != ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED ||
-        cluster->indicator_led == NULL) {
+    if (cluster->indicator_led == NULL) {
         return;
     }
     led_blink(cluster->indicator_led, SCENE_BLINK_ON_MS, SCENE_BLINK_OFF_MS,
@@ -481,6 +480,11 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
 }
 
 void switch_cluster_on_button_long_press(zigbee_switch_cluster *cluster) {
+    // Gesture feedback: hold blinks in scene mode and in normal+multiclick
+    if (cluster->multi_click) {
+        scene_feedback_blink(cluster);
+    }
+
     if (cluster->button->multi_press_cnt >= RESET_RITUAL_PRESSES) {
         if (!reset_ritual_task_init) {
             reset_ritual_task.handler = reset_ritual_confirm;
@@ -529,6 +533,11 @@ void switch_cluster_on_button_multi_press_end(zigbee_switch_cluster *cluster,
     }
 
     if (count == 1) {
+        // Scene mode (detached): every resolved gesture blinks, including
+        // the single click. Normal mode: single acts on the relay silently.
+        if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_DETACHED) {
+            scene_feedback_blink(cluster);
+        }
         // The confirmed single click is the moment the relay/bindings act
         // (unless detached / long-only modes).
         if (cluster->relay_mode == ZCL_ONOFF_CONFIGURATION_RELAY_MODE_RISE ||

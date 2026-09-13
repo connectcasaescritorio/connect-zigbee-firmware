@@ -39,6 +39,12 @@ static uint8_t g_suppress_dp_tx = 0;  // evita eco DP<->cluster
 
 static hal_task_t g_tick_task;
 
+// Auto-baud: cicla as velocidades Tuya ate o handshake fechar
+static const uint32_t BAUDS[] = {9600, 115200};
+static uint8_t g_baud_idx = 0;
+static uint16_t g_ticks_in_state = 0;
+#define BAUD_SWITCH_TICKS 40   // 4s sem handshake -> proxima velocidade
+
 static void on_mcu_dp(const tuya_dp_t *dp);
 
 static void uart_rx(const uint8_t *bytes, uint16_t len) {
@@ -51,8 +57,25 @@ static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {
 
 static void tick(void *arg) {
     bridge_tick_100ms();
-    basic_cluster_update_bridge_diag((uint8_t)bridge_state(),
-                                     bridge_rx_frame_count());
+
+    // Auto-baud: sem operacao apos 4s, tenta a proxima velocidade
+    if (bridge_state() != BR_ST_OPERATIONAL) {
+        g_ticks_in_state++;
+        if (g_ticks_in_state >= BAUD_SWITCH_TICKS) {
+            g_ticks_in_state = 0;
+            g_baud_idx = (g_baud_idx + 1) % 2;
+            printf("bridge: auto-baud -> %d\r\n", (int)BAUDS[g_baud_idx]);
+            hal_uart_init(BAUDS[g_baud_idx], uart_rx);
+            bridge_init(bridge_uart_tx, on_mcu_dp);
+        }
+    } else {
+        g_ticks_in_state = 0;
+    }
+
+    // Diagnostico: nibble alto do estado = indice do baud atual
+    basic_cluster_update_bridge_diag(
+        (uint8_t)((g_baud_idx << 4) | (uint8_t)bridge_state()),
+        bridge_rx_frame_count());
     hal_tasks_schedule(&g_tick_task, 100);
 }
 

@@ -22,6 +22,12 @@ static uint16_t g_rx_frames = 0;
 static uint8_t g_last_rx_cmd = 0;
 static char g_product[96];
 
+// Formato aprendido dos reports dela (espelhado nos comandos)
+static uint8_t g_learned = 0;
+static uint8_t g_dp_verb = 0x06;
+static uint8_t g_dp_has_addr = 0;
+static uint8_t g_mcu_addr[2] = {0, 0};
+
 #define TXQ_SIZE 384
 static uint8_t g_txq[TXQ_SIZE];
 static uint16_t g_txq_len = 0;
@@ -52,26 +58,54 @@ static void assert_connected(void) {
     send_cmd(TUYA_CMD_NET_STATUS, &st, 1);
 }
 
-static void parse_dp_frame(const tuya_frame_t *f) {
-    // Tolerante: tenta DPs direto (offset 0) e pulando endereco (offset 2)
+static int dp_units_valid(const tuya_frame_t *f, uint16_t start) {
+    // Valida se a partir de start os DPs preenchem o frame exatamente
     uint16_t off = 0;
     tuya_dp_t dp;
-    uint16_t start = 0;
-    if (!tuya_dp_next_from(f, 0, &off, &dp) ||
-        (dp.type > TUYA_DP_TYPE_ENUM + 1)) {
-        off = 0;
-        start = 2;
-        if (!tuya_dp_next_from(f, 2, &off, &dp)) return;
+    uint16_t consumed = start;
+    while (tuya_dp_next_from(f, start, &off, &dp)) {
+        if (dp.type > 0x05) return 0;
+        consumed = off;
     }
-    do {
+    return consumed == f->data_len && consumed > start;
+}
+
+static void parse_dp_frame(const tuya_frame_t *f) {
+    // Aprende o formato: DPs direto (0) ou com endereco 2B (2)?
+    uint16_t start;
+    if (dp_units_valid(f, 0)) {
+        start = 0;
+    } else if (dp_units_valid(f, 2)) {
+        start = 2;
+    } else {
+        return;
+    }
+    // Registra o dialeto dela para espelhar nos comandos
+    g_dp_verb = f->command;
+    g_dp_has_addr = (start == 2);
+    if (g_dp_has_addr) {
+        g_mcu_addr[0] = f->data[0];
+        g_mcu_addr[1] = f->data[1];
+    }
+    g_learned = 1;
+
+    uint16_t off = 0;
+    tuya_dp_t dp;
+    while (tuya_dp_next_from(f, start, &off, &dp)) {
         if (g_on_dp) g_on_dp(&dp);
-    } while (tuya_dp_next_from(f, start, &off, &dp));
+    }
 }
 
 static void on_frame(const tuya_frame_t *f) {
     g_rx_frames++;
     g_last_rx_cmd = f->command;
     switch (f->command) {
+    case 0x00:
+        // Heartbeat respondido (dialeto classico): emenda o produto
+        if (g_state < BR_ST_OPERATIONAL) {
+            send_cmd(TUYA_CMD_PRODUCT_QUERY, 0, 0);
+        }
+        break;
     case TUYA_CMD_PRODUCT_QUERY: {
         uint16_t n = f->data_len < sizeof(g_product) - 1
                    ? f->data_len : sizeof(g_product) - 1;
@@ -148,13 +182,15 @@ void bridge_tick_100ms(void) {
             // Abertura multipla: alterna os verbos ate ela responder
             static uint8_t opener = 0;
             if (opener == 0) {
-                send_cmd(TUYA_CMD_PRODUCT_QUERY, 0, 0);
+                send_cmd(0x00, 0, 0);  // heartbeat classico
             } else if (opener == 1) {
+                send_cmd(TUYA_CMD_PRODUCT_QUERY, 0, 0);
+            } else if (opener == 2) {
                 assert_connected();
             } else {
                 send_cmd(TUYA_CMD_SYNC_NOTIFY, 0, 0);
             }
-            opener = (opener + 1) % 3;
+            opener = (opener + 1) % 4;
             g_last_action_tick = g_tick;
         }
         break;
@@ -182,9 +218,29 @@ static void queue_dp(uint8_t dp_id, uint8_t type,
     d[n++] = (uint8_t)(vlen >> 8);
     d[n++] = (uint8_t)(vlen & 0xFF);
     for (uint16_t i = 0; i < vlen; i++) d[n++] = val[i];
-    // Poliglota: manda nos dois verbos de comando (0x06 classico + 0x08 spec)
-    send_cmd(0x06, d, n);
-    send_cmd(TUYA_CMD_DP_COMMAND, d, n);
+    if (g_learned) {
+        // Espelha o dialeto DELA: mesmo verbo, mesmo enderecamento
+        if (g_dp_has_addr) {
+            uint8_t da[14];
+            da[0] = g_mcu_addr[0];
+            da[1] = g_mcu_addr[1];
+            for (uint16_t i = 0; i < n; i++) da[2 + i] = d[i];
+            send_cmd(g_dp_verb, da, n + 2);
+            // e a variante spec com endereco, por seguranca
+            if (g_dp_verb != TUYA_CMD_DP_COMMAND) {
+                send_cmd(TUYA_CMD_DP_COMMAND, da, n + 2);
+            }
+        } else {
+            send_cmd(g_dp_verb, d, n);
+            if (g_dp_verb != TUYA_CMD_DP_COMMAND) {
+                send_cmd(TUYA_CMD_DP_COMMAND, d, n);
+            }
+        }
+    } else {
+        // Sem aprendizado ainda: dupla classica
+        send_cmd(0x06, d, n);
+        send_cmd(TUYA_CMD_DP_COMMAND, d, n);
+    }
 }
 
 void bridge_set_dp_bool(uint8_t dp_id, uint8_t value) {

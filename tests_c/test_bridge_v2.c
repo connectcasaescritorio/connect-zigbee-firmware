@@ -59,13 +59,13 @@ int main(void) {
     mcu_rx_len = 0;
     bridge_set_dp_bool(25, 1);
     bridge_tick_100ms();
-    // Poliglota: primeiro 0x06, depois 0x08, mesmo payload DP
-    assert(mcu_rx[5]==0x06 && mcu_rx[8]==25 && mcu_rx[12]==1);
+    // Verbo aprendido do report anterior (0x09) sai primeiro; 0x08 depois
+    assert(mcu_rx[5]==0x09 && mcu_rx[8]==25 && mcu_rx[12]==1);
     int g2 = -1;
     for (int i = 13; i < mcu_rx_len - 1; i++)
         if (mcu_rx[i]==0x55 && mcu_rx[i+1]==0xAA) { g2 = i; break; }
     assert(g2 > 0 && mcu_rx[g2+5]==0x08 && mcu_rx[g2+8]==25);
-    printf("5. DP command poliglota (0x06+0x08) OK\n");
+    printf("5. DP command espelhando verbo aprendido OK\n");
 
     // Reset 5s da MCU (0x03 data 1): ACK diplomatico + status conectado
     mcu_rx_len = 0;
@@ -95,6 +95,20 @@ int main(void) {
     assert(mcu_rx[5]==0x06 && mcu_rx[4]==13);
     printf("8. report em 0x06 (dialeto real) OK\n");
 
-    printf("bridge v2: 8/8 poliglota\n");
+    // Aprendizado: report dela COM endereco 0x0102 em 0x06 ->
+    // proximo comando nosso espelha verbo E endereco
+    bridge_tick_100ms(); mcu_rx_len = 0;
+    uint8_t repA[] = {0x01, 0x02, 24, 0x01, 0x00, 0x01, 0x01};
+    mcu_reply(21, 0x06, repA, sizeof(repA));
+    bridge_tick_100ms();
+    mcu_rx_len = 0;
+    bridge_set_dp_bool(24, 0);
+    bridge_tick_100ms();
+    // Primeiro frame: verbo dela (0x06) + endereco 01 02 + DP 24
+    assert(mcu_rx[5]==0x06 && mcu_rx[8]==0x01 && mcu_rx[9]==0x02
+           && mcu_rx[10]==24);
+    printf("9. comando espelhado (verbo+endereco aprendidos) OK\n");
+
+    printf("bridge v2: 9/9 com aprendizado de dialeto\n");
     return 0;
 }

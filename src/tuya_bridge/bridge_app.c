@@ -49,6 +49,9 @@ static void on_mcu_dp(const tuya_dp_t *dp);
 
 static void uart_rx(const uint8_t *bytes, uint16_t len) {
     bridge_rx(bytes, len);
+    // ACKs nao podem esperar o tick de 100ms: a MCU tem timeout curto.
+    // Reagenda o tick para JA (drena a fila em ~1ms, fora da IRQ).
+    hal_tasks_schedule(&g_tick_task, 1);
 }
 
 static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {

@@ -23,6 +23,7 @@ int main(void) {
 
     // Tick 1: ponte manda heartbeat
     bridge_tick_100ms();
+    bridge_tick_100ms();  // flush da fila
     assert(bridge_state() == BR_ST_WAIT_HEARTBEAT && mcu_rx_len > 0);
     assert(mcu_rx[3] == TUYA_CMD_HEARTBEAT);
 
@@ -30,6 +31,7 @@ int main(void) {
     mcu_rx_len = 0;
     uint8_t hb = 0x01;
     mcu_reply(TUYA_CMD_HEARTBEAT, &hb, 1);
+    bridge_tick_100ms();
     assert(bridge_state() == BR_ST_WAIT_PRODUCT);
     assert(mcu_rx[3] == TUYA_CMD_PRODUCT_INFO);
 
@@ -37,12 +39,14 @@ int main(void) {
     mcu_rx_len = 0;
     const char *pi = "{\"p\":\"3kjidznp\",\"v\":\"1.0.0\"}";
     mcu_reply(TUYA_CMD_PRODUCT_INFO, (const uint8_t*)pi, strlen(pi));
+    bridge_tick_100ms();
     assert(bridge_state() == BR_ST_WAIT_CONF);
     assert(strstr(bridge_product_info(), "3kjidznp"));
 
     // MCU responde conf -> ponte: wifi_state(4) + query DPs, OPERACIONAL
     mcu_rx_len = 0;
     mcu_reply(TUYA_CMD_MCU_CONF, 0, 0);
+    bridge_tick_100ms();
     assert(bridge_state() == BR_ST_OPERATIONAL);
     assert(mcu_rx[3] == TUYA_CMD_WIFI_STATE && mcu_rx[6] == 0x04);
 
@@ -55,6 +59,7 @@ int main(void) {
     // Ponte comanda: liga rele 2 (DP 25)
     mcu_rx_len = 0;
     bridge_set_dp_bool(25, 1);
+    bridge_tick_100ms();
     assert(mcu_rx[3] == TUYA_CMD_DP_CMD && mcu_rx[6] == 25 && mcu_rx[10] == 1);
 
     // Heartbeat periodico em operacao (150 ticks)
@@ -65,6 +70,7 @@ int main(void) {
     // MCU pede RESET (segurar 5s) -> ponte ACKa e reafirma conectado
     mcu_rx_len = 0;
     mcu_reply(0x04, 0, 0);
+    bridge_tick_100ms();
     assert(mcu_rx[3] == 0x04);              // ACK do reset
     assert(mcu_rx_len > 8);                  // + segundo frame
     // segundo frame: wifi_state=4

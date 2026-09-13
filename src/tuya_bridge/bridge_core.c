@@ -12,10 +12,25 @@ static uint16_t g_tick = 0;
 static uint16_t g_last_hb_tick = 0;
 static char g_product[96];
 
+// Fila de TX: frames montados aqui e transmitidos SO no tick
+// (nunca de dentro da IRQ de RX - transmissao em contexto seguro)
+#define TXQ_SIZE 384
+static uint8_t g_txq[TXQ_SIZE];
+static uint16_t g_txq_len = 0;
+
 static void send_cmd(uint8_t cmd, const uint8_t *data, uint16_t len) {
     uint8_t buf[TUYA_MAX_FRAME + 8];
     uint16_t n = tuya_serial_build(buf, 0x00, cmd, data, len);
-    if (g_tx) g_tx(buf, n);
+    if (g_txq_len + n <= TXQ_SIZE) {
+        for (uint16_t i = 0; i < n; i++) g_txq[g_txq_len++] = buf[i];
+    }
+}
+
+static void txq_flush(void) {
+    if (g_txq_len && g_tx) {
+        g_tx(g_txq, g_txq_len);
+        g_txq_len = 0;
+    }
 }
 
 static void on_frame(const tuya_frame_t *f) {
@@ -86,6 +101,7 @@ void bridge_rx(const uint8_t *bytes, uint16_t len) {
 
 void bridge_tick_100ms(void) {
     g_tick++;
+    txq_flush();
     switch (g_state) {
     case BR_ST_BOOT:
         g_state = BR_ST_WAIT_HEARTBEAT;
@@ -117,19 +133,25 @@ const char *bridge_product_info(void) { return g_product; }
 void bridge_set_dp_bool(uint8_t dp_id, uint8_t value) {
     uint8_t buf[16];
     uint16_t n = tuya_serial_build_dp_bool(buf, dp_id, value);
-    if (g_tx) g_tx(buf, n);
+    if (g_txq_len + n <= TXQ_SIZE) {
+        for (uint16_t i = 0; i < n; i++) g_txq[g_txq_len++] = buf[i];
+    }
 }
 
 void bridge_set_dp_enum(uint8_t dp_id, uint8_t value) {
     uint8_t buf[16];
     uint16_t n = tuya_serial_build_dp_enum(buf, dp_id, value);
-    if (g_tx) g_tx(buf, n);
+    if (g_txq_len + n <= TXQ_SIZE) {
+        for (uint16_t i = 0; i < n; i++) g_txq[g_txq_len++] = buf[i];
+    }
 }
 
 void bridge_set_dp_value(uint8_t dp_id, uint32_t value) {
     uint8_t buf[16];
     uint16_t n = tuya_serial_build_dp_value(buf, dp_id, value);
-    if (g_tx) g_tx(buf, n);
+    if (g_txq_len + n <= TXQ_SIZE) {
+        for (uint16_t i = 0; i < n; i++) g_txq[g_txq_len++] = buf[i];
+    }
 }
 
 void bridge_query_all_dps(void) {

@@ -128,6 +128,22 @@ void bridge_on_relay_change(uint8_t relay_index, uint8_t state) {
 
 uint8_t bridge_app_active(void) { return g_active; }
 
+// ===== Modo RADAR (modelo -RD): descoberta de fiacao =====
+static hal_task_t g_radar_task;
+static void radar_tick(void *arg) {
+    radar_step();
+    basic_cluster_update_bridge_diag(radar_status(), radar_result());
+    hal_tasks_schedule(&g_radar_task, 3000);
+}
+
+void radar_app_init(void) {
+    g_radar_task.handler = radar_tick;
+    g_radar_task.arg = 0;
+    hal_tasks_init(&g_radar_task);
+    hal_tasks_schedule(&g_radar_task, 5000);
+    printf("RADAR: varredura de UART iniciada\r\n");
+}
+
 void bridge_app_init(void) {
     g_active = 1;
     hal_uart_init(9600, uart_rx);

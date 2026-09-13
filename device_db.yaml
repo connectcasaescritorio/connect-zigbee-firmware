@@ -5626,7 +5626,7 @@ BRIDGE_PAINEL_3CH_CENAS:
   alt_config_str: null
   build: true
   category: switch
-  config_str: 3kjidznp;TS0601-BR;SB4u;RC1;SB5u;RD3;SC0u;RB6;M;P0;
+  config_str: 3kjidznp;TS0601-RD;SB4u;RC4;M;P0;
   device_type: router
   firmware_image_type: 47150
   human_name: Ponte Painel 3ch Cenas

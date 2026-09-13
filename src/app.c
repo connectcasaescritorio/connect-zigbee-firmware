@@ -58,6 +58,9 @@ void app_init(void) {
         if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'B' && mm[L-1] == 'R') {
             bridge_app_init();
         }
+        if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'R' && mm[L-1] == 'D') {
+            radar_app_init();
+        }
     } // Does most of the setup, including all callbacks
                     // registration
     hal_zigbee_init_ota();

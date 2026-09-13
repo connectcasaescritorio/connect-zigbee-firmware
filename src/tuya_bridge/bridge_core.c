@@ -19,6 +19,7 @@ static uint16_t g_tick = 0;
 static uint16_t g_last_action_tick = 0;
 static uint16_t g_seq = 1;
 static uint16_t g_rx_frames = 0;
+static uint8_t g_last_rx_cmd = 0;
 static char g_product[96];
 
 #define TXQ_SIZE 384
@@ -69,6 +70,7 @@ static void parse_dp_frame(const tuya_frame_t *f) {
 
 static void on_frame(const tuya_frame_t *f) {
     g_rx_frames++;
+    g_last_rx_cmd = f->command;
     switch (f->command) {
     case TUYA_CMD_PRODUCT_QUERY: {
         uint16_t n = f->data_len < sizeof(g_product) - 1
@@ -135,8 +137,16 @@ void bridge_tick_100ms(void) {
     case BR_ST_WAIT_PRODUCT:
     case BR_ST_WAIT_CONF:
         if (g_tick - g_last_action_tick >= QUERY_RETRY_TICKS) {
-            g_state = BR_ST_WAIT_PRODUCT;
-            send_cmd(TUYA_CMD_PRODUCT_QUERY, 0, 0);
+            // Abertura multipla: alterna os verbos ate ela responder
+            static uint8_t opener = 0;
+            if (opener == 0) {
+                send_cmd(TUYA_CMD_PRODUCT_QUERY, 0, 0);
+            } else if (opener == 1) {
+                assert_connected();
+            } else {
+                send_cmd(TUYA_CMD_SYNC_NOTIFY, 0, 0);
+            }
+            opener = (opener + 1) % 3;
             g_last_action_tick = g_tick;
         }
         break;
@@ -152,6 +162,7 @@ void bridge_tick_100ms(void) {
 
 bridge_state_t bridge_state(void) { return g_state; }
 uint16_t bridge_rx_frame_count(void) { return g_rx_frames; }
+uint8_t bridge_last_rx_cmd(void) { return g_last_rx_cmd; }
 const char *bridge_product_info(void) { return g_product; }
 
 static void queue_dp(uint8_t dp_id, uint8_t type,

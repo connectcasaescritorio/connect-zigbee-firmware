@@ -81,22 +81,28 @@ static void tick(void *arg) {
         g_ticks_in_state = 0;
     }
 
-    // Diagnostico: nibble alto do estado = indice do baud atual
-    basic_cluster_update_bridge_diag(
-        (uint8_t)((g_baud_idx << 4) | (uint8_t)bridge_state()),
-        bridge_rx_frame_count());
-    basic_cluster_update_bridge_last_cmd(bridge_last_rx_cmd());
-    basic_cluster_update_bridge_frame(bridge_last_frame_hex());
-    basic_cluster_update_bridge_unknown(bridge_unknown_dps());
-    basic_cluster_update_bridge_tx(
-        (uint16_t)((hal_uart_tx_hw_count() << 8)
-                   | (hal_uart_tx_fb_count() & 0xFF)));
     hal_tasks_schedule(&g_tick_task, 100);
+}
+
+static hal_task_t g_action_reset_task;
+static uint8_t g_action_pending[3] = {0, 0, 0};
+
+static void action_reset(void *arg) {
+    for (uint8_t i = 0; i < 3; i++) {
+        if (g_action_pending[i]) {
+            g_action_pending[i] = 0;
+            switch_cluster_emit_action(&switch_clusters[i], 0);
+        }
+    }
 }
 
 static void emit_action(uint8_t key_idx, uint8_t ms_value) {
     if (key_idx > 2) return;
     switch_cluster_emit_action(&switch_clusters[key_idx], ms_value);
+    g_action_pending[key_idx] = 1;
+    g_action_reset_task.handler = action_reset;
+    hal_tasks_init(&g_action_reset_task);
+    hal_tasks_schedule(&g_action_reset_task, 400);
 }
 
 static void set_relay_from_dp(uint8_t idx, uint8_t on) {
@@ -162,7 +168,6 @@ uint8_t bridge_app_active(void) { return g_active; }
 static hal_task_t g_radar_task;
 static void radar_tick(void *arg) {
     radar_step();
-    basic_cluster_update_bridge_diag(radar_status(), radar_result());
     hal_tasks_schedule(&g_radar_task, 3000);
 }
 

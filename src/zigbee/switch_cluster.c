@@ -482,13 +482,10 @@ void switch_cluster_on_button_release(zigbee_switch_cluster *cluster) {
 
 void switch_cluster_emit_action(zigbee_switch_cluster *cluster,
                                 uint8_t multistate_value) {
-    // Injecao externa de gesto (usada pela ponte Tuya): publica o valor
-    // e volta a 0 (solto), como o fluxo natural das teclas.
+    // Injecao externa de gesto (ponte Tuya): publica o valor.
+    // O retorno a 0 (solto) e AGENDADO pelo chamador — zerar
+    // imediatamente faz o stack deduplicar e engolir o gesto.
     cluster->multistate_state = multistate_value;
-    hal_zigbee_notify_attribute_changed(cluster->endpoint,
-                                        ZCL_CLUSTER_MULTISTATE_INPUT_BASIC,
-                                        ZCL_ATTR_MULTISTATE_INPUT_PRESENT_VALUE);
-    cluster->multistate_state = 0;
     hal_zigbee_notify_attribute_changed(cluster->endpoint,
                                         ZCL_CLUSTER_MULTISTATE_INPUT_BASIC,
                                         ZCL_ATTR_MULTISTATE_INPUT_PRESENT_VALUE);

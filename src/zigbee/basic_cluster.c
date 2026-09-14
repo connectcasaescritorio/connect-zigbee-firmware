@@ -34,56 +34,14 @@ void basic_cluster_store_attrs_to_nv();
 void basic_cluster_load_attrs_from_nv();
 
 static uint8_t g_factory_wipe = 0;
-static uint8_t g_bridge_cmd_verb = 0;
 static uint8_t g_br_backlight = 1;
 static uint8_t g_br_brightness = 100;
 static uint8_t g_br_mode[3] = {0, 0, 0};
-static uint8_t g_br_probe = 0;
-static uint8_t g_br_poke_id = 0;
-static uint8_t g_br_poke_val = 0;
-static uint8_t g_br_unknown_pascal[66];
-
-void basic_cluster_update_bridge_unknown(const char *txt) {
-    uint8_t n = 0;
-    while (txt[n] && n < 64) {
-        g_br_unknown_pascal[1 + n] = (uint8_t)txt[n];
-        n++;
-    }
-    g_br_unknown_pascal[0] = n;
-}
 
 void basic_cluster_update_bridge_backlight(uint8_t on) { g_br_backlight = on; }
 void basic_cluster_update_bridge_brightness(uint8_t pct) { g_br_brightness = pct; }
 void basic_cluster_update_bridge_mode(uint8_t ch, uint8_t m) {
     if (ch < 3) g_br_mode[ch] = m;
-}
-static uint8_t g_bridge_state_attr = 0;
-static uint16_t g_bridge_rx_attr = 0;
-static uint8_t g_bridge_last_cmd_attr = 0;
-static uint8_t g_bridge_frame_pascal[66];
-
-static uint16_t g_bridge_tx_counts = 0;
-
-void basic_cluster_update_bridge_tx(uint16_t counts) {
-    g_bridge_tx_counts = counts;
-}
-
-void basic_cluster_update_bridge_frame(const char *hex) {
-    uint8_t n = 0;
-    while (hex[n] && n < 64) {
-        g_bridge_frame_pascal[1 + n] = (uint8_t)hex[n];
-        n++;
-    }
-    g_bridge_frame_pascal[0] = n;
-}
-
-void basic_cluster_update_bridge_diag(uint8_t state, uint16_t rx_frames) {
-    g_bridge_state_attr = state;
-    g_bridge_rx_attr = rx_frames;
-}
-
-void basic_cluster_update_bridge_last_cmd(uint8_t cmd) {
-    g_bridge_last_cmd_attr = cmd;
 }
 
 void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
@@ -104,10 +62,6 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         device_params_set_backlight_mode(g_backlight_mode);
         update_relay_clusters(); // re-aplica o backlight nos LEDs
     }
-    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_CMD_VERB) {
-        void bridge_set_cmd_verb(uint8_t v);
-        bridge_set_cmd_verb(g_bridge_cmd_verb);
-    }
     if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT) {
         void bridge_ui_backlight(uint8_t on);
         bridge_ui_backlight(g_br_backlight);
@@ -123,22 +77,6 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_MODE_CH2) {
         void bridge_ui_mode(uint8_t ch, uint8_t m);
         bridge_ui_mode(1, g_br_mode[1]);
-    }
-    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_POKE_VAL) {
-        // Cutuca o DP escolhido nos tres tipos (a MCU ignora o errado)
-        void bridge_set_dp_bool(uint8_t, uint8_t);
-        void bridge_set_dp_enum(uint8_t, uint8_t);
-        void bridge_set_dp_value(uint8_t, uint32_t);
-        if (g_br_poke_id > 0) {
-            if (g_br_poke_val <= 1) bridge_set_dp_bool(g_br_poke_id, g_br_poke_val);
-            bridge_set_dp_enum(g_br_poke_id, g_br_poke_val);
-            bridge_set_dp_value(g_br_poke_id, g_br_poke_val);
-        }
-    }
-    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_PROBE) {
-        void bridge_query_all_dps(void);
-        bridge_query_all_dps();
-        g_br_probe = 0;
     }
     if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_MODE_CH3) {
         void bridge_ui_mode(uint8_t ch, uint8_t m);
@@ -196,44 +134,24 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, g_backlight_mode);
     SETUP_ATTR(14, ZCL_ATTR_BASIC_FACTORY_WIPE, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_factory_wipe);
-    SETUP_ATTR(15, ZCL_ATTR_BASIC_BRIDGE_STATE, ZCL_DATA_TYPE_UINT8,
-               0, g_bridge_state_attr);
-    SETUP_ATTR(16, ZCL_ATTR_BASIC_BRIDGE_RX_FRAMES, ZCL_DATA_TYPE_UINT16,
-               0, g_bridge_rx_attr);
-    SETUP_ATTR(17, ZCL_ATTR_BASIC_BRIDGE_LAST_CMD, ZCL_DATA_TYPE_UINT8,
-               0, g_bridge_last_cmd_attr);
-    SETUP_ATTR(18, ZCL_ATTR_BASIC_BRIDGE_LAST_FRAME, ZCL_DATA_TYPE_CHAR_STR,
-               0, g_bridge_frame_pascal);
-    SETUP_ATTR(19, ZCL_ATTR_BASIC_BRIDGE_TX_COUNTS, ZCL_DATA_TYPE_UINT16,
-               0, g_bridge_tx_counts);
-    SETUP_ATTR(20, ZCL_ATTR_BASIC_BRIDGE_CMD_VERB, ZCL_DATA_TYPE_UINT8,
-               ATTR_WRITABLE, g_bridge_cmd_verb);
-    SETUP_ATTR(21, ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT, ZCL_DATA_TYPE_UINT8,
+    SETUP_ATTR(15, ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_backlight);
-    SETUP_ATTR(22, ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS, ZCL_DATA_TYPE_UINT8,
+    SETUP_ATTR(16, ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_brightness);
-    SETUP_ATTR(23, ZCL_ATTR_BASIC_BRIDGE_MODE_CH1, ZCL_DATA_TYPE_UINT8,
+    SETUP_ATTR(17, ZCL_ATTR_BASIC_BRIDGE_MODE_CH1, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_mode[0]);
-    SETUP_ATTR(24, ZCL_ATTR_BASIC_BRIDGE_MODE_CH2, ZCL_DATA_TYPE_UINT8,
+    SETUP_ATTR(18, ZCL_ATTR_BASIC_BRIDGE_MODE_CH2, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_mode[1]);
-    SETUP_ATTR(25, ZCL_ATTR_BASIC_BRIDGE_MODE_CH3, ZCL_DATA_TYPE_UINT8,
+    SETUP_ATTR(19, ZCL_ATTR_BASIC_BRIDGE_MODE_CH3, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_mode[2]);
-    SETUP_ATTR(26, ZCL_ATTR_BASIC_BRIDGE_PROBE, ZCL_DATA_TYPE_UINT8,
-               ATTR_WRITABLE, g_br_probe);
-    SETUP_ATTR(27, ZCL_ATTR_BASIC_BRIDGE_UNKNOWN_DPS, ZCL_DATA_TYPE_CHAR_STR,
-               0, g_br_unknown_pascal);
-    SETUP_ATTR(28, ZCL_ATTR_BASIC_BRIDGE_POKE_ID, ZCL_DATA_TYPE_UINT8,
-               ATTR_WRITABLE, g_br_poke_id);
-    SETUP_ATTR(29, ZCL_ATTR_BASIC_BRIDGE_POKE_VAL, ZCL_DATA_TYPE_UINT8,
-               ATTR_WRITABLE, g_br_poke_val);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(30, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(20, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 31 : 30;
+        network_indicator.has_dedicated_led ? 21 : 20;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

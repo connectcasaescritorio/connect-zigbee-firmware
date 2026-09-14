@@ -59,12 +59,12 @@ int main(void) {
     mcu_rx_len = 0;
     bridge_set_dp_bool(25, 1);
     bridge_tick_100ms();
-    // Verbo aprendido do report anterior (0x09) sai primeiro; 0x08 depois
-    assert(mcu_rx[5]==0x09 && mcu_rx[8]==25 && mcu_rx[12]==1);
+    // Spray: 0x06 sai primeiro, sempre
+    assert(mcu_rx[5]==0x06 && mcu_rx[8]==25 && mcu_rx[12]==1);
     int g2 = -1;
     for (int i = 13; i < mcu_rx_len - 1; i++)
         if (mcu_rx[i]==0x55 && mcu_rx[i+1]==0xAA) { g2 = i; break; }
-    assert(g2 > 0 && mcu_rx[g2+5]==0x08 && mcu_rx[g2+8]==25);
+    assert(g2 > 0 && mcu_rx[g2+5]==0x07 && mcu_rx[g2+8]==25);  // 2o do spray
     printf("5. DP command espelhando verbo aprendido OK\n");
 
     // Reset 5s da MCU (0x03 data 1): ACK diplomatico + status conectado
@@ -104,10 +104,9 @@ int main(void) {
     mcu_rx_len = 0;
     bridge_set_dp_bool(24, 0);
     bridge_tick_100ms();
-    // Primeiro frame: verbo dela (0x06) + endereco 01 02 + DP 24
-    assert(mcu_rx[5]==0x06 && mcu_rx[8]==0x01 && mcu_rx[9]==0x02
-           && mcu_rx[10]==24);
-    printf("9. comando espelhado (verbo+endereco aprendidos) OK\n");
+    // Spray: primeiro frame 0x06 sem endereco, DP 24
+    assert(mcu_rx[5]==0x06 && mcu_rx[8]==24 && mcu_rx[12]==0);
+    printf("9. comando em spray (0x06 primeiro) OK\n");
 
     printf("bridge v2: 9/9 com aprendizado de dialeto\n");
     return 0;

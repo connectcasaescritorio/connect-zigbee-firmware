@@ -38,6 +38,19 @@ static uint8_t g_br_backlight = 1;
 static uint8_t g_br_brightness = 100;
 static uint8_t g_br_mode[3] = {0, 0, 0};
 
+static uint16_t g_hid_frames = 0;
+static uint8_t g_hid_frame_pascal[66];
+
+void basic_cluster_update_bridge_hidden(uint16_t frames, const char *hex) {
+    g_hid_frames = frames;
+    uint8_t n = 0;
+    while (hex[n] && n < 64) {
+        g_hid_frame_pascal[1 + n] = (uint8_t)hex[n];
+        n++;
+    }
+    g_hid_frame_pascal[0] = n;
+}
+
 void basic_cluster_request_factory_wipe(void) {
     printf("FACTORY WIPE via ritual da ponte\r\n");
     schedule_full_reset(500);
@@ -149,14 +162,18 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, g_br_mode[1]);
     SETUP_ATTR(19, ZCL_ATTR_BASIC_BRIDGE_MODE_CH3, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_mode[2]);
+    SETUP_ATTR(20, ZCL_ATTR_BASIC_BRIDGE_RX_FRAMES, ZCL_DATA_TYPE_UINT16,
+               0, g_hid_frames);
+    SETUP_ATTR(21, ZCL_ATTR_BASIC_BRIDGE_LAST_FRAME, ZCL_DATA_TYPE_CHAR_STR,
+               0, g_hid_frame_pascal);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(20, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(22, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 21 : 20;
+        network_indicator.has_dedicated_led ? 23 : 22;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

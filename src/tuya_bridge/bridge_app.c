@@ -24,9 +24,9 @@
 #define DP_BTN_1        5
 #define DP_BTN_2        6
 #define DP_BTN_3        7
-#define DP_SCENE_CH_1   2
-#define DP_SCENE_CH_2   3
-#define DP_SCENE_CH_3   4
+#define DP_SCENE_CH_1   1
+#define DP_SCENE_CH_2   2
+#define DP_SCENE_CH_3   3
 #define DP_MODE_CH_1    18
 #define DP_MODE_CH_2    19
 #define DP_MODE_CH_3    20
@@ -83,6 +83,8 @@ static void tick(void *arg) {
         g_ticks_in_state = 0;
     }
 
+    basic_cluster_update_bridge_hidden(bridge_rx_frame_count(),
+                                       bridge_last_frame_hex());
     hal_tasks_schedule(&g_tick_task, 100);
 }
 
@@ -98,8 +100,15 @@ static void action_reset(void *arg) {
     }
 }
 
+static uint8_t ritual_armed(void);
+
 static void emit_action(uint8_t key_idx, uint8_t ms_value) {
     if (key_idx > 2) return;
+    if (ms_value == MS_LONG_PRESS && ritual_armed()) {
+        printf("bridge: RITUAL por gesto - factory wipe\r\n");
+        basic_cluster_request_factory_wipe();
+        return;
+    }
     switch_cluster_emit_action(&switch_clusters[key_idx], ms_value);
     g_action_pending[key_idx] = 1;
     g_action_reset_task.handler = action_reset;

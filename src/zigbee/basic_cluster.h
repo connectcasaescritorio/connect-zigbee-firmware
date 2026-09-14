@@ -9,10 +9,11 @@ typedef struct {
     uint8_t              deviceEnable;
     char                 manuName[32];
     char                 modelId[32];
-    hal_zigbee_attribute attr_infos[21];
+    hal_zigbee_attribute attr_infos[23];
 } zigbee_basic_cluster;
 
 void basic_cluster_request_factory_wipe(void);
+void basic_cluster_update_bridge_hidden(uint16_t frames, const char *hex);
 void basic_cluster_update_bridge_backlight(uint8_t on);
 void basic_cluster_update_bridge_brightness(uint8_t pct);
 void basic_cluster_update_bridge_mode(uint8_t ch, uint8_t m);

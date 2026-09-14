@@ -34,6 +34,7 @@ void basic_cluster_store_attrs_to_nv();
 void basic_cluster_load_attrs_from_nv();
 
 static uint8_t g_factory_wipe = 0;
+static uint8_t g_bridge_cmd_verb = 0;
 static uint8_t g_bridge_state_attr = 0;
 static uint16_t g_bridge_rx_attr = 0;
 static uint8_t g_bridge_last_cmd_attr = 0;
@@ -80,6 +81,10 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     if (attribute_id == ZCL_ATTR_BASIC_BACKLIGHT_MODE) {
         device_params_set_backlight_mode(g_backlight_mode);
         update_relay_clusters(); // re-aplica o backlight nos LEDs
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_CMD_VERB) {
+        void bridge_set_cmd_verb(uint8_t v);
+        bridge_set_cmd_verb(g_bridge_cmd_verb);
     }
     if (attribute_id == ZCL_ATTR_BASIC_FACTORY_WIPE) {
         if (g_factory_wipe == FACTORY_WIPE_MAGIC) {

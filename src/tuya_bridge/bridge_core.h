@@ -33,6 +33,8 @@ bridge_state_t bridge_state(void);
 uint16_t bridge_rx_frame_count(void);
 uint8_t bridge_last_rx_cmd(void);
 const char *bridge_last_frame_hex(void);
+void bridge_set_cmd_verb(uint8_t v);
+uint8_t bridge_get_cmd_verb(void);
 const char *bridge_product_info(void);  // JSON da MCU (apos handshake)
 
 // Comandos de saida (ponte -> MCU)

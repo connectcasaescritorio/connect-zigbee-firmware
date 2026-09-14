@@ -22,6 +22,11 @@ static uint16_t g_rx_frames = 0;
 static uint8_t g_last_rx_cmd = 0;
 static char g_product[96];
 
+// Verbo de comando: 0 = spray (todos os candidatos); N = so o verbo N
+static uint8_t g_cmd_verb = 0;
+void bridge_set_cmd_verb(uint8_t v) { g_cmd_verb = v; }
+uint8_t bridge_get_cmd_verb(void) { return g_cmd_verb; }
+
 // Formato aprendido dos reports dela (espelhado nos comandos)
 static uint8_t g_learned = 0;
 static uint8_t g_dp_verb = 0x06;
@@ -241,29 +246,25 @@ static void queue_dp(uint8_t dp_id, uint8_t type,
     d[n++] = (uint8_t)(vlen >> 8);
     d[n++] = (uint8_t)(vlen & 0xFF);
     for (uint16_t i = 0; i < vlen; i++) d[n++] = val[i];
-    if (g_learned) {
-        // Espelha o dialeto DELA: mesmo verbo, mesmo enderecamento
-        if (g_dp_has_addr) {
-            uint8_t da[14];
-            da[0] = g_mcu_addr[0];
-            da[1] = g_mcu_addr[1];
-            for (uint16_t i = 0; i < n; i++) da[2 + i] = d[i];
-            send_cmd(g_dp_verb, da, n + 2);
-            // e a variante spec com endereco, por seguranca
-            if (g_dp_verb != TUYA_CMD_DP_COMMAND) {
-                send_cmd(TUYA_CMD_DP_COMMAND, da, n + 2);
-            }
-        } else {
-            send_cmd(g_dp_verb, d, n);
-            if (g_dp_verb != TUYA_CMD_DP_COMMAND) {
-                send_cmd(TUYA_CMD_DP_COMMAND, d, n);
-            }
-        }
-    } else {
-        // Sem aprendizado ainda: dupla classica
-        send_cmd(0x06, d, n);
-        send_cmd(TUYA_CMD_DP_COMMAND, d, n);
+    if (g_cmd_verb != 0) {
+        // Seletor travado: SO o verbo escolhido (bisseccao ao vivo)
+        send_cmd(g_cmd_verb, d, n);
+        return;
     }
+    // SPRAY: todos os verbos candidatos (bool/enum idempotentes -
+    // apenas o verbo certo age; os demais ela ignora)
+    send_cmd(0x06, d, n);
+    send_cmd(0x07, d, n);
+    send_cmd(0x04, d, n);
+    send_cmd(0x05, d, n);
+    send_cmd(TUYA_CMD_DP_COMMAND, d, n);          // 0x08 direto
+    {
+        uint8_t da[14];
+        da[0] = 0x00; da[1] = 0x00;               // 0x08 three-level addr 0
+        for (uint16_t i = 0; i < n; i++) da[2 + i] = d[i];
+        send_cmd(TUYA_CMD_DP_COMMAND, da, n + 2);
+    }
+    send_cmd_seq(0x0000, 0x06, d, n);             // 0x06 com seq reservada 0
 }
 
 void bridge_set_dp_bool(uint8_t dp_id, uint8_t value) {

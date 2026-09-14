@@ -1,4 +1,5 @@
 #include "bridge_app.h"
+#include <stdint.h>
 #include "bridge_core.h"
 #include "hal/uart.h"
 #include "hal/tasks.h"
@@ -7,6 +8,7 @@
 #include "zigbee/switch_cluster.h"
 #include "zigbee/basic_cluster.h"
 #include "hal/system.h"
+#include "hal/zigbee.h"
 
 // ============================================================
 // ConnectCasa tuya_mcu_bridge - aplicacao da ponte
@@ -37,6 +39,8 @@
 #define MS_LONG_PRESS   2
 #define MS_SINGLE       5
 #define MS_DOUBLE       6
+#define MS_TRIPLE       7
+#define MS_CENA_BASE    11  // 11/12/13 = cena single/double/triple
 
 extern zigbee_relay_cluster relay_clusters[];
 extern zigbee_switch_cluster switch_clusters[];
@@ -65,9 +69,14 @@ static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {
     hal_uart_send(bytes, len);
 }
 
+static uint32_t g_app_ticks = 0;
+
 static void tick(void *arg) {
+    g_app_ticks++;
     hal_uart_process();
     bridge_tick_100ms();
+    bridge_set_network_joined(
+        hal_zigbee_get_network_status() == HAL_ZIGBEE_NETWORK_JOINED);
 
     // Auto-baud: sem operacao apos 4s, tenta a proxima velocidade
     if (bridge_state() != BR_ST_OPERATIONAL) {
@@ -101,6 +110,32 @@ static void action_reset(void *arg) {
 }
 
 static uint8_t ritual_armed(void);
+static void emit_action(uint8_t key_idx, uint8_t ms_value);
+
+// ===== Multiclique fabricado na ponte (a MCU so manda toques v=0) =====
+#define MC_WINDOW_MS 400
+static uint8_t g_mc_count[6];
+static hal_task_t g_mc_task[6];
+
+static void mc_fire(void *arg) {
+    uint8_t src = (uint8_t)(uintptr_t)arg;
+    uint8_t n = g_mc_count[src];
+    g_mc_count[src] = 0;
+    if (n == 0) return;
+    if (n > 3) n = 3;
+    uint8_t key = src % 3;
+    uint8_t base = (src < 3) ? MS_CENA_BASE : MS_SINGLE;
+    emit_action(key, base + (n - 1));
+}
+
+static void mc_press(uint8_t src) {
+    if (src > 5) return;
+    g_mc_count[src]++;
+    g_mc_task[src].handler = mc_fire;
+    g_mc_task[src].arg = (void *)(uintptr_t)src;
+    hal_tasks_init(&g_mc_task[src]);
+    hal_tasks_schedule(&g_mc_task[src], MC_WINDOW_MS);
+}
 
 static void emit_action(uint8_t key_idx, uint8_t ms_value) {
     if (key_idx > 2) return;
@@ -125,21 +160,22 @@ static void set_relay_from_dp(uint8_t idx, uint8_t on) {
 }
 
 // Ritual de reset fisico: 7 toques rapidos + segurar (0x03 da MCU)
-#define RITUAL_PRESSES   7
-#define RITUAL_WINDOW_MS 8000
-static uint32_t g_press_times[RITUAL_PRESSES];
+#define RITUAL_PRESSES       7
+#define RITUAL_WINDOW_TICKS  140   // 14s em ticks de 100ms
+static uint32_t g_press_ticks[RITUAL_PRESSES];
 static uint8_t g_press_idx = 0;
+extern uint32_t bridge_app_ticks(void);
 
 static void ritual_note_press(void) {
-    g_press_times[g_press_idx % RITUAL_PRESSES] = hal_millis();
+    g_press_ticks[g_press_idx % RITUAL_PRESSES] = bridge_app_ticks();
     g_press_idx++;
 }
 
 static uint8_t ritual_armed(void) {
     if (g_press_idx < RITUAL_PRESSES) return 0;
-    uint32_t now = hal_millis();
+    uint32_t now = bridge_app_ticks();
     for (uint8_t i = 0; i < RITUAL_PRESSES; i++) {
-        if (now - g_press_times[i] > RITUAL_WINDOW_MS + 6000) return 0;
+        if (now - g_press_ticks[i] > RITUAL_WINDOW_TICKS) return 0;
     }
     return 1;
 }
@@ -163,21 +199,16 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
     case DP_RELAY_3: set_relay_from_dp(2, v); break;
     case DP_BTN_1:
     case DP_BTN_2:
-    case DP_BTN_3: {
-        uint8_t key = dp->id - DP_BTN_1;
-        uint8_t ms = (v == 0) ? MS_SINGLE : (v == 1) ? MS_DOUBLE : MS_LONG_PRESS;
-        emit_action(key, ms);
+    case DP_BTN_3:
+        (void)v;
+        mc_press(3 + (dp->id - DP_BTN_1));  // fontes 3-5 = teclas direita
         break;
-    }
     case DP_SCENE_CH_1:
     case DP_SCENE_CH_2:
-    case DP_SCENE_CH_3: {
-        // Modo cena: gestos chegam com valor 0/1/2 (single/double/hold)
-        uint8_t key = dp->id - DP_SCENE_CH_1;
-        uint8_t ms = (v == 1) ? MS_DOUBLE : (v == 2) ? MS_LONG_PRESS : MS_SINGLE;
-        emit_action(key, ms);
+    case DP_SCENE_CH_3:
+        (void)v;
+        mc_press(dp->id - DP_SCENE_CH_1);  // fontes 0-2 = cenas esquerda
         break;
-    }
     case DP_BACKLIGHT:
         basic_cluster_update_bridge_backlight(v ? 1 : 0);
         break;
@@ -205,6 +236,7 @@ void bridge_on_relay_change(uint8_t relay_index, uint8_t state) {
 }
 
 uint8_t bridge_app_active(void) { return g_active; }
+uint32_t bridge_app_ticks(void) { return g_app_ticks; }
 
 // ===== Modo RADAR (modelo -RD): descoberta de fiacao =====
 static hal_task_t g_radar_task;

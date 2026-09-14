@@ -58,9 +58,20 @@ static void txq_flush(void) {
     }
 }
 
+static uint8_t g_net_joined = 1;
+
 static void assert_connected(void) {
-    uint8_t st = 0x01;  // conectado ao gateway
+    // Fala a VERDADE do radio: 0x01=conectado, 0x03=pareando (MCU pisca!)
+    uint8_t st = g_net_joined ? 0x01 : 0x03;
     send_cmd(TUYA_CMD_NET_STATUS, &st, 1);
+}
+
+void bridge_set_network_joined(uint8_t joined) {
+    joined = joined ? 1 : 0;
+    if (joined != g_net_joined) {
+        g_net_joined = joined;
+        assert_connected();  // muda? avisa a MCU na hora (o balé liga/desliga)
+    }
 }
 
 static int dp_units_valid(const tuya_frame_t *f, uint16_t start) {

@@ -102,6 +102,35 @@ static void parse_dp_frame(const tuya_frame_t *f) {
 }
 
 static char g_last_hex[64];
+static char g_unknown_dps[64];
+static uint16_t g_unknown_len = 0;
+
+void bridge_note_unknown_dp(uint8_t id, uint8_t value) {
+    // acumula "id:val," sem duplicar o id
+    char idbuf[8];
+    uint8_t n = 0;
+    uint8_t x = id;
+    if (x >= 100) { idbuf[n++] = '0' + x / 100; x %= 100; }
+    if (id >= 10)  { idbuf[n++] = '0' + x / 10; x %= 10; }
+    idbuf[n++] = '0' + x;
+    idbuf[n] = 0;
+    // duplicado?
+    for (uint16_t i = 0; i + n < g_unknown_len; i++) {
+        uint8_t match = (i == 0 || g_unknown_dps[i-1] == ',');
+        for (uint8_t k = 0; match && k < n; k++)
+            if (g_unknown_dps[i+k] != idbuf[k]) match = 0;
+        if (match && g_unknown_dps[i+n] == ':') return;
+    }
+    if (g_unknown_len + n + 5 >= sizeof(g_unknown_dps)) return;
+    for (uint8_t k = 0; k < n; k++) g_unknown_dps[g_unknown_len++] = idbuf[k];
+    g_unknown_dps[g_unknown_len++] = ':';
+    g_unknown_dps[g_unknown_len++] = '0' + (value / 10) % 10;
+    g_unknown_dps[g_unknown_len++] = '0' + value % 10;
+    g_unknown_dps[g_unknown_len++] = ',';
+    g_unknown_dps[g_unknown_len] = 0;
+}
+
+const char *bridge_unknown_dps(void) { return g_unknown_dps; }
 
 static void record_hex(const tuya_frame_t *f) {
     static const char H[] = "0123456789ABCDEF";

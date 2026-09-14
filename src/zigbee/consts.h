@@ -58,6 +58,10 @@
 #define ZCL_ATTR_BASIC_BRIDGE_MODE_CH1            0xff0D
 #define ZCL_ATTR_BASIC_BRIDGE_MODE_CH2            0xff0E
 #define ZCL_ATTR_BASIC_BRIDGE_MODE_CH3            0xff0F
+#define ZCL_ATTR_BASIC_BRIDGE_PROBE               0xff10
+#define ZCL_ATTR_BASIC_BRIDGE_UNKNOWN_DPS         0xff11
+#define ZCL_ATTR_BASIC_BRIDGE_POKE_ID             0xff12
+#define ZCL_ATTR_BASIC_BRIDGE_POKE_VAL            0xff13
 
 // Power Configuration cluster
 

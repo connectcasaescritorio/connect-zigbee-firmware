@@ -87,6 +87,7 @@ static void tick(void *arg) {
         bridge_rx_frame_count());
     basic_cluster_update_bridge_last_cmd(bridge_last_rx_cmd());
     basic_cluster_update_bridge_frame(bridge_last_frame_hex());
+    basic_cluster_update_bridge_unknown(bridge_unknown_dps());
     basic_cluster_update_bridge_tx(
         (uint16_t)((hal_uart_tx_hw_count() << 8)
                    | (hal_uart_tx_fb_count() & 0xFF)));
@@ -141,6 +142,7 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
         basic_cluster_update_bridge_mode(dp->id - DP_MODE_CH_1, v);
         break;
     default:
+        bridge_note_unknown_dp(dp->id, v);
         printf("bridge: DP %d desconhecido (type %d len %d)\r\n",
                dp->id, dp->type, dp->len);
         break;

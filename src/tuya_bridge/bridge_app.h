@@ -11,5 +11,8 @@ void radar_step(void);
 uint8_t bridge_app_active(void);
 // Hook chamado pelo relay_cluster (sempre linkado; inerte fora do modo ponte)
 void bridge_on_relay_change(uint8_t relay_index, uint8_t state);
+void bridge_ui_backlight(unsigned char on);
+void bridge_ui_brightness(unsigned char pct);
+void bridge_ui_mode(unsigned char ch, unsigned char mode);
 
 #endif

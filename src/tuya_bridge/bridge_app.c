@@ -25,6 +25,11 @@
 #define DP_SCENE_CH_1   1
 #define DP_SCENE_CH_2   2
 #define DP_SCENE_CH_3   3
+#define DP_MODE_CH_1    18
+#define DP_MODE_CH_2    19
+#define DP_MODE_CH_3    20
+#define DP_BACKLIGHT    36
+#define DP_BRIGHTNESS   101
 
 // Valores multistate (mesma tabela do switch_cluster/converters)
 #define MS_LONG_PRESS   2
@@ -117,8 +122,23 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
     }
     case DP_SCENE_CH_1:
     case DP_SCENE_CH_2:
-    case DP_SCENE_CH_3:
-        emit_action(dp->id - DP_SCENE_CH_1, MS_SINGLE);
+    case DP_SCENE_CH_3: {
+        // Modo cena: gestos chegam com valor 0/1/2 (single/double/hold)
+        uint8_t key = dp->id - DP_SCENE_CH_1;
+        uint8_t ms = (v == 1) ? MS_DOUBLE : (v == 2) ? MS_LONG_PRESS : MS_SINGLE;
+        emit_action(key, ms);
+        break;
+    }
+    case DP_BACKLIGHT:
+        basic_cluster_update_bridge_backlight(v ? 1 : 0);
+        break;
+    case DP_BRIGHTNESS:
+        basic_cluster_update_bridge_brightness(v);
+        break;
+    case DP_MODE_CH_1:
+    case DP_MODE_CH_2:
+    case DP_MODE_CH_3:
+        basic_cluster_update_bridge_mode(dp->id - DP_MODE_CH_1, v);
         break;
     default:
         printf("bridge: DP %d desconhecido (type %d len %d)\r\n",
@@ -150,6 +170,16 @@ void radar_app_init(void) {
     hal_tasks_init(&g_radar_task);
     hal_tasks_schedule(&g_radar_task, 5000);
     printf("RADAR: varredura de UART iniciada\r\n");
+}
+
+void bridge_ui_backlight(uint8_t on) {
+    if (g_active) bridge_set_dp_bool(DP_BACKLIGHT, on);
+}
+void bridge_ui_brightness(uint8_t pct) {
+    if (g_active) bridge_set_dp_value(DP_BRIGHTNESS, pct);
+}
+void bridge_ui_mode(uint8_t ch, uint8_t mode) {
+    if (g_active && ch < 3) bridge_set_dp_enum(DP_MODE_CH_1 + ch, mode);
 }
 
 void bridge_app_init(void) {

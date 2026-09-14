@@ -35,6 +35,15 @@ void basic_cluster_load_attrs_from_nv();
 
 static uint8_t g_factory_wipe = 0;
 static uint8_t g_bridge_cmd_verb = 0;
+static uint8_t g_br_backlight = 1;
+static uint8_t g_br_brightness = 100;
+static uint8_t g_br_mode[3] = {0, 0, 0};
+
+void basic_cluster_update_bridge_backlight(uint8_t on) { g_br_backlight = on; }
+void basic_cluster_update_bridge_brightness(uint8_t pct) { g_br_brightness = pct; }
+void basic_cluster_update_bridge_mode(uint8_t ch, uint8_t m) {
+    if (ch < 3) g_br_mode[ch] = m;
+}
 static uint8_t g_bridge_state_attr = 0;
 static uint16_t g_bridge_rx_attr = 0;
 static uint8_t g_bridge_last_cmd_attr = 0;
@@ -85,6 +94,26 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_CMD_VERB) {
         void bridge_set_cmd_verb(uint8_t v);
         bridge_set_cmd_verb(g_bridge_cmd_verb);
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT) {
+        void bridge_ui_backlight(uint8_t on);
+        bridge_ui_backlight(g_br_backlight);
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS) {
+        void bridge_ui_brightness(uint8_t pct);
+        bridge_ui_brightness(g_br_brightness);
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_MODE_CH1) {
+        void bridge_ui_mode(uint8_t ch, uint8_t m);
+        bridge_ui_mode(0, g_br_mode[0]);
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_MODE_CH2) {
+        void bridge_ui_mode(uint8_t ch, uint8_t m);
+        bridge_ui_mode(1, g_br_mode[1]);
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_MODE_CH3) {
+        void bridge_ui_mode(uint8_t ch, uint8_t m);
+        bridge_ui_mode(2, g_br_mode[2]);
     }
     if (attribute_id == ZCL_ATTR_BASIC_FACTORY_WIPE) {
         if (g_factory_wipe == FACTORY_WIPE_MAGIC) {

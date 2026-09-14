@@ -53,6 +53,11 @@
 #define ZCL_ATTR_BASIC_BRIDGE_LAST_FRAME          0xff08
 #define ZCL_ATTR_BASIC_BRIDGE_TX_COUNTS           0xff09
 #define ZCL_ATTR_BASIC_BRIDGE_CMD_VERB            0xff0A
+#define ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT           0xff0B
+#define ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS          0xff0C
+#define ZCL_ATTR_BASIC_BRIDGE_MODE_CH1            0xff0D
+#define ZCL_ATTR_BASIC_BRIDGE_MODE_CH2            0xff0E
+#define ZCL_ATTR_BASIC_BRIDGE_MODE_CH3            0xff0F
 
 // Power Configuration cluster
 

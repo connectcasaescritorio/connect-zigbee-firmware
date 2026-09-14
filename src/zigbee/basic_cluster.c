@@ -177,14 +177,26 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                0, g_bridge_frame_pascal);
     SETUP_ATTR(19, ZCL_ATTR_BASIC_BRIDGE_TX_COUNTS, ZCL_DATA_TYPE_UINT16,
                0, g_bridge_tx_counts);
+    SETUP_ATTR(20, ZCL_ATTR_BASIC_BRIDGE_CMD_VERB, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_bridge_cmd_verb);
+    SETUP_ATTR(21, ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_br_backlight);
+    SETUP_ATTR(22, ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_br_brightness);
+    SETUP_ATTR(23, ZCL_ATTR_BASIC_BRIDGE_MODE_CH1, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_br_mode[0]);
+    SETUP_ATTR(24, ZCL_ATTR_BASIC_BRIDGE_MODE_CH2, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_br_mode[1]);
+    SETUP_ATTR(25, ZCL_ATTR_BASIC_BRIDGE_MODE_CH3, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_br_mode[2]);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(20, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(26, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 21 : 20;
+        network_indicator.has_dedicated_led ? 27 : 26;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

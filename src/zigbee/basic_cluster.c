@@ -38,6 +38,11 @@ static uint8_t g_br_backlight = 1;
 static uint8_t g_br_brightness = 100;
 static uint8_t g_br_mode[3] = {0, 0, 0};
 
+void basic_cluster_request_factory_wipe(void) {
+    printf("FACTORY WIPE via ritual da ponte\r\n");
+    schedule_full_reset(500);
+}
+
 void basic_cluster_update_bridge_backlight(uint8_t on) { g_br_backlight = on; }
 void basic_cluster_update_bridge_brightness(uint8_t pct) { g_br_brightness = pct; }
 void basic_cluster_update_bridge_mode(uint8_t ch, uint8_t m) {

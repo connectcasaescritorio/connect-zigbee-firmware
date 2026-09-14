@@ -185,6 +185,10 @@ static void on_frame(const tuya_frame_t *f) {
         // Segurar 5s: ACK diplomatico + seguimos conectados
         send_cmd_seq(f->seq, TUYA_CMD_MCU_RESET_REQ, 0, 0);
         assert_connected();
+        {
+            void bridge_on_mcu_reset_request(void);
+            bridge_on_mcu_reset_request();
+        }
         break;
     }
     case 0x05:

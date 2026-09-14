@@ -6,6 +6,7 @@
 #include "zigbee/relay_cluster.h"
 #include "zigbee/switch_cluster.h"
 #include "zigbee/basic_cluster.h"
+#include "hal/system.h"
 
 // ============================================================
 // ConnectCasa tuya_mcu_bridge - aplicacao da ponte
@@ -19,12 +20,13 @@
 #define DP_RELAY_1      24
 #define DP_RELAY_2      25
 #define DP_RELAY_3      26
-#define DP_BTN_1        4
-#define DP_BTN_2        5
-#define DP_BTN_3        6
-#define DP_SCENE_CH_1   1
-#define DP_SCENE_CH_2   2
-#define DP_SCENE_CH_3   3
+// Mapa REAL medido em campo (o stock nasceu deslocado +1!):
+#define DP_BTN_1        5
+#define DP_BTN_2        6
+#define DP_BTN_3        7
+#define DP_SCENE_CH_1   2
+#define DP_SCENE_CH_2   3
+#define DP_SCENE_CH_3   4
 #define DP_MODE_CH_1    18
 #define DP_MODE_CH_2    19
 #define DP_MODE_CH_3    20
@@ -113,8 +115,39 @@ static void set_relay_from_dp(uint8_t idx, uint8_t on) {
     g_suppress_dp_tx = 0;
 }
 
+// Ritual de reset fisico: 7 toques rapidos + segurar (0x03 da MCU)
+#define RITUAL_PRESSES   7
+#define RITUAL_WINDOW_MS 8000
+static uint32_t g_press_times[RITUAL_PRESSES];
+static uint8_t g_press_idx = 0;
+
+static void ritual_note_press(void) {
+    g_press_times[g_press_idx % RITUAL_PRESSES] = hal_millis();
+    g_press_idx++;
+}
+
+static uint8_t ritual_armed(void) {
+    if (g_press_idx < RITUAL_PRESSES) return 0;
+    uint32_t now = hal_millis();
+    for (uint8_t i = 0; i < RITUAL_PRESSES; i++) {
+        if (now - g_press_times[i] > RITUAL_WINDOW_MS + 6000) return 0;
+    }
+    return 1;
+}
+
+void bridge_on_mcu_reset_request(void) {
+    if (ritual_armed()) {
+        printf("bridge: RITUAL completo - factory wipe\r\n");
+        basic_cluster_request_factory_wipe();
+    }
+}
+
 static void on_mcu_dp(const tuya_dp_t *dp) {
     uint8_t v = dp->len > 0 ? dp->data[dp->len - 1] : 0;
+    if ((dp->id >= DP_SCENE_CH_1 && dp->id <= DP_BTN_3) ||
+        (dp->id >= DP_RELAY_1 && dp->id <= DP_RELAY_3)) {
+        ritual_note_press();
+    }
     switch (dp->id) {
     case DP_RELAY_1: set_relay_from_dp(0, v); break;
     case DP_RELAY_2: set_relay_from_dp(1, v); break;

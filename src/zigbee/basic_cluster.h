@@ -12,6 +12,7 @@ typedef struct {
     hal_zigbee_attribute attr_infos[21];
 } zigbee_basic_cluster;
 
+void basic_cluster_request_factory_wipe(void);
 void basic_cluster_update_bridge_backlight(uint8_t on);
 void basic_cluster_update_bridge_brightness(uint8_t pct);
 void basic_cluster_update_bridge_mode(uint8_t ch, uint8_t m);

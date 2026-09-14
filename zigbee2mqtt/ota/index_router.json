@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.4.9-3ca9e99.zigbee",
-    "fileVersion": 336146432,
-    "fileSize": 188786,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.4.9-3ca9e99.zigbee",
+    "fileName": "tlc_switch-1.5.0-7b011a8.zigbee",
+    "fileVersion": 352333824,
+    "fileSize": 189458,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.5.0-7b011a8.zigbee",
     "imageType": 47150,
     "manufacturerCode": 4417,
-    "sha512": "ecea4e0b90bfb76ae1ed835ba3268f2f354052557cab2c5b46fead13d71fbcb38b14bf0a1319339ae0624b9526137458dfa23106b5b1ae6ca8d1613b94d9f6cd",
+    "sha512": "521ca9aeb8f34d0630ae1dc9162a60d08336bdbd9944defd229cde7e42891e81fc905730232676fbc057d759ac125dacc4602361bce60ffbd1fb8e1218f2537b",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZE284_3kjidznp",
@@ -14,13 +14,13 @@
     ]
   },
   {
-    "fileName": "tlc_switch-1.4.9-3ca9e99-from_tuya.zigbee",
+    "fileName": "tlc_switch-1.5.0-7b011a8-from_tuya.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 188786,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.4.9-3ca9e99-from_tuya.zigbee",
+    "fileSize": 189458,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.5.0-7b011a8-from_tuya.zigbee",
     "imageType": 54179,
     "manufacturerCode": 4417,
-    "sha512": "d9b1a01d999f91a7f3931a34312c87664b14bd566761b3a329af56ee503d8acfd5b91b273b96d836fbe9f3a8f33c09f427907e9ed7a83f07c461c28dab059112",
+    "sha512": "3b6f4403f1bcfaecc85cc56bd329c20703939b03474f13a0239c736a189feedb68b7b1456d2e3ee676f2004994ee5cbfaa1fde0801304973fd5e609f962f0bca",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZE284_3kjidznp",

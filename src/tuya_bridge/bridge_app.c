@@ -58,6 +58,7 @@ static uint16_t g_ticks_in_state = 0;
 #define BAUD_SWITCH_TICKS 40   // 4s sem handshake -> proxima velocidade
 
 static void on_mcu_dp(const tuya_dp_t *dp);
+const char *bridge_dp_log(void);
 
 static void uart_rx(const uint8_t *bytes, uint16_t len) {
     bridge_rx(bytes, len);
@@ -89,7 +90,7 @@ static void tick(void *arg) {
     }
 
     basic_cluster_update_bridge_hidden(bridge_rx_frame_count(),
-                                       bridge_last_frame_hex());
+                                       bridge_dp_log());
     hal_tasks_schedule(&g_tick_task, 100);
 }
 
@@ -195,8 +196,29 @@ void bridge_on_mcu_reset_request(void) {
     }
 }
 
+// ===== Gravador de DP para cacar o hold =====
+static char g_dp_log[64];
+static uint16_t g_dp_log_pos = 0;
+
+static void dp_log_add(const tuya_dp_t *dp) {
+    static const char H[] = "0123456789ABCDEF";
+    // formato "id.tipo.val " ex "07.04.02 " — mantem os ultimos que couberem
+    if (g_dp_log_pos > 48) g_dp_log_pos = 0;  // wrap
+    uint8_t val = dp->len > 0 ? dp->data[dp->len - 1] : 0;
+    uint8_t trio[3] = {dp->id, dp->type, val};
+    for (uint8_t i = 0; i < 3; i++) {
+        g_dp_log[g_dp_log_pos++] = H[trio[i] >> 4];
+        g_dp_log[g_dp_log_pos++] = H[trio[i] & 0xF];
+        g_dp_log[g_dp_log_pos++] = (i < 2) ? '.' : ' ';
+    }
+    g_dp_log[g_dp_log_pos] = 0;
+}
+
+const char *bridge_dp_log(void) { return g_dp_log; }
+
 static void on_mcu_dp(const tuya_dp_t *dp) {
     uint8_t v = dp->len > 0 ? dp->data[dp->len - 1] : 0;
+    dp_log_add(dp);
     if (dp->id == 1 || dp->id == 2 || dp->id == 3 ||
         dp->id == 5 || dp->id == 6 || dp->id == 7) {
         ritual_note_press();

@@ -125,8 +125,20 @@ static void mc_fire(void *arg) {
     emit_action(key, value);
 }
 
-static void mc_press(uint8_t src) {
+static void emit_action(uint8_t key_idx, uint8_t ms_value);
+
+static void mc_press_v(uint8_t src, uint8_t mcu_val) {
     if (src > 5) return;
+    if (mcu_val != 0) {
+        // A MCU JA classificou (0=single,1=double,2=hold): emite direto.
+        // gesto n: 1=single,2=double,3=hold -> valor 11+src*3+(n-1)
+        uint8_t n = mcu_val + 1;   // 1->double(2), 2->hold(3)
+        if (n > 3) n = 3;
+        uint8_t key = src % 3;
+        emit_action(key, 11 + src * 3 + (n - 1));
+        return;
+    }
+    // v==0: multiclique fabricado por contagem
     g_mc_count[src]++;
     g_mc_task[src].handler = mc_fire;
     g_mc_task[src].arg = (void *)(uintptr_t)src;
@@ -185,17 +197,21 @@ void bridge_on_mcu_reset_request(void) {
 
 static void on_mcu_dp(const tuya_dp_t *dp) {
     uint8_t v = dp->len > 0 ? dp->data[dp->len - 1] : 0;
-    if (dp->id >= DP_CENA_MIN && dp->id <= DP_CENA_MAX) {
+    if (dp->id == 1 || dp->id == 2 || dp->id == 3 ||
+        dp->id == 5 || dp->id == 6 || dp->id == 7) {
         ritual_note_press();
     }
     switch (dp->id) {
     case DP_RELAY_1: set_relay_from_dp(0, v); break;
     case DP_RELAY_2: set_relay_from_dp(1, v); break;
     case DP_RELAY_3: set_relay_from_dp(2, v); break;
-    case 1: case 2: case 3: case 4: case 5: case 6:
-        (void)v;
-        mc_press(dp->id - 1);  // DP 1..6 -> tecla 0..5 (6 cenas distintas)
-        break;
+    // Mapa real: esquerda=DP1,2,3  direita=DP5,6,7 (pula o 4)
+    case 1: mc_press_v(0, v); break;
+    case 2: mc_press_v(1, v); break;
+    case 3: mc_press_v(2, v); break;
+    case 5: mc_press_v(3, v); break;
+    case 6: mc_press_v(4, v); break;
+    case 7: mc_press_v(5, v); break;
     case DP_BACKLIGHT:
         basic_cluster_update_bridge_backlight(v ? 1 : 0);
         break;

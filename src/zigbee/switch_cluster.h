@@ -44,6 +44,7 @@ void switch_cluster_apply_mode(zigbee_switch_cluster *cluster, uint8_t mode);
 // momentary (pulsador). Single click does nothing. Reset only on 10s hold.
 void switch_cluster_field_config_end(void *unused, uint8_t count);
 
+void switch_cluster_emit_action(zigbee_switch_cluster *cluster, uint8_t multistate_value);
 void switch_cluster_add_to_endpoint(zigbee_switch_cluster *cluster,
                                     hal_zigbee_endpoint *endpoint);
 

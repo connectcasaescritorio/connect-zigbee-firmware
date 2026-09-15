@@ -22,13 +22,11 @@
 #define DP_RELAY_1      24
 #define DP_RELAY_2      25
 #define DP_RELAY_3      26
-// Mapa REAL medido em campo (o stock nasceu deslocado +1!):
-#define DP_BTN_1        5
-#define DP_BTN_2        6
-#define DP_BTN_3        7
-#define DP_SCENE_CH_1   1
-#define DP_SCENE_CH_2   2
-#define DP_SCENE_CH_3   3
+// Mapa do Marcello: 6 DPs de cena DISTINTOS = 6 teclas fisicas.
+// DP 1..6 -> endpoints de action 1..6 (esquerda 1-3, direita 4-6)
+#define DP_CENA_MIN     1
+#define DP_CENA_MAX     6
+#define DP_MODE_CH_1_v  18
 #define DP_MODE_CH_1    18
 #define DP_MODE_CH_2    19
 #define DP_MODE_CH_3    20
@@ -70,6 +68,7 @@ static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {
 }
 
 static uint32_t g_app_ticks = 0;
+uint32_t bridge_app_ticks(void);
 
 static void tick(void *arg) {
     g_app_ticks++;
@@ -98,10 +97,10 @@ static void tick(void *arg) {
 }
 
 static hal_task_t g_action_reset_task;
-static uint8_t g_action_pending[3] = {0, 0, 0};
+static uint8_t g_action_pending[6] = {0,0,0,0,0,0};
 
 static void action_reset(void *arg) {
-    for (uint8_t i = 0; i < 3; i++) {
+    for (uint8_t i = 0; i < 6; i++) {
         if (g_action_pending[i]) {
             g_action_pending[i] = 0;
             switch_cluster_emit_action(&switch_clusters[i], 0);
@@ -109,8 +108,7 @@ static void action_reset(void *arg) {
     }
 }
 
-static uint8_t ritual_armed(void);
-static void emit_action(uint8_t key_idx, uint8_t ms_value);
+static void emit_action_ep(uint8_t src, uint8_t ms_value);
 
 // ===== Multiclique fabricado na ponte (a MCU so manda toques v=0) =====
 #define MC_WINDOW_MS 400
@@ -118,14 +116,13 @@ static uint8_t g_mc_count[6];
 static hal_task_t g_mc_task[6];
 
 static void mc_fire(void *arg) {
-    uint8_t src = (uint8_t)(uintptr_t)arg;
+    uint8_t src = (uint8_t)(uintptr_t)arg;   // 0..5 = tecla fisica 1..6
     uint8_t n = g_mc_count[src];
     g_mc_count[src] = 0;
     if (n == 0) return;
     if (n > 3) n = 3;
-    uint8_t key = src % 3;
-    uint8_t base = (src < 3) ? MS_CENA_BASE : MS_SINGLE;
-    emit_action(key, base + (n - 1));
+    // Cada fonte tem SEU endpoint (1..6) e o gesto single/double/triple
+    emit_action_ep(src, MS_SINGLE + (n - 1));
 }
 
 static void mc_press(uint8_t src) {
@@ -137,15 +134,10 @@ static void mc_press(uint8_t src) {
     hal_tasks_schedule(&g_mc_task[src], MC_WINDOW_MS);
 }
 
-static void emit_action(uint8_t key_idx, uint8_t ms_value) {
-    if (key_idx > 2) return;
-    if (ms_value == MS_LONG_PRESS && ritual_armed()) {
-        printf("bridge: RITUAL por gesto - factory wipe\r\n");
-        basic_cluster_request_factory_wipe();
-        return;
-    }
-    switch_cluster_emit_action(&switch_clusters[key_idx], ms_value);
-    g_action_pending[key_idx] = 1;
+static void emit_action_ep(uint8_t src, uint8_t ms_value) {
+    if (src > 5) return;
+    switch_cluster_emit_action(&switch_clusters[src], ms_value);
+    g_action_pending[src] = 1;
     g_action_reset_task.handler = action_reset;
     hal_tasks_init(&g_action_reset_task);
     hal_tasks_schedule(&g_action_reset_task, 400);
@@ -160,54 +152,43 @@ static void set_relay_from_dp(uint8_t idx, uint8_t on) {
 }
 
 // Ritual de reset fisico: 7 toques rapidos + segurar (0x03 da MCU)
-#define RITUAL_PRESSES       7
-#define RITUAL_WINDOW_TICKS  140   // 14s em ticks de 100ms
-static uint32_t g_press_ticks[RITUAL_PRESSES];
+extern uint8_t g_multi_press_reset_count;
+#define RITUAL_WINDOW_TICKS  140
+static uint32_t g_press_ticks[16];
 static uint8_t g_press_idx = 0;
-extern uint32_t bridge_app_ticks(void);
 
 static void ritual_note_press(void) {
-    g_press_ticks[g_press_idx % RITUAL_PRESSES] = bridge_app_ticks();
+    uint8_t need = g_multi_press_reset_count;
+    if (need == 0 || need > 16) need = 10;
+    g_press_ticks[g_press_idx % need] = bridge_app_ticks();
     g_press_idx++;
-}
-
-static uint8_t ritual_armed(void) {
-    if (g_press_idx < RITUAL_PRESSES) return 0;
-    uint32_t now = bridge_app_ticks();
-    for (uint8_t i = 0; i < RITUAL_PRESSES; i++) {
-        if (now - g_press_ticks[i] > RITUAL_WINDOW_TICKS) return 0;
-    }
-    return 1;
-}
-
-void bridge_on_mcu_reset_request(void) {
-    if (ritual_armed()) {
-        printf("bridge: RITUAL completo - factory wipe\r\n");
-        basic_cluster_request_factory_wipe();
+    if (g_press_idx >= need) {
+        uint32_t now = bridge_app_ticks();
+        uint8_t all_recent = 1;
+        for (uint8_t i = 0; i < need; i++)
+            if (now - g_press_ticks[i] > RITUAL_WINDOW_TICKS) all_recent = 0;
+        if (all_recent) {
+            printf("bridge: RITUAL %d toques - wipe\r\n", need);
+            basic_cluster_request_factory_wipe();
+            g_press_idx = 0;
+        }
     }
 }
+
 
 static void on_mcu_dp(const tuya_dp_t *dp) {
     uint8_t v = dp->len > 0 ? dp->data[dp->len - 1] : 0;
-    if ((dp->id >= DP_SCENE_CH_1 && dp->id <= DP_BTN_3) ||
-        (dp->id >= DP_RELAY_1 && dp->id <= DP_RELAY_3)) {
+    if (dp->id >= DP_CENA_MIN && dp->id <= DP_CENA_MAX) {
         ritual_note_press();
     }
     switch (dp->id) {
     case DP_RELAY_1: set_relay_from_dp(0, v); break;
     case DP_RELAY_2: set_relay_from_dp(1, v); break;
     case DP_RELAY_3: set_relay_from_dp(2, v); break;
-    case DP_BTN_1:
-    case DP_BTN_2:
-    case DP_BTN_3:
+
+    case 1: case 2: case 3: case 4: case 5: case 6:
         (void)v;
-        mc_press(3 + (dp->id - DP_BTN_1));  // fontes 3-5 = teclas direita
-        break;
-    case DP_SCENE_CH_1:
-    case DP_SCENE_CH_2:
-    case DP_SCENE_CH_3:
-        (void)v;
-        mc_press(dp->id - DP_SCENE_CH_1);  // fontes 0-2 = cenas esquerda
+        mc_press(dp->id - 1);  // DP 1..6 -> fonte 0..5 (6 teclas distintas)
         break;
     case DP_BACKLIGHT:
         basic_cluster_update_bridge_backlight(v ? 1 : 0);

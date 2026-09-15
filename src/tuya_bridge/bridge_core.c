@@ -59,10 +59,18 @@ static void txq_flush(void) {
 }
 
 static uint8_t g_net_joined = 1;
+static uint8_t g_unjoined_flip = 0;
 
 static void assert_connected(void) {
-    // Fala a VERDADE do radio: 0x01=conectado, 0x03=pareando (MCU pisca!)
-    uint8_t st = g_net_joined ? 0x01 : 0x03;
+    // Conectado: 0x01. Despareado: alterna 0x00/0x03 (dialeto da MCU
+    // desconhecido para "pareando" - um dos dois acende o bale)
+    uint8_t st;
+    if (g_net_joined) {
+        st = 0x01;
+    } else {
+        st = g_unjoined_flip ? 0x03 : 0x00;
+        g_unjoined_flip ^= 1;
+    }
     send_cmd(TUYA_CMD_NET_STATUS, &st, 1);
 }
 
@@ -196,10 +204,6 @@ static void on_frame(const tuya_frame_t *f) {
         // Segurar 5s: ACK diplomatico + seguimos conectados
         send_cmd_seq(f->seq, TUYA_CMD_MCU_RESET_REQ, 0, 0);
         assert_connected();
-        {
-            void bridge_on_mcu_reset_request(void);
-            bridge_on_mcu_reset_request();
-        }
         break;
     }
     case 0x05:
@@ -267,12 +271,15 @@ void bridge_tick_100ms(void) {
         }
         break;
     case BR_ST_WAIT_HEARTBEAT:  // legado (nao usado no v2)
-    case BR_ST_OPERATIONAL:
-        if (g_tick - g_last_action_tick >= STATUS_REFRESH_TICKS) {
+    case BR_ST_OPERATIONAL: {
+        // Refresh: 60s conectado; 3s despareado (bale acende rapido)
+        uint16_t period = g_net_joined ? STATUS_REFRESH_TICKS : 30;
+        if (g_tick - g_last_action_tick >= period) {
             assert_connected();
             g_last_action_tick = g_tick;
         }
         break;
+    }
     }
 }
 

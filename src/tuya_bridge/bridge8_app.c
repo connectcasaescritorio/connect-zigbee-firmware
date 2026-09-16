@@ -1,6 +1,7 @@
 #include "bridge8_app.h"
 #include "bridge_core.h"
 #include "hal/uart.h"
+#include "hal/zigbee.h"
 #include "hal/tasks.h"
 #include "hal/printf_selector.h"
 #include "zigbee/relay_cluster.h"
@@ -87,6 +88,9 @@ static void tick(void *arg) {
     g_app_ticks++;
     hal_uart_process();
     bridge_tick_100ms();
+    // Espelha o estado REAL da rede pra ponte -> MCU pisca quando despareado
+    bridge_set_network_joined(
+        hal_zigbee_get_network_status() == HAL_ZIGBEE_NETWORK_JOINED);
 
     if (bridge_state() != BR_ST_OPERATIONAL) {
         g_ticks_in_state++;

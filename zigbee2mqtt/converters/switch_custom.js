@@ -243,14 +243,14 @@ const romasku = {
                     } else if (part[0] == 'C') {
                         validatePin(part.slice(1,3));
                         validatePin(part.slice(3,5));
-                    } else if (part[0] == 'L' || part[0] == 'R' || part[0] == 'I') {
+                    } else if (part[0] == 'L' || part[0] == 'R' || part[0] == 'I' || part[0] == 'Q') {
                         validatePin(part.slice(1,3));
                     } else if(part[0] == 'M') {
                         ;
                     } else if(part[0] == 'i') {
                         ; // TODO: write validation
                     } else {
-                        throw new Error(`Invalid entry ${part}. Should start with one of B, BT, C, D, I, L, M, R, S, SLP, X, i`);
+                        throw new Error(`Invalid entry ${part}. Should start with one of B, BT, C, D, I, L, M, Q, R, S, SLP, X, i`);
                     }
                 }
             },
@@ -14884,7 +14884,6 @@ const definitions = [
             deviceEndpoints({ endpoints: {"switch_0": 1, "switch_1": 2, "switch_2": 3, "switch_3": 4, "relay_0": 5, "relay_1": 6, "relay_2": 7, "relay_3": 8, } }),
             romasku.deviceConfig("device_config", "switch_0"),
             romasku.multiPressResetCount("multi_press_reset_count", "switch_0"),
-            romasku.networkIndicator("network_led", "switch_0"),
             onOff({ endpointNames: ["relay_0", "relay_1", "relay_2", "relay_3"] }),
             romasku.pressAction("switch_0_press_action", "switch_0"),
             romasku.switchMode("switch_0_mode", "switch_0"),

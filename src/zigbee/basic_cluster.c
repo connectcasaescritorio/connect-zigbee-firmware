@@ -34,6 +34,7 @@ void basic_cluster_store_attrs_to_nv();
 void basic_cluster_load_attrs_from_nv();
 
 static uint8_t g_factory_wipe = 0;
+static uint8_t g_reset_now = 0;
 static uint8_t g_br_backlight = 1;
 static uint8_t g_br_brightness = 100;
 static uint8_t g_br_mode[3] = {0, 0, 0};
@@ -103,11 +104,17 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         bridge_ui_mode(2, g_br_mode[2]);
     }
     if (attribute_id == ZCL_ATTR_BASIC_FACTORY_WIPE) {
+        printf("FACTORY WIPE recebido, valor=%d\r\n", g_factory_wipe);
         if (g_factory_wipe == FACTORY_WIPE_MAGIC) {
-            printf("FACTORY WIPE via Zigbee: full NVM clean\r\n");
+            printf("FACTORY WIPE: disparando schedule_full_reset\r\n");
             schedule_full_reset(500);
         }
         g_factory_wipe = 0;
+    }
+    if (attribute_id == ZCL_ATTR_BASIC_RESET_NOW) {
+        // Reset direto e incondicional: escrever qualquer coisa reseta
+        printf("RESET_NOW: schedule_full_reset imediato\r\n");
+        schedule_full_reset(200);
     }
 }
 
@@ -154,6 +161,8 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, g_backlight_mode);
     SETUP_ATTR(14, ZCL_ATTR_BASIC_FACTORY_WIPE, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_factory_wipe);
+    SETUP_ATTR(23, ZCL_ATTR_BASIC_RESET_NOW, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_reset_now);
     SETUP_ATTR(15, ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_backlight);
     SETUP_ATTR(16, ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS, ZCL_DATA_TYPE_UINT8,
@@ -175,7 +184,7 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 23 : 22;
+        network_indicator.has_dedicated_led ? 24 : 23;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

@@ -32,6 +32,7 @@ void peripherals_init(void);
 network_indicator_t network_indicator = {
     .leds                        = { NULL, NULL, NULL, NULL },
     .has_dedicated_led           = 0,
+    .silent                      = 0,
     .manual_state_when_connected = 0, // ConnectCasa: apagado quando
                                       // conectado; pisca so no pareamento
 };
@@ -51,7 +52,7 @@ zigbee_basic_cluster basic_cluster = {
 
 zigbee_group_cluster group_cluster = {};
 
-zigbee_switch_cluster switch_clusters[6];
+zigbee_switch_cluster switch_clusters[4];
 uint8_t switch_clusters_cnt = 0;
 
 zigbee_relay_cluster relay_clusters[4];
@@ -158,6 +159,21 @@ void parse_config() {
             network_indicator.leds[1]           = NULL;
             network_indicator.has_dedicated_led = true;
 
+            has_dedicated_status_led = true;
+            leds_cnt++;
+        } else if (entry[0] == 'Q') {
+            // Q<pino>: LED de status SILENCIOSO — registra o pino como led
+            // de status, mas o firmware nunca escreve nele automaticamente.
+            // Usado quando o pino de status compartilha hardware com um rele.
+            hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);
+            hal_gpio_init(pin, 0, HAL_GPIO_PULL_NONE);
+            leds[leds_cnt].pin     = pin;
+            leds[leds_cnt].on_high = entry[3] != 'i';
+            led_init(&leds[leds_cnt]);
+            network_indicator.leds[0]           = &leds[leds_cnt];
+            network_indicator.leds[1]           = NULL;
+            network_indicator.has_dedicated_led = true;
+            network_indicator.silent            = true;
             has_dedicated_status_led = true;
             leds_cnt++;
         } else if (entry[0] == 'I') {

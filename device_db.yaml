@@ -5576,7 +5576,7 @@ BOARD__CONNECT_TOUCH_4CH:
   alt_config_str: null
   build: true
   category: board
-  config_str: 1nenkvye;TS0004-CT4;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;SA0u;RC4;M;
+  config_str: 1nenkvye;TS0004-CT4;BC0u;QC3i;SD7u;RD7;SD2u;RD4;SC0u;RA0;SC2u;RB5;M;
   device_type: router
   firmware_image_type: 47200
   human_name: Connect Touch 4CH

@@ -7,6 +7,7 @@
 typedef struct {
     led_t *leds[4];
     bool   has_dedicated_led;
+    bool   silent;  // se true, nunca escreve nos leds automaticamente
     bool   manual_state_when_connected;
 } network_indicator_t;
 

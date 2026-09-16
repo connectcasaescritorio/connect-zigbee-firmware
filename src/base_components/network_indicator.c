@@ -6,6 +6,7 @@ void network_indicator_connected(network_indicator_t *indicator) {
 }
 
 void network_indicator_from_manual_state(network_indicator_t *indicator) {
+    if (indicator->silent) return;
     led_t **led = indicator->leds;
 
     while (*led != NULL && (led - indicator->leds) < 4) {
@@ -22,6 +23,7 @@ void network_indicator_from_manual_state(network_indicator_t *indicator) {
 }
 
 void network_indicator_commission_success(network_indicator_t *indicator) {
+    if (indicator->silent) return;
     led_t **led = indicator->leds;
 
     while (*led != NULL && (led - indicator->leds) < 4) {
@@ -31,6 +33,7 @@ void network_indicator_commission_success(network_indicator_t *indicator) {
 }
 
 void network_indicator_not_connected(network_indicator_t *indicator) {
+    if (indicator->silent) return;
     led_t **led = indicator->leds;
 
     while (*led != NULL && (led - indicator->leds) < 4) {

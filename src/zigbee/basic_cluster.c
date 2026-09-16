@@ -82,7 +82,9 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     }
     if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT) {
         void bridge_ui_backlight(uint8_t on);
+        void bridge8_set_backlight(uint8_t mode);
         bridge_ui_backlight(g_br_backlight);
+        bridge8_set_backlight(g_br_backlight);  // 0=off,1=normal,2=inverted
     }
     if (attribute_id == ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS) {
         void bridge_ui_brightness(uint8_t pct);

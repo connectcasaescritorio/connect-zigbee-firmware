@@ -18,6 +18,24 @@
 
 // DP de cada relé, indexado por 0..7
 static const uint16_t RELAY_DP[8] = {1, 2, 3, 4, 5, 6, 101, 102};
+#define DP_BACKLIGHT 15
+
+// Log de DPs desconhecidos (pra achar toque e LED individual)
+static char g_dplog[80];
+static uint16_t g_dplog_pos = 0;
+static void dplog_add(uint16_t id, uint8_t type, uint8_t val) {
+    static const char H[] = "0123456789ABCDEF";
+    if (g_dplog_pos > 64) g_dplog_pos = 0;
+    uint8_t b[4] = {(uint8_t)(id>>8), (uint8_t)id, type, val};
+    // grava "iiTTvv " (id 2 bytes, tipo, valor)
+    for (uint8_t k = 0; k < 4; k++) {
+        g_dplog[g_dplog_pos++] = H[b[k]>>4];
+        g_dplog[g_dplog_pos++] = H[b[k]&0xF];
+    }
+    g_dplog[g_dplog_pos++] = ' ';
+    g_dplog[g_dplog_pos] = 0;
+}
+const char *bridge8_dplog(void) { return g_dplog; }
 
 extern zigbee_relay_cluster relay_clusters[];
 
@@ -62,7 +80,7 @@ static void tick(void *arg) {
 
     // Expõe estado no atributo oculto: frames_rx (0xff06) e último frame (0xff08)
     basic_cluster_update_bridge_hidden(bridge_rx_frame_count(),
-                                       bridge_last_frame_hex());
+                                       bridge8_dplog());
     hal_tasks_schedule(&g_tick_task, 100);
 }
 
@@ -87,7 +105,9 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
     if (idx != 0xFF) {
         set_relay_from_dp(idx, v);
     } else {
-        printf("bridge8: DP %d desconhecido\r\n", dp->id);
+        // DP nao-relé: candidato a toque/cena/LED. Registra pro raio-X.
+        dplog_add(dp->id, dp->type, v);
+        printf("bridge8: DP %d desconhecido (v=%d)\r\n", dp->id, v);
     }
 }
 
@@ -99,6 +119,10 @@ void bridge8_on_relay_change(uint8_t relay_index, uint8_t state) {
 }
 
 uint8_t bridge8_app_active(void) { return g_active; }
+
+void bridge8_set_backlight(uint8_t mode) {
+    if (g_active) bridge_set_dp_enum(DP_BACKLIGHT, mode);
+}
 
 void bridge8_app_init(void) {
     g_active = 1;

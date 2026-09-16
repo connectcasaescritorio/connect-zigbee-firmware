@@ -36,6 +36,7 @@ void basic_cluster_load_attrs_from_nv();
 
 static uint8_t g_factory_wipe = 0;
 static uint8_t g_reset_now = 0;
+static uint8_t g_test_net_status = 0;
 static uint8_t g_br_backlight = 1;
 static uint8_t g_br_brightness = 100;
 static uint8_t g_br_mode[3] = {0, 0, 0};
@@ -112,6 +113,11 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         }
         g_factory_wipe = 0;
     }
+    if (attribute_id == ZCL_ATTR_BASIC_TEST_NET_STATUS) {
+        void bridge_force_net_status(uint8_t status);
+        printf("TEST_NET_STATUS: forcando %d\r\n", g_test_net_status);
+        bridge_force_net_status(g_test_net_status);
+    }
     if (attribute_id == ZCL_ATTR_BASIC_RESET_NOW) {
         // Reset com LEAVE da rede: limpa NVM e chama factory_reset
         // (zb_factoryReset faz o leave e reinicia sozinho). NAO chamar
@@ -181,14 +187,16 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                0, g_hid_frame_pascal);
     SETUP_ATTR(22, ZCL_ATTR_BASIC_RESET_NOW, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_reset_now);
+    SETUP_ATTR(23, ZCL_ATTR_BASIC_TEST_NET_STATUS, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_test_net_status);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(23, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(24, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 24 : 23;
+        network_indicator.has_dedicated_led ? 25 : 24;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

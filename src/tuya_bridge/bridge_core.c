@@ -61,17 +61,24 @@ static void txq_flush(void) {
 static uint8_t g_net_joined = 1;
 static uint8_t g_unjoined_flip = 0;
 
+static uint8_t g_net_status_override = 0xFF;  // 0xFF = automatico
+
 static void assert_connected(void) {
-    // Conectado: 0x01. Despareado: alterna 0x00/0x03 (dialeto da MCU
-    // desconhecido para "pareando" - um dos dois acende o bale)
     uint8_t st;
-    if (g_net_joined) {
-        st = 0x01;
+    if (g_net_status_override != 0xFF) {
+        st = g_net_status_override;   // valor forcado (teste do pisca)
+    } else if (g_net_joined) {
+        st = 0x01;                     // conectado
     } else {
-        st = g_unjoined_flip ? 0x03 : 0x00;
-        g_unjoined_flip ^= 1;
+        st = 0x02;                     // PAREANDO (padrao Tuya: LED pisca)
     }
     send_cmd(TUYA_CMD_NET_STATUS, &st, 1);
+}
+
+// Forca um valor de net_status pra MCU (pra descobrir o do pisca)
+void bridge_force_net_status(uint8_t status) {
+    g_net_status_override = (status == 0xFF) ? 0xFF : status;
+    assert_connected();
 }
 
 void bridge_set_network_joined(uint8_t joined) {

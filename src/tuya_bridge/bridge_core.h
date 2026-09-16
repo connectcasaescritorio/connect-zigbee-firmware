@@ -43,6 +43,7 @@ void bridge_set_dp_enum(uint8_t dp_id, uint8_t value);
 void bridge_set_dp_value(uint8_t dp_id, uint32_t value);
 void bridge_query_all_dps(void);
 void bridge_set_network_joined(uint8_t joined);
+void bridge_force_net_status(uint8_t status);
 void bridge_note_unknown_dp(uint8_t id, uint8_t value);
 const char *bridge_unknown_dps(void);
 

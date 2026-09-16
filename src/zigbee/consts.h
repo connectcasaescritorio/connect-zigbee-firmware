@@ -63,6 +63,7 @@
 #define ZCL_ATTR_BASIC_BRIDGE_POKE_ID             0xff12
 #define ZCL_ATTR_BASIC_BRIDGE_POKE_VAL            0xff13
 #define ZCL_ATTR_BASIC_RESET_NOW                  0xff14
+#define ZCL_ATTR_BASIC_TEST_NET_STATUS            0xff15
 
 // Power Configuration cluster
 

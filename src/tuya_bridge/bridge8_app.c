@@ -6,6 +6,14 @@
 #include "zigbee/relay_cluster.h"
 #include "zigbee/basic_cluster.h"
 void basic_cluster_request_factory_wipe(void);
+// Reset direto que FUNCIONA (leave da rede) - mesmo da via RESET_NOW
+int hal_nvm_clear_all(void);
+void hal_factory_reset(void);
+static void bridge8_reset_direto(void) {
+    printf("bridge8: RESET por toques - leave da rede\r\n");
+    hal_nvm_clear_all();
+    hal_factory_reset();
+}
 
 // ============================================================
 // ConnectCasa - PONTE 8 RELÉS (placa 8gang-touch, _TZE204_wktrysab)
@@ -128,9 +136,8 @@ static void ritual_conta_toque(uint8_t tecla) {
     if (alvo == 0) alvo = 10;
     printf("bridge8: toque %d/%d (tecla %d)\r\n", g_ritual_cnt, alvo, tecla);
     if (g_ritual_cnt >= alvo) {
-        printf("bridge8: RESET por %d toques - factory wipe\r\n", alvo);
-        basic_cluster_request_factory_wipe();
         g_ritual_cnt = 0;
+        bridge8_reset_direto();
     }
 }
 

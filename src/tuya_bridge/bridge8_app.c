@@ -5,6 +5,7 @@
 #include "hal/printf_selector.h"
 #include "zigbee/relay_cluster.h"
 #include "zigbee/basic_cluster.h"
+void basic_cluster_request_factory_wipe(void);
 
 // ============================================================
 // ConnectCasa - PONTE 8 RELÉS (placa 8gang-touch, _TZE204_wktrysab)
@@ -19,6 +20,14 @@
 // DP de cada relé, indexado por 0..7
 static const uint16_t RELAY_DP[8] = {1, 2, 3, 4, 5, 6, 101, 102};
 #define DP_BACKLIGHT 15
+#define DP_GESTO 15   // mesma id: a MCU manda gesto (0/1/2) neste DP
+
+// Ritual de reset: 7 toques rapidos + segurar (hold) no 8o
+#define RITUAL_TOQUES 7
+#define RITUAL_JANELA_TICKS 150   // 15s
+extern uint32_t bridge8_ticks(void);
+static uint8_t g_ritual_cnt = 0;
+static uint32_t g_ritual_last = 0;
 
 // Log de DPs desconhecidos (pra achar toque e LED individual)
 static char g_dplog[80];
@@ -47,6 +56,8 @@ static hal_task_t g_tick_task;
 static const uint32_t BAUDS[] = {115200, 9600};
 static uint8_t g_baud_idx = 0;
 static uint16_t g_ticks_in_state = 0;
+static uint32_t g_app_ticks = 0;
+uint32_t bridge8_ticks(void) { return g_app_ticks; }
 #define BAUD_SWITCH_TICKS 40  // 4s sem handshake -> proxima velocidade
 
 static void on_mcu_dp(const tuya_dp_t *dp);
@@ -62,6 +73,7 @@ static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {
 }
 
 static void tick(void *arg) {
+    g_app_ticks++;
     hal_uart_process();
     bridge_tick_100ms();
 
@@ -104,11 +116,31 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
     uint8_t idx = dp_to_relay(dp->id);
     if (idx != 0xFF) {
         set_relay_from_dp(idx, v);
-    } else {
-        // DP nao-relé: candidato a toque/cena/LED. Registra pro raio-X.
-        dplog_add(dp->id, dp->type, v);
-        printf("bridge8: DP %d desconhecido (v=%d)\r\n", dp->id, v);
+        return;
     }
+    if (dp->id == DP_GESTO) {
+        // Gesto de tecla: 0=single, 1=double, 2=hold
+        uint32_t now = bridge8_ticks();
+        if (now - g_ritual_last > RITUAL_JANELA_TICKS) {
+            g_ritual_cnt = 0;  // janela expirou, reinicia
+        }
+        g_ritual_last = now;
+        if (v == 2) {
+            // hold: se ja teve >=7 toques, e o ritual -> wipe
+            if (g_ritual_cnt >= RITUAL_TOQUES) {
+                printf("bridge8: RITUAL 7+hold - factory wipe\r\n");
+                basic_cluster_request_factory_wipe();
+                g_ritual_cnt = 0;
+            }
+        } else {
+            // single ou double conta como toque
+            if (g_ritual_cnt < 255) g_ritual_cnt++;
+        }
+        dplog_add(dp->id, dp->type, v);
+        return;
+    }
+    dplog_add(dp->id, dp->type, v);
+    printf("bridge8: DP %d desconhecido (v=%d)\r\n", dp->id, v);
 }
 
 // Chamado pelo relay_cluster quando um relé muda (comando Zigbee)

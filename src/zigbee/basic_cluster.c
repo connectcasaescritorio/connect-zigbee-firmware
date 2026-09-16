@@ -113,11 +113,12 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         g_factory_wipe = 0;
     }
     if (attribute_id == ZCL_ATTR_BASIC_RESET_NOW) {
-        // Reset IMEDIATO e direto - sem agendar, chama tudo na hora
-        printf("RESET_NOW: reset imediato direto\r\n");
+        // Reset com LEAVE da rede: limpa NVM e chama factory_reset
+        // (zb_factoryReset faz o leave e reinicia sozinho). NAO chamar
+        // mcu_reset depois - isso cortava o leave antes de completar.
+        printf("RESET_NOW: factory reset com leave\r\n");
         hal_nvm_clear_all();
         hal_factory_reset();
-        hal_system_reset();
     }
 }
 

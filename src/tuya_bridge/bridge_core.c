@@ -62,6 +62,7 @@ static uint8_t g_net_joined = 1;
 static uint8_t g_unjoined_flip = 0;
 
 static uint8_t g_net_status_override = 0xFF;  // 0xFF = automatico
+static uint8_t g_silence = 0;
 
 static void assert_connected(void) {
     uint8_t st;
@@ -72,14 +73,26 @@ static void assert_connected(void) {
     } else {
         st = 0x02;                     // PAREANDO (padrao Tuya: LED pisca)
     }
+    if (g_silence) return;
     send_cmd(TUYA_CMD_NET_STATUS, &st, 1);
 }
 
 // Forca um valor de net_status pra MCU (pra descobrir o do pisca)
 void bridge_force_net_status(uint8_t status) {
+    if (status == 254) {          // 254 = SILENCIO (nao manda status)
+        g_silence = 1;
+        return;
+    }
+    if (status == 253) {          // 253 = volta ao normal
+        g_silence = 0;
+        g_net_status_override = 0xFF;
+        return;
+    }
+    g_silence = 0;
     g_net_status_override = (status == 0xFF) ? 0xFF : status;
     assert_connected();
 }
+uint8_t bridge_is_silent(void) { return g_silence; }
 
 void bridge_set_network_joined(uint8_t joined) {
     joined = joined ? 1 : 0;

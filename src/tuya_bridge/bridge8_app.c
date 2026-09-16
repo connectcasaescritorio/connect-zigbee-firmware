@@ -114,31 +114,37 @@ static void set_relay_from_dp(uint8_t idx, uint8_t on) {
     g_suppress_dp_tx = 0;
 }
 
+static uint8_t g_ritual_tecla = 0xFF;  // qual tecla esta sendo martelada
+static void ritual_conta_toque(uint8_t tecla) {
+    uint32_t now = bridge8_ticks();
+    // Reinicia se: demorou demais OU trocou de tecla (uso normal alterna)
+    if (now - g_ritual_last > RITUAL_JANELA_TICKS || tecla != g_ritual_tecla) {
+        g_ritual_cnt = 0;
+        g_ritual_tecla = tecla;
+    }
+    g_ritual_last = now;
+    g_ritual_cnt++;
+    uint8_t alvo = g_multi_press_reset_count;
+    if (alvo == 0) alvo = 10;
+    printf("bridge8: toque %d/%d (tecla %d)\r\n", g_ritual_cnt, alvo, tecla);
+    if (g_ritual_cnt >= alvo) {
+        printf("bridge8: RESET por %d toques - factory wipe\r\n", alvo);
+        basic_cluster_request_factory_wipe();
+        g_ritual_cnt = 0;
+    }
+}
+
 static void on_mcu_dp(const tuya_dp_t *dp) {
     uint8_t v = dp->len > 0 ? dp->data[dp->len - 1] : 0;
     uint8_t idx = dp_to_relay(dp->id);
     if (idx != 0xFF) {
         set_relay_from_dp(idx, v);
+        ritual_conta_toque(idx);  // martelar a MESMA tecla conta pro reset
         return;
     }
     if (dp->id == DP_GESTO) {
-        // Reset por toques: conta CADA gesto como 1 toque, ate atingir
-        // o multi_press_reset_count (default 10, configuravel 1-255).
-        uint32_t now = bridge8_ticks();
-        if (now - g_ritual_last > RITUAL_JANELA_TICKS) {
-            g_ritual_cnt = 0;  // demorou demais entre toques, reinicia
-        }
-        g_ritual_last = now;
-        g_ritual_cnt++;
-        uint8_t alvo = g_multi_press_reset_count;
-        if (alvo == 0) alvo = 10;  // seguranca
-        printf("bridge8: toque %d/%d\r\n", g_ritual_cnt, alvo);
-        if (g_ritual_cnt >= alvo) {
-            printf("bridge8: RESET por %d toques - factory wipe\r\n", alvo);
-            basic_cluster_request_factory_wipe();
-            g_ritual_cnt = 0;
-        }
-        // Log dos valores recebidos
+        // Gesto especial (double/hold): conta na "tecla" do gesto (200)
+        ritual_conta_toque(200);
         g_gesto_count++;
         static const char HH[] = "0123456789ABCDEF";
         if (g_dplog_pos > 70) g_dplog_pos = 0;

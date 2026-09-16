@@ -4,6 +4,7 @@
 #include "hal/tasks.h"
 #include "hal/printf_selector.h"
 #include "zigbee/relay_cluster.h"
+#include "zigbee/basic_cluster.h"
 
 // ============================================================
 // ConnectCasa - PONTE 8 RELÉS (placa 8gang-touch, _TZE204_wktrysab)
@@ -24,6 +25,15 @@ static uint8_t g_active = 0;
 static uint8_t g_suppress_dp_tx = 0;
 static hal_task_t g_tick_task;
 
+// Auto-baud: cicla 115200 <-> 9600 ate o handshake fechar
+static const uint32_t BAUDS[] = {115200, 9600};
+static uint8_t g_baud_idx = 0;
+static uint16_t g_ticks_in_state = 0;
+#define BAUD_SWITCH_TICKS 40  // 4s sem handshake -> proxima velocidade
+
+static void on_mcu_dp(const tuya_dp_t *dp);
+static void bridge_uart_tx(const uint8_t *bytes, uint16_t len);
+
 static void uart_rx(const uint8_t *bytes, uint16_t len) {
     bridge_rx(bytes, len);
     hal_tasks_schedule(&g_tick_task, 1);  // ACK rápido
@@ -36,6 +46,23 @@ static void bridge_uart_tx(const uint8_t *bytes, uint16_t len) {
 static void tick(void *arg) {
     hal_uart_process();
     bridge_tick_100ms();
+
+    if (bridge_state() != BR_ST_OPERATIONAL) {
+        g_ticks_in_state++;
+        if (g_ticks_in_state >= BAUD_SWITCH_TICKS) {
+            g_ticks_in_state = 0;
+            g_baud_idx = (g_baud_idx + 1) % 2;
+            printf("bridge8: auto-baud -> %d\r\n", (int)BAUDS[g_baud_idx]);
+            hal_uart_init(BAUDS[g_baud_idx], uart_rx);
+            bridge_init(bridge_uart_tx, on_mcu_dp);
+        }
+    } else {
+        g_ticks_in_state = 0;
+    }
+
+    // Expõe estado no atributo oculto: frames_rx (0xff06) e último frame (0xff08)
+    basic_cluster_update_bridge_hidden(bridge_rx_frame_count(),
+                                       bridge_last_frame_hex());
     hal_tasks_schedule(&g_tick_task, 100);
 }
 
@@ -75,7 +102,7 @@ uint8_t bridge8_app_active(void) { return g_active; }
 
 void bridge8_app_init(void) {
     g_active = 1;
-    hal_uart_init(115200, uart_rx);
+    hal_uart_init(BAUDS[0], uart_rx);
     bridge_init(bridge_uart_tx, on_mcu_dp);
     g_tick_task.handler = tick;
     g_tick_task.arg = 0;

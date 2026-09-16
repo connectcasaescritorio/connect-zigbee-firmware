@@ -5599,3 +5599,31 @@ BOARD__CONNECT_TOUCH_4CH:
   store: null
   threads: null
   tuya_module: ZTU
+
+BOARD__CONNECT_TOUCH_8CH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: wktrysab;TS0601-B8;BC0u;RC0;RC1;RC2;RC3;RC4;RD2;RD3;RD7;M;
+  device_type: router
+  firmware_image_type: 47300
+  human_name: Connect Touch 8CH
+  info: ConnectCasa - painel touch 8 canais (ponte ZT3L + MCU DP)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0601
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZE204_wktrysab
+  stock_model_name: TS0601
+  store: null
+  threads: null
+  tuya_module: ZT3L

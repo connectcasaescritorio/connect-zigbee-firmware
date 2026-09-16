@@ -40,6 +40,7 @@ SOURCES := \
 	$(SRC_DIR)/tuya_bridge/tuya_serial.c \
 	$(SRC_DIR)/tuya_bridge/bridge_core.c \
 	$(SRC_DIR)/tuya_bridge/bridge_app.c \
+	$(SRC_DIR)/tuya_bridge/bridge8_app.c \
 	$(SRC_DIR)/tuya_bridge/radar.c \
 	$(SRC_DIR)/stub/hal/system.c \
 	$(SRC_DIR)/stub/hal/timer.c \

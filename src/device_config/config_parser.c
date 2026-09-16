@@ -57,7 +57,7 @@ zigbee_group_cluster group_cluster = {};
 zigbee_switch_cluster switch_clusters[4];
 uint8_t switch_clusters_cnt = 0;
 
-zigbee_relay_cluster relay_clusters[4];
+zigbee_relay_cluster relay_clusters[8];
 uint8_t relay_clusters_cnt = 0;
 
 zigbee_cover_switch_cluster cover_switch_clusters[3];

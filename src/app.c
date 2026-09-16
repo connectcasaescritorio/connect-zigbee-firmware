@@ -7,6 +7,7 @@
 #include "hal/system.h"
 #include "hal/zigbee.h"
 #include "tuya_bridge/bridge_app.h"
+#include "tuya_bridge/bridge8_app.h"
 #include "zigbee/basic_cluster.h"
 #include "hal/zigbee_ota.h"
 #include "zigbee/battery_cluster.h"
@@ -60,6 +61,9 @@ void app_init(void) {
         }
         if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'R' && mm[L-1] == 'D') {
             radar_app_init();
+        }
+        if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'B' && mm[L-1] == '8') {
+            bridge8_app_init();
         }
     } // Does most of the setup, including all callbacks
                     // registration

@@ -191,17 +191,20 @@ void sync_indicator_led(zigbee_relay_cluster *cluster) {
 }
 
 #include "tuya_bridge/bridge_app.h"
+#include "tuya_bridge/bridge8_app.h"
 
 static uint8_t relay_cluster_index_of(zigbee_relay_cluster *cluster);
 
 void relay_cluster_on(zigbee_relay_cluster *cluster) {
     bridge_on_relay_change(relay_cluster_index_of(cluster), 1);
+    bridge8_on_relay_change(relay_cluster_index_of(cluster), 1);
     relay_on(cluster->relay);
     sync_indicator_led(cluster);
 }
 
 void relay_cluster_off(zigbee_relay_cluster *cluster) {
     bridge_on_relay_change(relay_cluster_index_of(cluster), 0);
+    bridge8_on_relay_change(relay_cluster_index_of(cluster), 0);
     relay_off(cluster->relay);
     sync_indicator_led(cluster);
 }

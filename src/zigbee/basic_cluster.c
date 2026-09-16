@@ -161,8 +161,6 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, g_backlight_mode);
     SETUP_ATTR(14, ZCL_ATTR_BASIC_FACTORY_WIPE, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_factory_wipe);
-    SETUP_ATTR(23, ZCL_ATTR_BASIC_RESET_NOW, ZCL_DATA_TYPE_UINT8,
-               ATTR_WRITABLE, g_reset_now);
     SETUP_ATTR(15, ZCL_ATTR_BASIC_BRIDGE_BACKLIGHT, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_br_backlight);
     SETUP_ATTR(16, ZCL_ATTR_BASIC_BRIDGE_BRIGHTNESS, ZCL_DATA_TYPE_UINT8,
@@ -177,8 +175,10 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                0, g_hid_frames);
     SETUP_ATTR(21, ZCL_ATTR_BASIC_BRIDGE_LAST_FRAME, ZCL_DATA_TYPE_CHAR_STR,
                0, g_hid_frame_pascal);
+    SETUP_ATTR(22, ZCL_ATTR_BASIC_RESET_NOW, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_reset_now);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(22, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(23, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 

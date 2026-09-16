@@ -123,6 +123,7 @@ static void set_relay_from_dp(uint8_t idx, uint8_t on) {
 }
 
 static uint8_t g_ritual_tecla = 0xFF;  // qual tecla esta sendo martelada
+#define RITUAL_CLASSICO_TOQUES 7  // 7 toques + hold no 8o
 static void ritual_conta_toque(uint8_t tecla) {
     uint32_t now = bridge8_ticks();
     // Reinicia se: demorou demais OU trocou de tecla (uso normal alterna)
@@ -150,8 +151,17 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
         return;
     }
     if (dp->id == DP_GESTO) {
-        // Gesto especial (double/hold): conta na "tecla" do gesto (200)
-        ritual_conta_toque(200);
+        // RITUAL CLASSICO: se for HOLD (v==2) apos >=7 toques na mesma tecla
+        // dentro da janela -> reset. Nao chama ritual_conta_toque (o hold
+        // NAO conta como toque, ele CONFIRMA o ritual).
+        uint32_t now = bridge8_ticks();
+        if (v == 2 && g_ritual_cnt >= RITUAL_CLASSICO_TOQUES &&
+            (now - g_ritual_last) <= RITUAL_JANELA_TICKS) {
+            printf("bridge8: RITUAL CLASSICO 7+hold - reset\r\n");
+            g_ritual_cnt = 0;
+            bridge8_reset_direto();
+            return;
+        }
         g_gesto_count++;
         static const char HH[] = "0123456789ABCDEF";
         if (g_dplog_pos > 70) g_dplog_pos = 0;

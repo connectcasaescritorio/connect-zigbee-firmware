@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.8.6-4691d01-forced.zigbee",
+    "fileName": "tlc_switch-1.8.7-48d7782-forced.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 191826,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_TOUCH_8CH/tlc_switch-1.8.6-4691d01-forced.zigbee",
+    "fileSize": 192018,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_TOUCH_8CH/tlc_switch-1.8.7-48d7782-forced.zigbee",
     "imageType": 47300,
     "manufacturerCode": 4417,
-    "sha512": "306bacd0f9627648650390cb475f4b317e999f833603f88c8f97fd29c5411e9b737358d55cc940c4a683720ce1acc2409755a6d018c4af83379e781891a29ff9",
+    "sha512": "3c6bdfb6355bcf7aa75c554cec0877278a613384c656f15529d1a6003765ca83cc96224fbd6c43f10fc2258d7b2e2ebdb5d710d06f1ef30c46ffe6dd6ab8e52a",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZE204_wktrysab",

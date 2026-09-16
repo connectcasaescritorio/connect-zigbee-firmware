@@ -1741,7 +1741,7 @@ MODULE_MOES_ZM4LT1_TS0001:
   alt_config_str: null
   build: true
   category: module
-  config_str: afgzktgb;TS0001-MS;BD3u;LD7i;SC0u;RC3;
+  config_str: afgzktgb;TS0001-MS;BD3d;LD7i;SC0u;RC3;
   device_type: router
   firmware_image_type: 43575
   human_name: Moes ZM4LT1
@@ -3697,59 +3697,34 @@ SWITCH_BSEED_TOUCH_BACKLIGHT_TS0001:
   store: https://www.aliexpress.com/item/1005004187227246.html
   threads: https://github.com/romasku/tuya-zigbee-switch/discussions/221
   tuya_module: ZTU
-SWITCH_CONNECT_4X2_1CH_TS0001:
+SWITCH_BSEED_TOUCH_BACKLIGHT_TS0002:
   alt_config_str: null
   build: true
   category: switch
-  config_str: connect1;TS0001-CC;LB1;ID7;SB7u;RC3;M;P0;
-  device_type: router
-  firmware_image_type: 47135
-  human_name: ConnectCasa 4x2 1ch
-  info: Interruptor 4x2 1 canal ConnectCasa - pinout oficial de fabrica
-  mcu: TLSR8258
-  mcu_family: Telink
-  neutral: required
-  old_manufacturer_names: null
-  old_zb_models: null
-  output: relay
-  override_z2m_device: null
-  power: mains
-  status: fully_supported
-  stock_converter_manufacturer: Tuya
-  stock_converter_model: TS0001
-  stock_image_type: 54179
-  stock_manufacturer_id: 4417
-  stock_manufacturer_name: _TZ3000_PENDENTE
-  store: null
-  threads: null
-  tuya_module: ZT3L
-  
-SWITCH_CONNECT_4X2_TS0002:
-  alt_config_str: null
-  build: true
-  category: switch
-  config_str: l9brjwau;TS0002-BSDB;LB1;IC2;IC4;SB5u;RC3;SB4u;RD2;M;P0;
+  config_str: l9brjwau;TS0002-BSDB;LD4i;SB5u;RC3;IC1;SD3u;RC2;ID7;M;
   device_type: router
   firmware_image_type: 43581
-  human_name: ConnectCasa 4x2 2ch
-  info: Interruptor 4x2 exclusivo ConnectCasa - ritual anti-despareamento
+  human_name: BSEED dim-backlight 2-gang touch switch
+  info: Backlight on D4i, netled on C4. Left indicator hard-wired?
   mcu: TLSR8258
   mcu_family: Telink
   neutral: required
   old_manufacturer_names: null
-  old_zb_models: null
+  old_zb_models:
+  - TS0002-BS-1
   output: relay
   override_z2m_device: null
   power: mains
-  status: fully_supported
+  status: mostly_supported
   stock_converter_manufacturer: Tuya
   stock_converter_model: TS0002
   stock_image_type: 54179
   stock_manufacturer_id: 4417
   stock_manufacturer_name: _TZ3000_l9brjwau
-  store: null
-  threads: null
-  tuya_module: ZT3L
+  stock_model_name: TS0002
+  store: https://www.aliexpress.com/item/1005003843553626.html
+  threads: https://github.com/romasku/tuya-zigbee-switch/issues/246
+  tuya_module: ZTU
 SWITCH_BSEED_TOUCH_BACKLIGHT_TS0003:
   alt_config_str: null
   build: true
@@ -5596,15 +5571,16 @@ SWITCH_ZEMISMART_TS0601_6GANG:
   store: https://www.zemismart.com/products/tb26-6
   threads: https://github.com/romasku/tuya-zigbee-switch/issues/209
   tuya_module: ZTU
-SWITCH_CONNECT_4X2_3CH_TS0003:
+
+BOARD__CONNECT_TOUCH_4CH:
   alt_config_str: null
   build: true
-  category: switch
-  config_str: njgrxsrf;TS0003-CC;LB1;IC2;ID7;IC4;SB5u;RC3;SB7u;RD2;SB4u;RC0;M;P0;
+  category: board
+  config_str: 1nenkvye;TS0004-CT4;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;SA0u;RC4;M;
   device_type: router
-  firmware_image_type: 47125
-  human_name: ConnectCasa 4x2 3ch
-  info: Interruptor 4x2 3 canais exclusivo ConnectCasa
+  firmware_image_type: 47200
+  human_name: Connect Touch 4CH
+  info: ConnectCasa - painel touch 4 canais (ZTU)
   mcu: TLSR8258
   mcu_family: Telink
   neutral: required
@@ -5615,36 +5591,11 @@ SWITCH_CONNECT_4X2_3CH_TS0003:
   power: mains
   status: in_progress
   stock_converter_manufacturer: Tuya
-  stock_converter_model: TS0003
+  stock_converter_model: TS0004
   stock_image_type: 54179
   stock_manufacturer_id: 4417
-  stock_manufacturer_name: _TZ3000_njgrxsrf
-  store: null
-  threads: null
-  tuya_module: ZT3L  
-BRIDGE_PAINEL_3CH_CENAS:
-  alt_config_str: null
-  build: true
-  category: switch
-  config_str: 3kjidznp;TS0601-BR;SB4u;RC1;SB5u;RD3;SC0u;RB6;M;P0;
-  device_type: router
-  firmware_image_type: 47150
-  human_name: Ponte Painel 3ch Cenas
-  info: Ponte ConnectCasa - painel 3 canais + 3 cenas (MCU Tuya via UART)
-  mcu: TLSR8258
-  mcu_family: Telink
-  neutral: required
-  old_manufacturer_names: null
-  old_zb_models: null
-  output: relay
-  override_z2m_device: null
-  power: mains
-  status: in_progress
-  stock_converter_manufacturer: Tuya
-  stock_converter_model: TS0601
-  stock_image_type: 54179
-  stock_manufacturer_id: 4417
-  stock_manufacturer_name: _TZE284_3kjidznp
+  stock_manufacturer_name: _TZ3000_1nenkvye
+  stock_model_name: TS0004
   store: null
   threads: null
   tuya_module: ZTU

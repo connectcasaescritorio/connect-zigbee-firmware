@@ -32,6 +32,7 @@ static uint32_t g_ritual_last = 0;
 // Log de DPs desconhecidos (pra achar toque e LED individual)
 static char g_dplog[80];
 static uint16_t g_dplog_pos = 0;
+static uint16_t g_gesto_count = 0;   // quantos DP15 chegaram no total
 static void dplog_add(uint16_t id, uint8_t type, uint8_t val) {
     static const char H[] = "0123456789ABCDEF";
     if (g_dplog_pos > 64) g_dplog_pos = 0;
@@ -136,7 +137,12 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
             // single ou double conta como toque
             if (g_ritual_cnt < 255) g_ritual_cnt++;
         }
-        dplog_add(dp->id, dp->type, v);
+        // Log dedicado do gesto: acumula "v" de cada DP15 recebido
+        g_gesto_count++;
+        static const char HH[] = "0123456789ABCDEF";
+        if (g_dplog_pos > 70) g_dplog_pos = 0;
+        g_dplog[g_dplog_pos++] = HH[v & 0xF];
+        g_dplog[g_dplog_pos] = 0;
         return;
     }
     dplog_add(dp->id, dp->type, v);

@@ -22,11 +22,13 @@ static const uint16_t RELAY_DP[8] = {1, 2, 3, 4, 5, 6, 101, 102};
 #define DP_BACKLIGHT 15
 #define DP_GESTO 15   // mesma id: a MCU manda gesto (0/1/2) neste DP
 
-// Ritual de reset: 7 toques rapidos + segurar (hold) no 8o
-#define RITUAL_TOQUES 7
-#define RITUAL_JANELA_TICKS 150   // 15s
+// Reset por toques (igual aos módulos): conta singles ate atingir
+// g_multi_press_reset_count (configuravel 1-255 pela UI). Janela entre
+// toques pra reiniciar a contagem se demorar.
+#define RITUAL_JANELA_TICKS 100   // 10s de janela entre toques
 extern uint32_t bridge8_ticks(void);
-static uint8_t g_ritual_cnt = 0;
+extern uint8_t g_multi_press_reset_count;
+static uint16_t g_ritual_cnt = 0;
 static uint32_t g_ritual_last = 0;
 
 // Log de DPs desconhecidos (pra achar toque e LED individual)
@@ -120,24 +122,23 @@ static void on_mcu_dp(const tuya_dp_t *dp) {
         return;
     }
     if (dp->id == DP_GESTO) {
-        // Gesto de tecla: 0=single, 1=double, 2=hold
+        // Reset por toques: conta CADA gesto como 1 toque, ate atingir
+        // o multi_press_reset_count (default 10, configuravel 1-255).
         uint32_t now = bridge8_ticks();
         if (now - g_ritual_last > RITUAL_JANELA_TICKS) {
-            g_ritual_cnt = 0;  // janela expirou, reinicia
+            g_ritual_cnt = 0;  // demorou demais entre toques, reinicia
         }
         g_ritual_last = now;
-        if (v == 2) {
-            // hold: se ja teve >=7 toques, e o ritual -> wipe
-            if (g_ritual_cnt >= RITUAL_TOQUES) {
-                printf("bridge8: RITUAL 7+hold - factory wipe\r\n");
-                basic_cluster_request_factory_wipe();
-                g_ritual_cnt = 0;
-            }
-        } else {
-            // single ou double conta como toque
-            if (g_ritual_cnt < 255) g_ritual_cnt++;
+        g_ritual_cnt++;
+        uint8_t alvo = g_multi_press_reset_count;
+        if (alvo == 0) alvo = 10;  // seguranca
+        printf("bridge8: toque %d/%d\r\n", g_ritual_cnt, alvo);
+        if (g_ritual_cnt >= alvo) {
+            printf("bridge8: RESET por %d toques - factory wipe\r\n", alvo);
+            basic_cluster_request_factory_wipe();
+            g_ritual_cnt = 0;
         }
-        // Log dedicado do gesto: acumula "v" de cada DP15 recebido
+        // Log dos valores recebidos
         g_gesto_count++;
         static const char HH[] = "0123456789ABCDEF";
         if (g_dplog_pos > 70) g_dplog_pos = 0;

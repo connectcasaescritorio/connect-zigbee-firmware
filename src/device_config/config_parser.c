@@ -38,6 +38,8 @@ network_indicator_t network_indicator = {
 };
 
 led_t   leds[5];
+hal_gpio_pin_t relay_pins_used[10];
+uint8_t relay_pins_used_cnt = 0;
 uint8_t leds_cnt = 0;
 
 button_t buttons[11];
@@ -238,6 +240,7 @@ void parse_config() {
             hal_gpio_init(pin, 0, HAL_GPIO_PULL_NONE);
 
             relays[relays_cnt].pin     = pin;
+            if (relay_pins_used_cnt < 10) relay_pins_used[relay_pins_used_cnt++] = relays[relays_cnt].pin;
             relays[relays_cnt].on_high = 1;
 
             if (entry[3] == 'i') {
@@ -434,7 +437,8 @@ void network_indicator_on_network_status_change(
         }
         network_indicator_connected(&network_indicator);
         update_switch_clusters();
-        update_relay_clusters();
+        // NAO reaplicar relés no connect: em placas onde um pino de status
+        // compartilha lógica com relé, isso contamina o estado do relé.
     } else {
         network_indicator_not_connected(&network_indicator);
     }
@@ -453,7 +457,8 @@ void peripherals_init() {
     if (hal_zigbee_get_network_status() == HAL_ZIGBEE_NETWORK_JOINED) {
         network_indicator_connected(&network_indicator);
         update_switch_clusters();
-        update_relay_clusters();
+        // NAO reaplicar relés no connect: em placas onde um pino de status
+        // compartilha lógica com relé, isso contamina o estado do relé.
     } else {
         network_indicator_not_connected(&network_indicator);
     }

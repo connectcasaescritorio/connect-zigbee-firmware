@@ -115,8 +115,18 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     }
     if (attribute_id == ZCL_ATTR_BASIC_TEST_NET_STATUS) {
         void bridge_force_net_status(uint8_t status);
-        printf("TEST_NET_STATUS: forcando %d\r\n", g_test_net_status);
-        bridge_force_net_status(g_test_net_status);
+        void bridge8_poke_dp(uint8_t dp_id, uint8_t value);
+        uint8_t val = g_test_net_status;
+        if (val >= 100) {
+            // 100+N: manda DP N pra MCU com valor 1 (caca o pisca por DP)
+            bridge8_poke_dp(val - 100, 1);
+        } else if (val >= 50) {
+            // 50+N: manda DP N com valor 0
+            bridge8_poke_dp(val - 50, 0);
+        } else {
+            // 0-9: testa net_status
+            bridge_force_net_status(val);
+        }
     }
     if (attribute_id == ZCL_ATTR_BASIC_RESET_NOW) {
         // Reset com LEAVE da rede: limpa NVM e chama factory_reset

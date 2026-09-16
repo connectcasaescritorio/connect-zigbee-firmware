@@ -186,6 +186,12 @@ void bridge8_on_relay_change(uint8_t relay_index, uint8_t state) {
 
 uint8_t bridge8_app_active(void) { return g_active; }
 
+// Sonda: manda um DP arbitrario pra MCU (caçar o comando do pisca)
+void bridge8_poke_dp(uint8_t dp_id, uint8_t value) {
+    printf("bridge8: poke DP %d = %d\r\n", dp_id, value);
+    bridge_set_dp_enum(dp_id, value);   // tenta como enum
+}
+
 void bridge8_set_backlight(uint8_t mode) {
     if (g_active) bridge_set_dp_enum(DP_BACKLIGHT, mode);
 }

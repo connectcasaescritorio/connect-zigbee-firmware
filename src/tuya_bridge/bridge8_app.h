@@ -5,5 +5,6 @@ void bridge8_app_init(void);
 uint8_t bridge8_app_active(void);
 void bridge8_on_relay_change(uint8_t relay_index, uint8_t state);
 void bridge8_set_backlight(uint8_t mode);
+void bridge8_poke_dp(uint8_t dp_id, uint8_t value);
 const char *bridge8_dplog(void);
 #endif

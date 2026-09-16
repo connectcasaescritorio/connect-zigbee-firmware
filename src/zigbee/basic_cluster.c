@@ -3,6 +3,7 @@
 #include "build_date.h"
 #include "cluster_common.h"
 #include "consts.h"
+#include "hal/system.h"
 #include "device_config/config_nv.h"
 #include "device_config/config_parser.h"
 #include "device_config/device_params_nv.h"
@@ -112,9 +113,11 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         g_factory_wipe = 0;
     }
     if (attribute_id == ZCL_ATTR_BASIC_RESET_NOW) {
-        // Reset direto e incondicional: escrever qualquer coisa reseta
-        printf("RESET_NOW: schedule_full_reset imediato\r\n");
-        schedule_full_reset(200);
+        // Reset IMEDIATO e direto - sem agendar, chama tudo na hora
+        printf("RESET_NOW: reset imediato direto\r\n");
+        hal_nvm_clear_all();
+        hal_factory_reset();
+        hal_system_reset();
     }
 }
 

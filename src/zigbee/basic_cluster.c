@@ -117,7 +117,10 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         void bridge_force_net_status(uint8_t status);
         void bridge8_poke_dp(uint8_t dp_id, uint8_t value);
         uint8_t val = g_test_net_status;
-        if (val >= 100) {
+        void bridge8_scan_start(uint8_t on);
+        if (val == 200) { bridge8_scan_start(1); }
+        else if (val == 201) { bridge8_scan_start(0); }
+        else if (val >= 100) {
             // 100+N: manda DP N pra MCU com valor 1 (caca o pisca por DP)
             bridge8_poke_dp(val - 100, 1);
         } else if (val >= 50) {

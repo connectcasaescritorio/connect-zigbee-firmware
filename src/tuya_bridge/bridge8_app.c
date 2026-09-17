@@ -73,6 +73,7 @@ uint32_t bridge8_ticks(void) { return g_app_ticks; }
 #define BAUD_SWITCH_TICKS 40  // 4s sem handshake -> proxima velocidade
 
 static void on_mcu_dp(const tuya_dp_t *dp);
+static void scan_tick(void);
 static void bridge_uart_tx(const uint8_t *bytes, uint16_t len);
 
 static void uart_rx(const uint8_t *bytes, uint16_t len) {
@@ -106,7 +107,8 @@ static void tick(void *arg) {
     }
 
     // Expõe estado no atributo oculto: frames_rx (0xff06) e último frame (0xff08)
-    basic_cluster_update_bridge_hidden(bridge_rx_frame_count(),
+    scan_tick();
+    basic_cluster_update_bridge_hidden(bridge8_scan_current_dp(),
                                        bridge8_dplog());
     hal_tasks_schedule(&g_tick_task, 100);
 }
@@ -189,7 +191,35 @@ uint8_t bridge8_app_active(void) { return g_active; }
 // Sonda: manda um DP arbitrario pra MCU (caçar o comando do pisca)
 void bridge8_poke_dp(uint8_t dp_id, uint8_t value) {
     printf("bridge8: poke DP %d = %d\r\n", dp_id, value);
-    bridge_set_dp_enum(dp_id, value);   // tenta como enum
+    bridge_set_dp_enum(dp_id, value);
+}
+
+// Varredura automatica: testa cada DP a cada N ticks, expondo o DP atual
+static uint8_t g_scan_active = 0;
+static uint8_t g_scan_dp = 0;
+static uint32_t g_scan_last = 0;
+#define SCAN_PERIOD_TICKS 40   // 4s por DP
+#define SCAN_DP_MAX 120
+
+void bridge8_scan_start(uint8_t on) {
+    g_scan_active = on ? 1 : 0;
+    g_scan_dp = 1;
+    g_scan_last = 0;
+}
+uint8_t bridge8_scan_current_dp(void) { return g_scan_dp; }
+
+static void scan_tick(void) {
+    if (!g_scan_active) return;
+    uint32_t now = bridge8_ticks();
+    if (now - g_scan_last < SCAN_PERIOD_TICKS) return;
+    g_scan_last = now;
+    // manda o DP atual em varios tipos (bool, enum, value) pra garantir
+    printf("bridge8: SCAN DP %d\r\n", g_scan_dp);
+    bridge_set_dp_bool(g_scan_dp, 1);
+    bridge_set_dp_enum(g_scan_dp, 1);
+    bridge_set_dp_enum(g_scan_dp, 2);   // hold/pisca costuma ser valor 2
+    g_scan_dp++;
+    if (g_scan_dp > SCAN_DP_MAX) g_scan_dp = 1;  // recomeca
 }
 
 void bridge8_set_backlight(uint8_t mode) {

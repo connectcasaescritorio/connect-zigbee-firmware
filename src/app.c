@@ -62,7 +62,8 @@ void app_init(void) {
         if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'R' && mm[L-1] == 'D') {
             radar_app_init();
         }
-        if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'B' && mm[L-1] == '8') {
+        if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'B' &&
+            (mm[L-1] == '4' || mm[L-1] == '6' || mm[L-1] == '8')) {
             bridge8_app_init();
         }
     } // Does most of the setup, including all callbacks

@@ -202,8 +202,10 @@ static uint16_t g_dp_log_pos = 0;
 
 static void dp_log_add(const tuya_dp_t *dp) {
     static const char H[] = "0123456789ABCDEF";
-    // formato "id.tipo.val " ex "07.04.02 " — mantem os ultimos que couberem
-    if (g_dp_log_pos > 48) g_dp_log_pos = 0;  // wrap
+    // SO grava DPs de tecla (1..7). Ignora backlight(36/101), modos(18-20),
+    // relés(24-26) — o ruido automatico que apagava o registro do gesto.
+    if (dp->id > 7) return;
+    if (g_dp_log_pos > 48) g_dp_log_pos = 0;
     uint8_t val = dp->len > 0 ? dp->data[dp->len - 1] : 0;
     uint8_t trio[3] = {dp->id, dp->type, val};
     for (uint8_t i = 0; i < 3; i++) {
@@ -266,6 +268,16 @@ uint8_t bridge_app_active(void) { return g_active; }
 static hal_task_t g_radar_task;
 static void radar_tick(void *arg) {
     radar_step();
+    // Expoe: frames_rx = status (bit7=achou, bits0-6=tx_idx atual),
+    //        ultimo_frame (hex) = resultado (tx_idx<<8 | rx_idx)
+    extern unsigned char radar_status(void);
+    extern unsigned short radar_result(void);
+    static char hex[8];
+    static const char H[] = "0123456789ABCDEF";
+    unsigned short r = radar_result();
+    hex[0]=H[(r>>12)&0xF]; hex[1]=H[(r>>8)&0xF];
+    hex[2]=H[(r>>4)&0xF]; hex[3]=H[r&0xF]; hex[4]=0;
+    basic_cluster_update_bridge_hidden(radar_status(), hex);
     hal_tasks_schedule(&g_radar_task, 3000);
 }
 

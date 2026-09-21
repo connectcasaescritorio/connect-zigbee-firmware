@@ -15171,7 +15171,7 @@ const definitions = [
     },
     {
         zigbeeModel: [
-            "TS0601-B8",
+            "TS0601-RD",
         ],
         model: "TS110E",
         vendor: "Tuya-custom",

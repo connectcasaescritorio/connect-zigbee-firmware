@@ -68,9 +68,11 @@ void basic_cluster_update_bridge_mode(uint8_t ch, uint8_t m) {
 void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
     basic_cluster_store_attrs_to_nv();
     if (attribute_id == ZCL_ATTR_BASIC_DEVICE_CONFIG) {
+        void schedule_reboot(uint16_t delay_ms);
         device_config_str.data[device_config_str.size] =
             0;              // NULL terminate the string
         device_config_write_to_nv();
+        schedule_reboot(800);  // reinicia pra aplicar a config nova na hora
         schedule_reboot(0); // Use default delay
     }
     if (attribute_id == ZCL_ATTR_BASIC_STATUS_LED_STATE) {

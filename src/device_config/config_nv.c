@@ -52,10 +52,25 @@ void device_config_read_from_nv() {
             p++;
         }
         if (has_bd) {
+            // Dimmer: tenta a NVM primeiro (string escrita pelo usuario).
+            // Se a NVM tiver uma config valida (-BD), usa ela.
+            // Senao, usa a compilada. Assim da pra testar RX por string.
+            hal_nvm_status_t nvst = hal_nvm_read(NV_ITEM_DEVICE_CONFIG,
+                sizeof(device_config_str), (uint8_t *)&device_config_str);
+            const char *nd = (const char *)device_config_str.data;
+            int nv_has_bd = 0;
+            if (nvst == HAL_NVM_SUCCESS) {
+                const char *q = nd;
+                while (*q) { if (q[0]=='-'&&q[1]=='B'&&q[2]=='D'){nv_has_bd=1;break;} q++; }
+            }
+            if (nv_has_bd) {
+                printf("Dimmer: usando config da NVM: %s\r\n", nd);
+                return;
+            }
             memcpy(device_config_str.data, default_config_data,
                    sizeof(default_config_data));
             device_config_str.size = strlen(d);
-            printf("Dimmer: usando config compilada (ignora NVM): %s\r\n", d);
+            printf("Dimmer: usando config compilada: %s\r\n", d);
             return;
         }
     }

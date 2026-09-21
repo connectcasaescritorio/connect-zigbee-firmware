@@ -5688,7 +5688,7 @@ BOARD__CONNECT_DIMMER_1CH:
   alt_config_str: null
   build: true
   category: board
-  config_str: ysfo0wla;TS0601-BD;BC0u;WC1;TD7;YB7;M;
+  config_str: ysfo0wla;TS0601-BD;BC0u;WC1;TD7;YA0;M;
   device_type: router
   firmware_image_type: 47400
   human_name: Connect Dimmer 1CH

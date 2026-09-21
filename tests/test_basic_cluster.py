@@ -166,7 +166,7 @@ def test_device_config_write_schedules_reset(tmp_path):
         device.write_zigbee_attr(
             1, ZCL_CLUSTER_BASIC, ZCL_ATTR_BASIC_DEVICE_CONFIG, "C;D;"
         )
-        device.step_time(3100)  # Device reboots after 3s delay
+        device.step_time(300)  # Device reboots after small delay
         assert proc.wait_for_exit(1.0)
 
     with StubProc() as proc:

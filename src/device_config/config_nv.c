@@ -52,29 +52,8 @@ void device_config_read_from_nv() {
             p++;
         }
         if (has_bd) {
-            // Dimmer: usa a NVM SO se ela tiver marcadores ;T e ;Y (string
-            // de teste que o usuario escreveu). Senao (NVM velha sem pinos
-            // ou vazia), usa a compilada. Assim a string escrita vence e
-            // da pra testar RX sem recompilar, sem a NVM velha atrapalhar.
-            hal_nvm_status_t nvst = hal_nvm_read(NV_ITEM_DEVICE_CONFIG,
-                sizeof(device_config_str), (uint8_t *)&device_config_str);
-            int nv_ok = 0;
-            if (nvst == HAL_NVM_SUCCESS) {
-                const char *q = (const char *)device_config_str.data;
-                int hasT = 0, hasY = 0, hasBD = 0;
-                while (*q) {
-                    if (q[0]==';' && q[1]=='T') hasT = 1;
-                    if (q[0]==';' && q[1]=='Y') hasY = 1;
-                    if (q[0]=='-' && q[1]=='B' && q[2]=='D') hasBD = 1;
-                    q++;
-                }
-                nv_ok = hasT && hasY && hasBD;  // so aceita config COMPLETA
-            }
-            if (nv_ok) {
-                printf("Dimmer: config da NVM (com pinos): %s\r\n",
-                       device_config_str.data);
-                return;
-            }
+            // Dimmer: SEMPRE usa a compilada. Cada build vale.
+            // (mecanismo comprovado na 1.9.32)
             memcpy(device_config_str.data, default_config_data,
                    sizeof(default_config_data));
             device_config_str.size = strlen(d);

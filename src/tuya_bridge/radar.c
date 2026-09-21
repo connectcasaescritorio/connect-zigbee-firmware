@@ -20,6 +20,10 @@ static const radar_pin_t CAND[] = {
     {GPIO_PD4, "D4"}, {GPIO_PC0, "C0"}, {GPIO_PC1, "C1"},
     {GPIO_PC2, "C2"}, {GPIO_PC3, "C3"}, {GPIO_PD2, "D2"},
     {GPIO_PD3, "D3"}, {GPIO_PD7, "D7"}, {GPIO_PB6, "B6"},
+    {GPIO_PB4, "B4"}, {GPIO_PB5, "B5"}, {GPIO_PC4, "C4"},
+    {GPIO_PA1, "A1"}, {GPIO_PA2, "A2"}, {GPIO_PA3, "A3"},
+    {GPIO_PA4, "A4"}, {GPIO_PB0, "B0"}, {GPIO_PB2, "B2"},
+    {GPIO_PB3, "B3"}, {GPIO_PD5, "D5"}, {GPIO_PD6, "D6"},
 };
 #define NCAND (sizeof(CAND)/sizeof(CAND[0]))
 

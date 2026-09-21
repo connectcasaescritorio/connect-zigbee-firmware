@@ -79,6 +79,10 @@
 // OnOff cluster
 
 #define ZCL_ATTR_ONOFF                    0x0000
+#define ZCL_ATTR_CURRENT_LEVEL            0x0000
+#define ZCL_ATTR_LEVEL_MIN                0x0002
+#define ZCL_ATTR_LEVEL_MAX                0x0003
+#define ZCL_ATTR_LEVEL_STARTUP            0x4000
 #define ZCL_ATTR_START_UP_ONOFF           0x4003
 
 #define ZCL_ATTR_ONOFF_INDICATOR_MODE     0xff01

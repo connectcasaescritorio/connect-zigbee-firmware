@@ -41,6 +41,25 @@ void device_config_write_to_nv() {
 void device_config_read_from_nv() {
     hal_nvm_status_t st = 0;
 
+    // Se a config COMPILADA for do dimmer (contem -BD), ignora a NVM
+    // e usa sempre a compilada (contorna NVM presa com config antiga).
+    {
+        const char *d = (const char *)default_config_data;
+        const char *p = d;
+        int has_bd = 0;
+        while (*p) {
+            if (p[0]=='-' && p[1]=='B' && p[2]=='D') { has_bd = 1; break; }
+            p++;
+        }
+        if (has_bd) {
+            memcpy(device_config_str.data, default_config_data,
+                   sizeof(default_config_data));
+            device_config_str.size = strlen(d);
+            printf("Dimmer: usando config compilada (ignora NVM): %s\r\n", d);
+            return;
+        }
+    }
+
     st = hal_nvm_read(NV_ITEM_DEVICE_CONFIG, sizeof(device_config_str),
                       (uint8_t *)&device_config_str);
 

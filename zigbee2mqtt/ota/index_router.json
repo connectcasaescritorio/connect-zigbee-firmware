@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.9.32-32fa832.zigbee",
-    "fileVersion": 422719488,
-    "fileSize": 196594,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_DIMMER_1CH/tlc_switch-1.9.32-32fa832.zigbee",
+    "fileName": "tlc_switch-1.9.34-91e30a0.zigbee",
+    "fileVersion": 422850560,
+    "fileSize": 196722,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_DIMMER_1CH/tlc_switch-1.9.34-91e30a0.zigbee",
     "imageType": 47400,
     "manufacturerCode": 4417,
-    "sha512": "c46779cdab968cbed899eeb01d6bdf7110d010993ae7df31287e652ba8499feae591af03fe6fd34a3e202183798469f9f2105bb8617597d3348e98a9771e0b51",
+    "sha512": "2acb965893d2b545185c85786ab2234ffee5ee93f7d89eaf5a1c245f72927716e7c2e16970c38004f9b420fc9cc932a13c7245f6d2290569589f9572f5524951",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3210_ysfo0wla",
@@ -14,13 +14,13 @@
     ]
   },
   {
-    "fileName": "tlc_switch-1.9.32-32fa832-from_tuya.zigbee",
+    "fileName": "tlc_switch-1.9.34-91e30a0-from_tuya.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 196594,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_DIMMER_1CH/tlc_switch-1.9.32-32fa832-from_tuya.zigbee",
+    "fileSize": 196722,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_DIMMER_1CH/tlc_switch-1.9.34-91e30a0-from_tuya.zigbee",
     "imageType": 54179,
     "manufacturerCode": 4417,
-    "sha512": "ba347305221e22ba693aa49dc56a5949ff604cb4fe267236cb4d029f4e75191aee77852bc1dda49d7515bd806e6605430cea01d0964217cef13e398763e65fc8",
+    "sha512": "0494eed6597ad5447b82e9621f3eb291ac190851f9d02de1d6ff6c358fdda7b35757778df543fea3666d6b1e9860362535f676894e9975bf3057988372cb7778",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3210_ysfo0wla",

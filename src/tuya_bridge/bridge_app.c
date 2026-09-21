@@ -281,6 +281,28 @@ static void radar_tick(void *arg) {
     hal_tasks_schedule(&g_radar_task, 3000);
 }
 
+static hal_task_t g_radarx_task;
+static void radarx_tick(void *arg) {
+    void radar_rx_step(void);
+    unsigned char radar_rx_best_pin(void);
+    unsigned short radar_rx_best_edges(void);
+    radar_rx_step();
+    // expoe: frames_rx = indice do melhor pino; ultimo_frame(hex) = bordas
+    static char hex[8]; static const char H[]="0123456789ABCDEF";
+    unsigned short e = radar_rx_best_edges();
+    hex[0]=H[(e>>12)&0xF]; hex[1]=H[(e>>8)&0xF];
+    hex[2]=H[(e>>4)&0xF]; hex[3]=H[e&0xF]; hex[4]=0;
+    basic_cluster_update_bridge_hidden(radar_rx_best_pin(), hex);
+    hal_tasks_schedule(&g_radarx_task, 2000);
+}
+void radar_rx_app_init(void) {
+    g_radarx_task.handler = radarx_tick;
+    g_radarx_task.arg = 0;
+    hal_tasks_init(&g_radarx_task);
+    hal_tasks_schedule(&g_radarx_task, 3000);
+    printf("RADAR-RX: escuta passiva iniciada\r\n");
+}
+
 void radar_app_init(void) {
     g_radar_task.handler = radar_tick;
     g_radar_task.arg = 0;

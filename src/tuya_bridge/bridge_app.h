@@ -5,6 +5,7 @@
 
 void bridge_app_init(void);
 void radar_app_init(void);
+void radar_rx_app_init(void);
 unsigned char radar_status(void);
 unsigned short radar_result(void);
 void radar_step(void);

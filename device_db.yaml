@@ -5683,3 +5683,31 @@ BOARD__CONNECT_TOUCH_4CH_TOUCH:
   store: null
   threads: null
   tuya_module: ZT3L
+
+BOARD__CONNECT_DIMMER_1CH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: ysfo0wla;TS110E-DIM;BC0u;LC3i;SA0u;RB4;M;
+  device_type: router
+  firmware_image_type: 47400
+  human_name: Connect Dimmer 1CH
+  info: ConnectCasa - dimmer 1 canal corte de fase (ZT3L)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS110E
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3210_ysfo0wla
+  stock_model_name: TS110E
+  store: null
+  threads: null
+  tuya_module: ZT3L

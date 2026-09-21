@@ -90,53 +90,22 @@ void radar_step(void) {
             gpio_write(CAND[t].pin,1); sleep_us(bit_us); } \
     } while(0)
 
-    u8 r = irq_disable();
-    // manda os 3 handshakes em 9600 e depois em 115200
-    SEND_FRAME(HS_HEARTBEAT, sizeof(HS_HEARTBEAT), BIT_US);
-    SEND_FRAME(HS_PRODV0, sizeof(HS_PRODV0), BIT_US);
-    SEND_FRAME(HS_PRODV2, sizeof(HS_PRODV2), BIT_US);
-    SEND_FRAME(HS_HEARTBEAT, sizeof(HS_HEARTBEAT), BIT_US_FAST);
-    SEND_FRAME(HS_PRODV0, sizeof(HS_PRODV0), BIT_US_FAST);
-    SEND_FRAME(HS_PRODV2, sizeof(HS_PRODV2), BIT_US_FAST);
-    // janela de escuta pos-handshake
-    for (u8 rep = 0; rep < 1; rep++) {
-        for (u8 k = 0; k < 1; k++) {
-            u8 b = 0;
-            gpio_write(CAND[t].pin, 0);
-            for (u16 us = 0; us < BIT_US; us += 8) {
-                for (u8 i = 0; i < NCAND; i++) {
-                    if (i == t) continue;
-                    u8 v = gpio_read(CAND[i].pin) ? 1 : 0;
-                    if (v != last[i]) { edges[i]++; last[i] = v; }
-                }
-                sleep_us(8);
-            }
-            for (u8 bit = 0; bit < 8; bit++) {
-                gpio_write(CAND[t].pin, (b >> bit) & 1);
-                for (u16 us = 0; us < BIT_US; us += 8) {
-                    for (u8 i = 0; i < NCAND; i++) {
-                        if (i == t) continue;
-                        u8 v = gpio_read(CAND[i].pin) ? 1 : 0;
-                        if (v != last[i]) { edges[i]++; last[i] = v; }
-                    }
-                    sleep_us(8);
-                }
-            }
-            gpio_write(CAND[t].pin, 1);
-            sleep_us(BIT_US);
-        }
-        // janela de resposta pos-frame: ~20ms de escuta
-        for (u16 w = 0; w < 2500; w++) {
-            for (u8 i = 0; i < NCAND; i++) {
-                if (i == t) continue;
-                u8 v = gpio_read(CAND[i].pin) ? 1 : 0;
-                if (v != edges[i] % 2 && v != last[i]) { edges[i]++; last[i] = v; }
-                else if (v != last[i]) { edges[i]++; last[i] = v; }
-            }
-            sleep_us(8);
-        }
-    }
-    irq_restore(r);
+    // Manda os handshakes com IRQ off SO durante cada frame (curto),
+    // reabilitando entre eles para nao travar o stack/scheduler.
+    { u8 r = irq_disable(); SEND_FRAME(HS_HEARTBEAT, sizeof(HS_HEARTBEAT), BIT_US); irq_restore(r); }
+    { u8 r = irq_disable(); SEND_FRAME(HS_PRODV0, sizeof(HS_PRODV0), BIT_US); irq_restore(r); }
+    { u8 r = irq_disable(); SEND_FRAME(HS_PRODV2, sizeof(HS_PRODV2), BIT_US); irq_restore(r); }
+    // escuta pos-handshake: ~30ms observando resposta da MCU (IRQ off curto)
+    { u8 r = irq_disable();
+      for (u16 w = 0; w < 3000; w++) {
+          for (u8 i = 0; i < NCAND; i++) {
+              if (i == t) continue;
+              u8 v = gpio_read(CAND[i].pin) ? 1 : 0;
+              if (v != last[i]) { edges[i]++; last[i] = v; }
+          }
+          sleep_us(8);
+      }
+      irq_restore(r); }
 
     // melhor RX desta rodada
     u16 best_e = 0; u8 best_i = 0xFF;

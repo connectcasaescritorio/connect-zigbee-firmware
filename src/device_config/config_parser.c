@@ -268,10 +268,13 @@ void parse_config() {
             relays_cnt++;
             relay_clusters_cnt++;
         } else if (entry[0] == 'T') {
-            // T<pino>: define o pino TX da ponte UART (RX fixo PB7).
-            // Usado pra varrer qual pino da MCU responde.
+            // T<pino>: define o pino TX da ponte UART.
             hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);
-            hal_uart_set_pins(pin, 0);  // rx ignorado (fixo no hal)
+            hal_uart_set_tx(pin);
+        } else if (entry[0] == 'Y') {
+            // Y<pino>: define o pino RX da ponte UART.
+            hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);
+            hal_uart_set_rx(pin);
         } else if (entry[0] == 'H') {
             // H<pino>: forca o pino em HIGH constante (teste: achar o gate).
             hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);

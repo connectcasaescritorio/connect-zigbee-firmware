@@ -29,3 +29,6 @@ unsigned short hal_uart_tx_hw_count(void) { return 0; }
 unsigned short hal_uart_tx_fb_count(void) { return 0; }
 
 void hal_uart_set_pins(unsigned int tx, unsigned int rx) { (void)tx; (void)rx; }
+
+void hal_uart_set_tx(unsigned int tx) { (void)tx; }
+void hal_uart_set_rx(unsigned int rx) { (void)rx; }

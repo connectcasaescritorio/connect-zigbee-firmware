@@ -15,6 +15,8 @@
 static u32 g_tx_pin = GPIO_PB1;
 static u32 g_rx_pin = GPIO_PB7;
 void hal_uart_set_pins(u32 tx, u32 rx) { g_tx_pin = tx; g_rx_pin = rx; }
+void hal_uart_set_tx(u32 tx) { g_tx_pin = tx; }
+void hal_uart_set_rx(u32 rx) { g_rx_pin = rx; }
 #define BRIDGE_TX_PIN   g_tx_pin
 
 static hal_uart_rx_cb_t g_rx_cb = 0;
@@ -37,7 +39,19 @@ void hal_uart_init(uint32_t baudrate, hal_uart_rx_cb_t rx_cb) {
     g_bit_us = (baudrate >= 115200) ? 8 : (1000000 / baudrate);
 
     // RX no periferico (so o pino de RX importa para ele)
-    drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7);  // RX periferico fixo PB7
+    // RX configuravel: mapeia o pino escolhido pro enum UART_RX do SDK.
+    // TX sempre PB1 no periferico (mas usamos bit-bang no g_tx_pin de qq jeito).
+    switch (g_rx_pin) {
+        case GPIO_PA0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PA0); break;
+        case GPIO_PB0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB0); break;
+        case GPIO_PB7: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
+        case GPIO_PC4: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC4); break;
+        case GPIO_PD0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD0); break;
+        case GPIO_PD6: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD6); break;
+        case GPIO_PC0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC0); break;
+        case GPIO_PC1: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC1); break;
+        default:       drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
+    }
     drv_uart_init(baudrate, g_rx_dma_buf, sizeof(g_rx_dma_buf),
                   uart_rx_irq_handler_cb);
 
@@ -63,7 +77,19 @@ static void tx_byte_bitbang(uint8_t b) {
     sleep_us(g_bit_us);
     irq_restore(r);
     // Devolve o pino ao periferico UART
-    drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7);  // RX periferico fixo PB7
+    // RX configuravel: mapeia o pino escolhido pro enum UART_RX do SDK.
+    // TX sempre PB1 no periferico (mas usamos bit-bang no g_tx_pin de qq jeito).
+    switch (g_rx_pin) {
+        case GPIO_PA0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PA0); break;
+        case GPIO_PB0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB0); break;
+        case GPIO_PB7: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
+        case GPIO_PC4: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC4); break;
+        case GPIO_PD0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD0); break;
+        case GPIO_PD6: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD6); break;
+        case GPIO_PC0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC0); break;
+        case GPIO_PC1: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC1); break;
+        default:       drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
+    }
 }
 
 // TX direto no periferico com buffer ESTATICO (formato DMA do 8258:

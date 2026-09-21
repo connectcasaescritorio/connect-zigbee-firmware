@@ -28,9 +28,12 @@ static const radar_pin_t CAND[] = {
 #define NCAND (sizeof(CAND)/sizeof(CAND[0]))
 
 // Product query v0x02 seq=1: 55 AA 02 00 01 01 00 00 chk(=0x03... calc)
-static const u8 HEARTBEAT[] = {0x55, 0xAA, 0x02, 0x00, 0x01, 0x01,
-                               0x00, 0x00, 0x03};
-#define BIT_US 104  // 9600 na sonda (bit-bang preciso; 115200 fica p/ ponte)
+// Multiplos handshakes: v0x00 heartbeat, v0x00 product query, v0x02 product query
+static const u8 HS_HEARTBEAT[] = {0x55, 0xAA, 0x00, 0x00, 0x00, 0x00, 0xFF};
+static const u8 HS_PRODV0[]    = {0x55, 0xAA, 0x00, 0x01, 0x00, 0x00, 0x00};
+static const u8 HS_PRODV2[]    = {0x55, 0xAA, 0x02, 0x00, 0x01, 0x01, 0x00, 0x00, 0x03};
+#define BIT_US 104   // 9600
+#define BIT_US_FAST 9  // ~115200
 
 static u8 g_tx_idx = 0;
 static u8 g_found = 0;
@@ -74,11 +77,31 @@ void radar_step(void) {
         edges[i] = 0;
     }
 
+    // helper: transmite um frame no baud dado, amostrando os outros pinos
+    #define SEND_FRAME(frame, sz, bit_us) do { \
+        for (u8 k = 0; k < (sz); k++) { \
+            u8 b = (frame)[k]; \
+            gpio_write(CAND[t].pin, 0); \
+            for (u16 us=0; us<(bit_us); us+=8) { \
+                for (u8 i=0;i<NCAND;i++){ if(i==t)continue; u8 v=gpio_read(CAND[i].pin)?1:0; if(v!=last[i]){edges[i]++;last[i]=v;} } \
+                sleep_us(8);} \
+            for (u8 bit=0;bit<8;bit++){ gpio_write(CAND[t].pin,(b>>bit)&1); \
+                for(u16 us=0;us<(bit_us);us+=8){ for(u8 i=0;i<NCAND;i++){if(i==t)continue;u8 v=gpio_read(CAND[i].pin)?1:0;if(v!=last[i]){edges[i]++;last[i]=v;}} sleep_us(8);} } \
+            gpio_write(CAND[t].pin,1); sleep_us(bit_us); } \
+    } while(0)
+
     u8 r = irq_disable();
-    for (u8 rep = 0; rep < 2; rep++) {
-        for (u8 k = 0; k < sizeof(HEARTBEAT); k++) {
-            // transmite o byte e amostra os outros pinos entre bits
-            u8 b = HEARTBEAT[k];
+    // manda os 3 handshakes em 9600 e depois em 115200
+    SEND_FRAME(HS_HEARTBEAT, sizeof(HS_HEARTBEAT), BIT_US);
+    SEND_FRAME(HS_PRODV0, sizeof(HS_PRODV0), BIT_US);
+    SEND_FRAME(HS_PRODV2, sizeof(HS_PRODV2), BIT_US);
+    SEND_FRAME(HS_HEARTBEAT, sizeof(HS_HEARTBEAT), BIT_US_FAST);
+    SEND_FRAME(HS_PRODV0, sizeof(HS_PRODV0), BIT_US_FAST);
+    SEND_FRAME(HS_PRODV2, sizeof(HS_PRODV2), BIT_US_FAST);
+    // janela de escuta pos-handshake
+    for (u8 rep = 0; rep < 1; rep++) {
+        for (u8 k = 0; k < 1; k++) {
+            u8 b = 0;
             gpio_write(CAND[t].pin, 0);
             for (u16 us = 0; us < BIT_US; us += 8) {
                 for (u8 i = 0; i < NCAND; i++) {

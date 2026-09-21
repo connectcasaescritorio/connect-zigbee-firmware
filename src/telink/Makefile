@@ -152,6 +152,7 @@ COMMON_SOURCES := \
 	$(SRC_DIR)/tuya_bridge/bridge_core.c \
 	$(SRC_DIR)/tuya_bridge/bridge_app.c \
 	$(SRC_DIR)/tuya_bridge/bridge8_app.c \
+	$(SRC_DIR)/tuya_bridge/bridge_dim_app.c \
 	$(SRC_DIR)/tuya_bridge/radar.c \
 	$(SRC_DIR)/tuya_bridge/radar_rx.c \
 	$(SRC_DIR)/base_components/button.c \

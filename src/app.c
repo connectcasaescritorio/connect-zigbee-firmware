@@ -8,6 +8,7 @@
 #include "hal/zigbee.h"
 #include "tuya_bridge/bridge_app.h"
 #include "tuya_bridge/bridge8_app.h"
+#include "tuya_bridge/bridge_dim_app.h"
 #include "zigbee/basic_cluster.h"
 #include "hal/zigbee_ota.h"
 #include "zigbee/battery_cluster.h"
@@ -64,6 +65,9 @@ void app_init(void) {
         }
         if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'R' && mm[L-1] == 'X') {
             radar_rx_app_init();
+        }
+        if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'B' && mm[L-1] == 'D') {
+            bridge_dim_app_init();
         }
         if (L >= 3 && mm[L-3] == '-' && mm[L-2] == 'B' &&
             (mm[L-1] == '4' || mm[L-1] == '6' || mm[L-1] == '8')) {

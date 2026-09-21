@@ -72,8 +72,7 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         device_config_str.data[device_config_str.size] =
             0;              // NULL terminate the string
         device_config_write_to_nv();
-        schedule_reboot(800);
-        schedule_reboot(0); // Use default delay
+        schedule_reboot(3000);  // 3s: garante que a NVM gravou antes
     }
     if (attribute_id == ZCL_ATTR_BASIC_STATUS_LED_STATE) {
         network_indicator_from_manual_state(&network_indicator);

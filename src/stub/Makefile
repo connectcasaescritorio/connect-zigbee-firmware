@@ -36,6 +36,7 @@ SOURCES := \
 	$(SRC_DIR)/zigbee/poll_control_cluster.c \
 	$(SRC_DIR)/stub/main.c \
 	$(SRC_DIR)/stub/hal/gpio.c \
+	$(SRC_DIR)/stub/hal/pwm.c \
 	$(SRC_DIR)/stub/hal/uart.c \
 	$(SRC_DIR)/tuya_bridge/tuya_serial.c \
 	$(SRC_DIR)/tuya_bridge/bridge_core.c \
@@ -55,6 +56,7 @@ SOURCES := \
 	$(SRC_DIR)/stub/machine_io.c \
 	$(SRC_DIR)/base_components/led.c \
 	$(SRC_DIR)/base_components/relay.c \
+	$(SRC_DIR)/base_components/triac_dimmer.c \
 	$(SRC_DIR)/base_components/button.c \
 	$(SRC_DIR)/base_components/battery.c \
 	$(SRC_DIR)/base_components/network_indicator.c \

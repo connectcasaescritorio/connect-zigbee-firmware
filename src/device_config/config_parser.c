@@ -58,6 +58,14 @@ zigbee_switch_cluster switch_clusters[4];
 uint8_t switch_clusters_cnt = 0;
 
 zigbee_relay_cluster relay_clusters[8];
+#include "zigbee/dimmer_cluster.h"
+#include "hal/pwm.h"
+zigbee_dimmer_cluster dimmer_clusters[2];
+uint8_t dimmer_clusters_cnt = 0;
+static hal_gpio_pin_t dimmer_pins[2];
+
+static void dimmer_apply_pwm_0(uint8_t level) { hal_pwm_set_duty(dimmer_pins[0], level); }
+static void dimmer_apply_pwm_1(uint8_t level) { hal_pwm_set_duty(dimmer_pins[1], level); }
 uint8_t relay_clusters_cnt = 0;
 
 zigbee_cover_switch_cluster cover_switch_clusters[3];
@@ -258,6 +266,17 @@ void parse_config() {
 
             relays_cnt++;
             relay_clusters_cnt++;
+        } else if (entry[0] == 'W') {
+            // W<pino>: dimmer PWM (corte de fase / MOSFET). Cria dimmer_cluster.
+            hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);
+            if (dimmer_clusters_cnt < 2) {
+                dimmer_pins[dimmer_clusters_cnt] = pin;
+                hal_pwm_init(pin);
+                dimmer_clusters[dimmer_clusters_cnt].apply =
+                    dimmer_clusters_cnt == 0 ? dimmer_apply_pwm_0 : dimmer_apply_pwm_1;
+                dimmer_clusters[dimmer_clusters_cnt].current_level = 254;
+                dimmer_clusters_cnt++;
+            }
         } else if (entry[0] == 'X') {
             hal_gpio_pin_t  open_pin  = hal_gpio_parse_pin(entry + 1);
             hal_gpio_pin_t  close_pin = hal_gpio_parse_pin(entry + 3);
@@ -394,6 +413,10 @@ void parse_config() {
         // Group cluster is stateless, safe to add to multiple endpoints
         group_cluster_add_to_endpoint(&group_cluster,
                                       &endpoints[switch_clusters_cnt + index]);
+    }
+
+    for (int index = 0; index < dimmer_clusters_cnt; index++) {
+        dimmer_cluster_add_to_endpoint(&dimmer_clusters[index], &endpoints[index]);
     }
 
     int cover_switch_base = switch_clusters_cnt + relay_clusters_cnt;

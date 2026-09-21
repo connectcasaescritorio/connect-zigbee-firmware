@@ -15171,25 +15171,18 @@ const definitions = [
     },
     {
         zigbeeModel: [
-            "TS0601-RD",
+            "TS0601-BD",
         ],
         model: "TS110E",
         vendor: "Tuya-custom",
         description: "Custom switch (https://github.com/romasku/tuya-zigbee-switch)",
         extend: [
-            deviceEndpoints({ endpoints: {"relay": 1, } }),
-            romasku.deviceConfig("device_config", "relay"),
-            romasku.multiPressResetCount("multi_press_reset_count", "relay"),
-            onOff({ endpointNames: ["relay"] }),
+            deviceEndpoints({ endpoints: {} }),
+            romasku.deviceConfig("device_config", ""),
+            romasku.multiPressResetCount("multi_press_reset_count", ""),
         ],
         meta: { multiEndpoint: true },
         configure: async (device, coordinatorEndpoint, logger) => {
-            const endpoint1 = device.getEndpoint(1);
-            await reporting.onOff(endpoint1, {
-                min: 0,
-                max: constants.repInterval.MAX,
-                change: 1,
-            });
 
 
 

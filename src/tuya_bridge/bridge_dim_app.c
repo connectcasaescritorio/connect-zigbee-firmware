@@ -4,6 +4,7 @@
 #include "hal/tasks.h"
 #include "hal/printf_selector.h"
 #include "zigbee/dimmer_cluster.h"
+#include "zigbee/basic_cluster.h"
 
 // ============================================================
 // PONTE DIMMER - dimmer TS110E via MCU HK32F030 (DP serial)

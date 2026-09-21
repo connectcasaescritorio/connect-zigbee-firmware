@@ -45,11 +45,9 @@ void hal_uart_init(uint32_t baudrate, hal_uart_rx_cb_t rx_cb) {
         case GPIO_PA0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PA0); break;
         case GPIO_PB0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB0); break;
         case GPIO_PB7: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
-        case GPIO_PC4: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC4); break;
-        case GPIO_PD0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD0); break;
+        case GPIO_PC3: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC3); break;
+        case GPIO_PC5: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC5); break;
         case GPIO_PD6: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD6); break;
-        case GPIO_PC0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC0); break;
-        case GPIO_PC1: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC1); break;
         default:       drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
     }
     drv_uart_init(baudrate, g_rx_dma_buf, sizeof(g_rx_dma_buf),
@@ -83,11 +81,9 @@ static void tx_byte_bitbang(uint8_t b) {
         case GPIO_PA0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PA0); break;
         case GPIO_PB0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB0); break;
         case GPIO_PB7: drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
-        case GPIO_PC4: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC4); break;
-        case GPIO_PD0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD0); break;
+        case GPIO_PC3: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC3); break;
+        case GPIO_PC5: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC5); break;
         case GPIO_PD6: drv_uart_pin_set(UART_TX_PB1, UART_RX_PD6); break;
-        case GPIO_PC0: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC0); break;
-        case GPIO_PC1: drv_uart_pin_set(UART_TX_PB1, UART_RX_PC1); break;
         default:       drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7); break;
     }
 }

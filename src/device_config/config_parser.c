@@ -60,6 +60,7 @@ uint8_t switch_clusters_cnt = 0;
 zigbee_relay_cluster relay_clusters[8];
 #include "zigbee/dimmer_cluster.h"
 #include "hal/pwm.h"
+#include "hal/uart.h"
 zigbee_dimmer_cluster dimmer_clusters[2];
 uint8_t dimmer_clusters_cnt = 0;
 static hal_gpio_pin_t dimmer_pins[2];
@@ -266,6 +267,11 @@ void parse_config() {
 
             relays_cnt++;
             relay_clusters_cnt++;
+        } else if (entry[0] == 'T') {
+            // T<pino>: define o pino TX da ponte UART (RX fixo PB7).
+            // Usado pra varrer qual pino da MCU responde.
+            hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);
+            hal_uart_set_pins(pin, 0);  // rx ignorado (fixo no hal)
         } else if (entry[0] == 'H') {
             // H<pino>: forca o pino em HIGH constante (teste: achar o gate).
             hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);

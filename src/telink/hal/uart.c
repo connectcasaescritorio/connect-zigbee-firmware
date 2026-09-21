@@ -11,7 +11,11 @@
 //       cadeia DMA/IRQ de transmissao.
 // ============================================================
 
-#define BRIDGE_TX_PIN   GPIO_PB1
+// Pinos configuraveis (default PB1/PB7). O parser pode sobrescrever.
+static u32 g_tx_pin = GPIO_PB1;
+static u32 g_rx_pin = GPIO_PB7;
+void hal_uart_set_pins(u32 tx, u32 rx) { g_tx_pin = tx; g_rx_pin = rx; }
+#define BRIDGE_TX_PIN   g_tx_pin
 
 static hal_uart_rx_cb_t g_rx_cb = 0;
 // 8258: a DMA RX entrega PACOTES inteiros (disparo por fim de recepcao)
@@ -33,7 +37,7 @@ void hal_uart_init(uint32_t baudrate, hal_uart_rx_cb_t rx_cb) {
     g_bit_us = (baudrate >= 115200) ? 8 : (1000000 / baudrate);
 
     // RX no periferico (so o pino de RX importa para ele)
-    drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7);
+    drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7);  // RX periferico fixo PB7
     drv_uart_init(baudrate, g_rx_dma_buf, sizeof(g_rx_dma_buf),
                   uart_rx_irq_handler_cb);
 
@@ -59,7 +63,7 @@ static void tx_byte_bitbang(uint8_t b) {
     sleep_us(g_bit_us);
     irq_restore(r);
     // Devolve o pino ao periferico UART
-    drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7);
+    drv_uart_pin_set(UART_TX_PB1, UART_RX_PB7);  // RX periferico fixo PB7
 }
 
 // TX direto no periferico com buffer ESTATICO (formato DMA do 8258:

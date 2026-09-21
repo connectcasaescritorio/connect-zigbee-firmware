@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.10.5-e6a5beb-forced.zigbee",
+    "fileName": "tlc_switch-1.10.6-07824a4-forced.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 193810,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_DIMMER_1CH/tlc_switch-1.10.5-e6a5beb-forced.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_DIMMER_1CH/tlc_switch-1.10.6-07824a4-forced.zigbee",
     "imageType": 47400,
     "manufacturerCode": 4417,
-    "sha512": "d19441259a2b18820daf53a5962fc4ff378d5b950db6646d04e6c089b3b64585fe6f54b9bc559d1c280e696b221f0247e0fe83dd8395753a2ac960e3ebed1778",
+    "sha512": "e1caed81b8e635c4f2763f25d2a38a69124ea69028ca8759a551c544a1efac4d08d73591c67ba86f6be727bb5160da6ad81780110627cbcd650532cfcbf36e65",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3210_ysfo0wla",

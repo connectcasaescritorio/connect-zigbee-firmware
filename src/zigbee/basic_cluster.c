@@ -72,7 +72,7 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         device_config_str.data[device_config_str.size] =
             0;              // NULL terminate the string
         device_config_write_to_nv();
-        schedule_reboot(800);  // reinicia pra aplicar a config nova na hora
+        schedule_reboot(800);
         schedule_reboot(0); // Use default delay
     }
     if (attribute_id == ZCL_ATTR_BASIC_STATUS_LED_STATE) {

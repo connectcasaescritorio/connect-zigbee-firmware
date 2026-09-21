@@ -266,6 +266,11 @@ void parse_config() {
 
             relays_cnt++;
             relay_clusters_cnt++;
+        } else if (entry[0] == 'H') {
+            // H<pino>: forca o pino em HIGH constante (teste: achar o gate).
+            hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);
+            hal_gpio_init(pin, 0, HAL_GPIO_PULL_NONE);
+            hal_gpio_write(pin, 1);
         } else if (entry[0] == 'W') {
             // W<pino>: dimmer PWM (corte de fase / MOSFET). Cria dimmer_cluster.
             hal_gpio_pin_t pin = hal_gpio_parse_pin(entry + 1);

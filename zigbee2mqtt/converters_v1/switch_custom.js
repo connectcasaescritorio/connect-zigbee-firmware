@@ -244,7 +244,7 @@ const romasku = {
                     } else if (part[0] == 'C') {
                         validatePin(part.slice(1,3));
                         validatePin(part.slice(3,5));
-                    } else if (part[0] == 'L' || part[0] == 'R' || part[0] == 'I' || part[0] == 'Q') {
+                    } else if (part[0] == 'L' || part[0] == 'R' || part[0] == 'I' || part[0] == 'Q' || part[0] == 'W') {
                         validatePin(part.slice(1,3));
                     } else if(part[0] == 'M') {
                         ;

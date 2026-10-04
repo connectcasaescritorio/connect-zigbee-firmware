@@ -5660,7 +5660,7 @@ BOARD__CONNECT_TOUCH_4CH_TOUCH:
   alt_config_str: null
   build: true
   category: board
-  config_str: PENDENTE4CH;TS0601-B4;BC0u;RC0;RC1;RC2;RC3;M;
+  config_str: irzgyra2;TS0601-B4;BC0u;RC0;RC1;RC2;RC3;M;
   device_type: router
   firmware_image_type: 47302
   human_name: Connect Touch 4CH Touch
@@ -5678,7 +5678,7 @@ BOARD__CONNECT_TOUCH_4CH_TOUCH:
   stock_converter_model: TS0601
   stock_image_type: 54179
   stock_manufacturer_id: 4417
-  stock_manufacturer_name: _TZE204_PENDENTE4CH
+  stock_manufacturer_name: _TZE204_irzgyra2
   stock_model_name: TS0601
   store: null
   threads: null

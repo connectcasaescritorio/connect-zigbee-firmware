@@ -1,30 +1,30 @@
 [
   {
-    "fileName": "tlc_switch-1.9.42-2f9922b.zigbee",
+    "fileName": "tlc_switch-1.9.42-c7caef3.zigbee",
     "fileVersion": 423768064,
-    "fileSize": 196578,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_TOUCH_4CH_TOUCH/tlc_switch-1.9.42-2f9922b.zigbee",
-    "imageType": 47302,
+    "fileSize": 196594,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_TOUCH_8CH/tlc_switch-1.9.42-c7caef3.zigbee",
+    "imageType": 47300,
     "manufacturerCode": 4417,
-    "sha512": "2581e74efb8085f838b411f392413c02c533bea6638aafd74f31ef478d91e54642d4d902e56e3332186a322b326cfa5298dc7f0d9da471882cdabaa1519aebc7",
+    "sha512": "6cb97e023ee2ee1c67e13500edb249cabd4088f4acbd77110399f2273d9626d83911aa21341c1aa0c44480be8738f4b3f86d80571745058e48f3706846e7fc22",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
-      "_TZE204_irzgyra2",
-      "irzgyra2"
+      "_TZE204_wktrysab",
+      "wktrysab"
     ]
   },
   {
-    "fileName": "tlc_switch-1.9.42-2f9922b-from_tuya.zigbee",
+    "fileName": "tlc_switch-1.9.42-c7caef3-from_tuya.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 196578,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_TOUCH_4CH_TOUCH/tlc_switch-1.9.42-2f9922b-from_tuya.zigbee",
+    "fileSize": 196594,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_TOUCH_8CH/tlc_switch-1.9.42-c7caef3-from_tuya.zigbee",
     "imageType": 54179,
     "manufacturerCode": 4417,
-    "sha512": "78806cc1e964adcad7032a1eceb209ff9bed2479dc2e72587793e4da53edc367152a951e28083343cfc396bb7e2eb72a8c6cbbd764b88c7c12df22203fea4f27",
+    "sha512": "8603479a02a17c3b97d15c6d9ba126426a82fb9c5c386853953527944f4bc390046030ed6446d83593c3732dc986b4ac2dc07bf8475342863f8ca748e9702f3b",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
-      "_TZE204_irzgyra2",
-      "irzgyra2"
+      "_TZE204_wktrysab",
+      "wktrysab"
     ]
   }
 ]

@@ -5711,3 +5711,31 @@ BOARD__CONNECT_DIMMER_1CH:
   store: null
   threads: null
   tuya_module: ZT3L
+
+BOARD__CONNECT_SA4W_TS0004:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: iymfxdis;TS0004-SA4W;LA0i;SB6u;RC2;IA1i;SC0u;RC3;IC4i;SD7u;RD2;IC1i;SD3u;RB4;ID4i;
+  device_type: router
+  firmware_image_type: 47500
+  human_name: Connect SA-4W 4CH (Nova Digital)
+  info: ConnectCasa - Nova Digital SA-4W 4 canais (ZTU SoC direto)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: SA-4W
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3210_iymfxdis
+  stock_model_name: TS0004
+  store: null
+  threads: null
+  tuya_module: ZTU

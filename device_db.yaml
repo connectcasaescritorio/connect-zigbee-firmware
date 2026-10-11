@@ -5716,7 +5716,7 @@ BOARD__CONNECT_SA4W_TS0004:
   alt_config_str: null
   build: true
   category: board
-  config_str: iymfxdis;TS0004-SA4W;LA0i;SB6u;RC2;IA1i;SC0u;RC3;IC4i;SD7u;RD2;IC1i;SD3u;RB4;ID4i;
+  config_str: iymfxdis;TS0004-SA4W;LA0i;SB6u;RC2;IA1i;SC0u;RC3;IC4i;SD7u;RD2;IC1i;SD3u;RB4;ID4i;M;
   device_type: router
   firmware_image_type: 47500
   human_name: Connect SA-4W 4CH (Nova Digital)

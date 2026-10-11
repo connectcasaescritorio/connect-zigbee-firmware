@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.9.42-9f4d592.zigbee",
+    "fileName": "tlc_switch-1.9.42-f29350a.zigbee",
     "fileVersion": 423768064,
     "fileSize": 196626,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_SA4W_TS0004/tlc_switch-1.9.42-9f4d592.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_SA4W_TS0004/tlc_switch-1.9.42-f29350a.zigbee",
     "imageType": 47500,
     "manufacturerCode": 4417,
-    "sha512": "7352b051722052069ba47f73f8fd5d7582c6630738aa015683f43e783312202410262c8880b0e12547a96d2723596544cfdd931bf246929d25e00231c86f98e5",
+    "sha512": "5c6ae27702737de6917fd765bf42e10ec35ca050f5f1a85842f8085976ad3ded6c1c437833bb6af1e7abcc8b12d5f8a7e54975e09a7e2418af129db02a710e41",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3210_iymfxdis",
@@ -14,13 +14,13 @@
     ]
   },
   {
-    "fileName": "tlc_switch-1.9.42-9f4d592-from_tuya.zigbee",
+    "fileName": "tlc_switch-1.9.42-f29350a-from_tuya.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 196626,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_SA4W_TS0004/tlc_switch-1.9.42-9f4d592-from_tuya.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_SA4W_TS0004/tlc_switch-1.9.42-f29350a-from_tuya.zigbee",
     "imageType": 2050,
     "manufacturerCode": 4417,
-    "sha512": "35461422f7c29faa00684ee6abdbdc728af4843aad1a23bc37a5c74be7ecddc5b1b11f752fd1391c74500bde6dab4ae50f523835a0e9fc33d709e4d6073647f7",
+    "sha512": "947043d14c440f112ad4e31a895f13dbd643a2ec9e9fda294f69544c4f55efbf0887089d9c1668e050968c38a6a67e1d3643750b3b2604915cd0ef82e2dc8fb9",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3210_iymfxdis",

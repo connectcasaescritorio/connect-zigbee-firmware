@@ -5732,7 +5732,7 @@ BOARD__CONNECT_SA4W_TS0004:
   status: in_progress
   stock_converter_manufacturer: Nova Digital
   stock_converter_model: SA-4W
-  stock_image_type: 54179
+  stock_image_type: 2050
   stock_manufacturer_id: 4417
   stock_manufacturer_name: _TZ3210_iymfxdis
   stock_model_name: TS0004

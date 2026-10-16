@@ -1,30 +1,30 @@
 [
   {
-    "fileName": "tlc_switch-1.9.44-4838e2d.zigbee",
+    "fileName": "tlc_switch-1.9.44-e0f8e52.zigbee",
     "fileVersion": 423899136,
-    "fileSize": 196578,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/MODULE_GIRIER_B_TS0001/tlc_switch-1.9.44-4838e2d.zigbee",
-    "imageType": 43595,
+    "fileSize": 196594,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_MOD2CH_TS0002/tlc_switch-1.9.44-e0f8e52.zigbee",
+    "imageType": 47600,
     "manufacturerCode": 4417,
-    "sha512": "92bfffa775c88d79fe3ad8c7fb428da21feae3a60272301ba2385aa955e8e3395fa58d35e1d079c28c913e568fc85bdb3fd8f37427a430e00a1188347c07eda1",
+    "sha512": "d69ee5a121634dce61a8d1bf25be2164232b447128938dd23165cd0b908ff10d86edee69f7b8f5f6c97236db1ede2008eb15e1168cfd360d63294834e3139f52",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
-      "_TZ3210_9hbau615",
-      "9hbau615"
+      "_TZ3210_gcagsb9r",
+      "gcagsb9r"
     ]
   },
   {
-    "fileName": "tlc_switch-1.9.44-4838e2d-from_tuya.zigbee",
+    "fileName": "tlc_switch-1.9.44-e0f8e52-from_tuya.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 196578,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/MODULE_GIRIER_B_TS0001/tlc_switch-1.9.44-4838e2d-from_tuya.zigbee",
-    "imageType": 2050,
+    "fileSize": 196594,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_MOD2CH_TS0002/tlc_switch-1.9.44-e0f8e52-from_tuya.zigbee",
+    "imageType": 54179,
     "manufacturerCode": 4417,
-    "sha512": "805ad285b611286fae4f413ba9c7861be0ed8b47d0f518aec92a5105758deac40bf3077bbcc3b7448c9e3f7444fd024eaf6412c2001711650b4173a381add709",
+    "sha512": "7972672f1233ca65a5b0a1ae227405bb7efd19ac6d96d97237366bc36b7cc14e97caf0614b778e39af05fcdea59efe8ba9c7d8c16b2fd81e12ce6927fa34544e",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
-      "_TZ3210_9hbau615",
-      "9hbau615"
+      "_TZ3210_gcagsb9r",
+      "gcagsb9r"
     ]
   }
 ]

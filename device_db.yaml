@@ -5739,3 +5739,31 @@ BOARD__CONNECT_SA4W_TS0004:
   store: null
   threads: null
   tuya_module: ZTU
+
+BOARD__CONNECT_MOD2CH_TS0002:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: gcagsb9r;TS0002-CC2;BC4u;LB1;SC2u;RB7;SC3u;RB4;M;
+  device_type: router
+  firmware_image_type: 47600
+  human_name: Connect Modulo 2CH (ZT2S)
+  info: ConnectCasa - modulo 2 canais ZT2S (_TZ3210_gcagsb9r)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0002
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3210_gcagsb9r
+  stock_model_name: TS0002
+  store: null
+  threads: null
+  tuya_module: ZT2S_real

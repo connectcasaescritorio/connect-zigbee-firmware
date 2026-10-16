@@ -1,12 +1,12 @@
 [
   {
-    "fileName": "tlc_switch-1.9.44-e0f8e52-forced.zigbee",
+    "fileName": "tlc_switch-1.9.45-da2ee7c-forced.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 196594,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_MOD2CH_TS0002/tlc_switch-1.9.44-e0f8e52-forced.zigbee",
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_MOD2CH_TS0002/tlc_switch-1.9.45-da2ee7c-forced.zigbee",
     "imageType": 47600,
     "manufacturerCode": 4417,
-    "sha512": "51e6facf1efb09f6d34440974af9db26ae34319286e11237501b4404645ea64f9ee198aa9721638a0e0c5291f15e66013d6bd702fde63d7080b8cac79857b471",
+    "sha512": "670c40182073ed435e83f47b37f61ce46be145e522e3fbab1aaa45322b18587fc7a8aad9e8d57d3690babd14bcfcd468fd59f950b68f07675eeb8f73f22fb88f",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
       "_TZ3210_gcagsb9r",

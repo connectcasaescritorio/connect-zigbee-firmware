@@ -5935,3 +5935,31 @@ BOARD__CONNECT_NOVADIGITAL_3CH:
   store: null
   threads: null
   tuya_module: ZTU
+
+BOARD__CONNECT_TOUCH_6CH_ZYXH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: tdhnhhiy;TS0601-B6;BC0u;RC0;RC1;RC2;RC3;RC4;RD2;M;
+  device_type: router
+  firmware_image_type: 47703
+  human_name: Connect Touch 6CH (ZYXH tdhnhhiy)
+  info: ConnectCasa - painel touch 6 canais ZYXH (ponte ZT3L + MCU DP)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0601
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZE204_tdhnhhiy
+  stock_model_name: TS0601
+  store: null
+  threads: null
+  tuya_module: ZT3L

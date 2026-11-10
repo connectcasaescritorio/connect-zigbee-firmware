@@ -5851,3 +5851,87 @@ BOARD__CONNECT_MOD2CH_ZT2SNS:
   store: null
   threads: null
   tuya_module: ZT2S_real_no_shield
+
+BOARD__CONNECT_NOVADIGITAL_1CH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: PENDENTE1W;ZTS-1W-CC;SB6u;RB5;ID3i;M;
+  device_type: router
+  firmware_image_type: 47700
+  human_name: Connect NovaDigital 1CH
+  info: ConnectCasa - NovaDigital 1 canal (ZTU)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0001
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_PENDENTE1W
+  stock_model_name: TS0001
+  store: null
+  threads: null
+  tuya_module: ZTU
+
+BOARD__CONNECT_NOVADIGITAL_2CH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: jjdkhueq;ZTS-2W-CC;SB6u;RB5;ID3i;SC1u;RB4;ID7i;M;
+  device_type: router
+  firmware_image_type: 47701
+  human_name: Connect NovaDigital 2CH
+  info: ConnectCasa - NovaDigital 2 canais (ZTU)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0002
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_jjdkhueq
+  stock_model_name: TS0002
+  store: null
+  threads: null
+  tuya_module: ZTU
+
+BOARD__CONNECT_NOVADIGITAL_3CH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: 785olaiq;ZTS-3W-CC;SB6u;RB5;ID3i;SC1u;RB4;ID7i;SC4u;RD2;IC0i;M;
+  device_type: router
+  firmware_image_type: 47702
+  human_name: Connect NovaDigital 3CH
+  info: ConnectCasa - NovaDigital 3 canais (ZTU)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0003
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_785olaiq
+  stock_model_name: TS0003
+  store: null
+  threads: null
+  tuya_module: ZTU

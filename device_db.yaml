@@ -5884,7 +5884,7 @@ BOARD__CONNECT_NOVADIGITAL_2CH:
   alt_config_str: null
   build: true
   category: board
-  config_str: jjdkhueq;ZTS-2W-CC;SB6u;RB5;ID3i;SC1u;RB4;ID7i;M;
+  config_str: jjdkhueq;ZTS-2W-CC;SB6u;RB5;ID3;SC4u;RB4;IC0;M;
   device_type: router
   firmware_image_type: 47701
   human_name: Connect NovaDigital 2CH

@@ -5963,3 +5963,31 @@ BOARD__CONNECT_TOUCH_6CH_ZYXH:
   store: null
   threads: null
   tuya_module: ZT3L
+
+BOARD__CONNECT_NOVADIGITAL_4CH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: lwthnp7j;ZTS-4W-CC;SB6u;RB5;ID3;SC4u;RB4;IC0;SC1u;RD2;ID7;SB7u;RC2;IC3;M;
+  device_type: router
+  firmware_image_type: 47705
+  human_name: Connect NovaDigital 4CH
+  info: ConnectCasa - NovaDigital 4 canais (ZTU)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0004
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_lwthnp7j
+  stock_model_name: TS0004
+  store: null
+  threads: null
+  tuya_module: ZTU

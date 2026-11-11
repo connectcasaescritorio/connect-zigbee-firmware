@@ -2,6 +2,7 @@
 #include "hal/nvm.h"
 #include "hal/printf_selector.h"
 #include "hal/system.h"
+#include "device_config/nvm_items.h"
 #include "hal/tasks.h"
 #include <stdint.h>
 
@@ -9,6 +10,7 @@ static hal_task_t reset_task;
 
 __attribute__((noreturn)) void reset_all() {
     printf("RESET ALL!\r\n");
+    hal_nvm_delete(NV_ITEM_DEVICE_CONFIG);  // apaga a config EXPLICITAMENTE
     hal_nvm_clear_all();
     hal_factory_reset();
     hal_system_reset();

@@ -5658,13 +5658,41 @@ BOARD__CONNECT_TOUCH_6CH:
 
 BOARD__CONNECT_TOUCH_4CH_TOUCH:
   alt_config_str: null
-  build: true
+  build: false
   category: board
   config_str: irzgyra2;TS0601-B4;BC0u;RC0;RC1;RC2;RC3;M;
   device_type: router
   firmware_image_type: 47302
-  human_name: Connect Touch 4CH Touch
-  info: ConnectCasa - painel touch 4 canais TS0601 (ponte ZT3L + MCU DP)
+  human_name: Connect Touch 4CH Touch (APOSENTADO - usar BOARD__CONNECT_4X4_TOUCH_4CH)
+  info: ConnectCasa - painel touch 4 canais TS0601 (ponte ZT3L + MCU DP) - APOSENTADO
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0601
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZE204_irzgyra2
+  stock_model_name: TS0601
+  store: null
+  threads: null
+  tuya_module: ZT3L
+
+BOARD__CONNECT_4X4_TOUCH_4CH:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: irzgyra2;TS0601-B4;BC0u;RC0;RC1;RC2;RC3;M;
+  device_type: router
+  firmware_image_type: 47303
+  human_name: Connect 4x4 Touch 4CH
+  info: ConnectCasa - painel touch 4x4 de 4 canais TS0601 (ponte ZT3L + MCU DP) - config compilada forcada (imune a NVM de 6ch presa)
   mcu: TLSR8258
   mcu_family: Telink
   neutral: required

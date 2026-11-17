@@ -41,23 +41,27 @@ void device_config_write_to_nv() {
 void device_config_read_from_nv() {
     hal_nvm_status_t st = 0;
 
-    // Se a config COMPILADA for do dimmer (contem -BD), ignora a NVM
-    // e usa sempre a compilada (contorna NVM presa com config antiga).
+    // Se a config COMPILADA for do dimmer (-BD) ou do touch 4 canais (-B4),
+    // ignora a NVM e usa SEMPRE a compilada. Contorna NVM presa com config
+    // antiga (ex.: peca de 4 canais que veio gravada como 6 canais).
     {
         const char *d = (const char *)default_config_data;
         const char *p = d;
-        int has_bd = 0;
+        int force_compiled = 0;
         while (*p) {
-            if (p[0]=='-' && p[1]=='B' && p[2]=='D') { has_bd = 1; break; }
+            if (p[0]=='-' && p[1]=='B' && (p[2]=='D' || p[2]=='4')) {
+                force_compiled = 1;
+                break;
+            }
             p++;
         }
-        if (has_bd) {
-            // Dimmer: SEMPRE usa a compilada. Cada build vale.
-            // (mecanismo comprovado na 1.9.32)
+        if (force_compiled) {
+            // SEMPRE usa a compilada. Cada build vale.
+            // (mecanismo comprovado no dimmer na 1.9.32)
             memcpy(device_config_str.data, default_config_data,
                    sizeof(default_config_data));
             device_config_str.size = strlen(d);
-            printf("Dimmer: config compilada: %s\r\n", d);
+            printf("Config compilada forcada: %s\r\n", d);
             return;
         }
     }

@@ -1,16 +1,16 @@
 [
   {
-    "fileName": "tlc_switch-1.9.51-2e16d28-forced.zigbee",
+    "fileName": "tlc_switch-1.9.52-dab6ffb-forced.zigbee",
     "fileVersion": 4294967295,
-    "fileSize": 196690,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_NOVADIGITAL_4CH/tlc_switch-1.9.51-2e16d28-forced.zigbee",
-    "imageType": 47705,
+    "fileSize": 196658,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BOARD__CONNECT_TOUCH_4CH_TOUCH/tlc_switch-1.9.52-dab6ffb-forced.zigbee",
+    "imageType": 47302,
     "manufacturerCode": 4417,
-    "sha512": "611aebfba5414d18755f0dad5d73f5b682812fd1dbf58421a3de743a6dc920b02f6b00b75bb8f8a0145307df8be5d0b6fa75ccaccec2854bcbfcd1ce70847b81",
+    "sha512": "23b44521ec78c53168061a9189dc5628fc31dfaf26e9457b60a719e4aa505985b99f10c6f5304b393cfc3b51e054d359644b383c1ba32b57c8b4c1d9f1fc0417",
     "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
     "manufacturerName": [
-      "_TZ3000_lwthnp7j",
-      "lwthnp7j"
+      "_TZE204_irzgyra2",
+      "irzgyra2"
     ]
   }
 ]

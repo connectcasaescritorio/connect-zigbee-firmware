@@ -133,12 +133,12 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
         }
     }
     if (attribute_id == ZCL_ATTR_BASIC_RESET_NOW) {
-        // Reset com LEAVE da rede: limpa NVM e chama factory_reset
-        // (zb_factoryReset faz o leave e reinicia sozinho). NAO chamar
-        // mcu_reset depois - isso cortava o leave antes de completar.
-        printf("RESET_NOW: factory reset com leave\r\n");
-        hal_nvm_clear_all();
-        hal_factory_reset();
+        // Adiado 500ms: deixa o write Zigbee receber o ACK antes de resetar.
+        // Antes rodava inline (clear_all + factory_reset) e o device saia da
+        // rede no meio do handler, sem responder -> o Z2M acusava erro/timeout
+        // e o reset "nao pegava". Agora agenda e responde o write normalmente.
+        printf("RESET_NOW: agendando factory reset com leave (500ms)\r\n");
+        schedule_reset_now(500);
     }
 }
 

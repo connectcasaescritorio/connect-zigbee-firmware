@@ -53,6 +53,12 @@ void device_config_read_from_nv() {
                 force_compiled = 1;
                 break;
             }
+            if (p[0]=='C' && p[1]=='T' && p[2]=='4') {
+                // TS0004-CT4 (touch 4 canais SoC): NVM nao grava nessa peca,
+                // entao forca a config compilada pra ela SEMPRE aplicar.
+                force_compiled = 1;
+                break;
+            }
             p++;
         }
         if (force_compiled) {

@@ -10,6 +10,7 @@
 #include "device_config/nvm_items.h"
 #include "device_config/reset.h"
 #include "relay_cluster.h"
+#include "hal/gpio.h"
 #include "hal/nvm.h"
 #include "hal/printf_selector.h"
 #include "hal/tasks.h"
@@ -37,6 +38,58 @@ void basic_cluster_load_attrs_from_nv();
 static uint8_t g_factory_wipe = 0;
 static uint8_t g_reset_now = 0;
 static uint8_t g_test_net_status = 0;
+static uint8_t g_gpio_test = 0;
+static uint8_t g_gpio_scan_result = 0;
+
+// ---- Bring-up: teste de GPIO em runtime (saidas) + scan de entradas ----
+extern hal_gpio_pin_t relay_pins_used[];
+extern uint8_t relay_pins_used_cnt;
+static uint8_t g_scan_active = 0;
+static hal_task_t g_scan_task;
+
+static uint8_t gpio_is_relay(hal_gpio_pin_t pin) {
+    for (uint8_t i = 0; i < relay_pins_used_cnt; i++)
+        if (relay_pins_used[i] == pin) return 1;
+    return 0;
+}
+
+// Varre A0..D7 (pulando os pinos de rele p/ nao glitchar) e guarda em
+// g_gpio_scan_result o codigo do pino que estiver em LOW (botao pressionado).
+static void gpio_scan_task(void *arg) {
+    if (!g_scan_active) return;
+    for (uint8_t port = 1; port <= 4; port++) {
+        for (uint8_t bit = 0; bit <= 7; bit++) {
+            char buf[3] = {(char)('A' + port - 1), (char)('0' + bit), 0};
+            hal_gpio_pin_t pin = hal_gpio_parse_pin(buf);
+            if (pin == HAL_INVALID_PIN || gpio_is_relay(pin)) continue;
+            if (hal_gpio_read(pin) == 0) {
+                g_gpio_scan_result = port * 10 + bit;
+                printf("GPIO_SCAN: %s LOW (code %d)\r\n", buf,
+                       g_gpio_scan_result);
+            }
+        }
+    }
+    hal_tasks_schedule(&g_scan_task, 150);
+}
+
+static void gpio_scan_start(void) {
+    // configura todos os pinos nao-rele como entrada com pull-up
+    for (uint8_t port = 1; port <= 4; port++) {
+        for (uint8_t bit = 0; bit <= 7; bit++) {
+            char buf[3] = {(char)('A' + port - 1), (char)('0' + bit), 0};
+            hal_gpio_pin_t pin = hal_gpio_parse_pin(buf);
+            if (pin == HAL_INVALID_PIN || gpio_is_relay(pin)) continue;
+            hal_gpio_init(pin, 1, HAL_GPIO_PULL_UP);
+        }
+    }
+    g_gpio_scan_result = 0;
+    g_scan_active = 1;
+    g_scan_task.handler = gpio_scan_task;
+    g_scan_task.arg = 0;
+    hal_tasks_init(&g_scan_task);
+    hal_tasks_schedule(&g_scan_task, 150);
+    printf("GPIO_SCAN: iniciado (pressione cada botao e leia gpio_scan_result)\r\n");
+}
 static uint8_t g_br_backlight = 1;
 static uint8_t g_br_brightness = 100;
 static uint8_t g_br_mode[3] = {0, 0, 0};
@@ -132,6 +185,46 @@ void basic_cluster_callback_attr_write_trampoline(uint16_t attribute_id) {
             bridge_force_net_status(val);
         }
     }
+    if (attribute_id == ZCL_ATTR_BASIC_GPIO_TEST) {
+        // Teste de GPIO em runtime (bring-up sem regravar).
+        // Codigo = porta*10 + bit, porta A=1,B=2,C=3,D=4.
+        //   HIGH:  A0=10 ... B5=25 ... C3=33 ... D7=47
+        //   LOW:   codigo + 100 (ex.: C4 em LOW = 134)
+        //   200:   inicia SCAN de entradas (acha botoes); le gpio_scan_result
+        //   201:   para o scan
+        //   0:     libera o pino de teste de saida
+        // Saidas (backlight: dirige LOW e ve qual apaga; LED pareamento: HIGH).
+        static hal_gpio_pin_t test_pin = HAL_INVALID_PIN;
+        uint8_t v = g_gpio_test;
+        if (v == 200) {
+            gpio_scan_start();
+        } else if (v == 201) {
+            g_scan_active = 0;
+            printf("GPIO_SCAN: parado\r\n");
+        } else {
+            if (test_pin != HAL_INVALID_PIN) {
+                hal_gpio_init(test_pin, 1, HAL_GPIO_PULL_UP);  // libera anterior
+                test_pin = HAL_INVALID_PIN;
+            }
+            uint8_t level = 1;
+            uint8_t code  = v;
+            if (v >= 100) { level = 0; code = v - 100; }
+            uint8_t port = code / 10;   // 1=A 2=B 3=C 4=D
+            uint8_t bit  = code % 10;
+            if (v != 0 && port >= 1 && port <= 4 && bit <= 7) {
+                char buf[3] = {(char)('A' + port - 1), (char)('0' + bit), 0};
+                hal_gpio_pin_t pin = hal_gpio_parse_pin(buf);
+                if (pin != HAL_INVALID_PIN) {
+                    hal_gpio_init(pin, 0, HAL_GPIO_PULL_NONE);  // saida
+                    hal_gpio_write(pin, level);
+                    test_pin = pin;
+                    printf("GPIO_TEST: %s = %d\r\n", buf, level);
+                }
+            } else {
+                printf("GPIO_TEST: liberado\r\n");
+            }
+        }
+    }
     if (attribute_id == ZCL_ATTR_BASIC_RESET_NOW) {
         // Adiado 500ms: deixa o write Zigbee receber o ACK antes de resetar.
         // Antes rodava inline (clear_all + factory_reset) e o device saia da
@@ -203,14 +296,18 @@ void basic_cluster_add_to_endpoint(zigbee_basic_cluster *cluster,
                ATTR_WRITABLE, g_reset_now);
     SETUP_ATTR(23, ZCL_ATTR_BASIC_TEST_NET_STATUS, ZCL_DATA_TYPE_UINT8,
                ATTR_WRITABLE, g_test_net_status);
+    SETUP_ATTR(24, ZCL_ATTR_BASIC_GPIO_TEST, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_gpio_test);
+    SETUP_ATTR(25, ZCL_ATTR_BASIC_GPIO_SCAN_RESULT, ZCL_DATA_TYPE_UINT8,
+               ATTR_WRITABLE, g_gpio_scan_result);
     if (network_indicator.has_dedicated_led) {
-        SETUP_ATTR(24, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
+        SETUP_ATTR(26, ZCL_ATTR_BASIC_STATUS_LED_STATE, ZCL_DATA_TYPE_BOOLEAN,
                    ATTR_WRITABLE, network_indicator.manual_state_when_connected);
     }
 
     endpoint->clusters[endpoint->cluster_count].cluster_id      = ZCL_CLUSTER_BASIC;
     endpoint->clusters[endpoint->cluster_count].attribute_count =
-        network_indicator.has_dedicated_led ? 25 : 24;
+        network_indicator.has_dedicated_led ? 27 : 26;
     endpoint->clusters[endpoint->cluster_count].attributes = cluster->attr_infos;
     endpoint->clusters[endpoint->cluster_count].is_server  = 1;
     endpoint->cluster_count++;

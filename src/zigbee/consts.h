@@ -64,6 +64,8 @@
 #define ZCL_ATTR_BASIC_BRIDGE_POKE_VAL            0xff13
 #define ZCL_ATTR_BASIC_RESET_NOW                  0xff14
 #define ZCL_ATTR_BASIC_TEST_NET_STATUS            0xff15
+#define ZCL_ATTR_BASIC_GPIO_TEST                  0xff16
+#define ZCL_ATTR_BASIC_GPIO_SCAN_RESULT           0xff17
 
 // Power Configuration cluster
 

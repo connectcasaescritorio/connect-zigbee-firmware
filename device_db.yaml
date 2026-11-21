@@ -5576,7 +5576,7 @@ BOARD__CONNECT_TOUCH_4CH:
   alt_config_str: null
   build: true
   category: board
-  config_str: 1nenkvye;TS0004-CT4;LC0;SD3u;RD7;SA0u;RD4;SD2u;RC3;SC4u;RB5;IB6;IC1;IC2;IB4;M;
+  config_str: 1nenkvye;TS0004-CT4;BC0u;QC3i;SD7u;RD7;SC0u;RD4;SD2u;RC3;SC2u;RB5;M;
   device_type: router
   firmware_image_type: 47200
   human_name: Connect Touch 4CH
@@ -5788,7 +5788,7 @@ BOARD__CONNECT_MOD2CH_TS0002:
   status: in_progress
   stock_converter_manufacturer: Tuya
   stock_converter_model: TS0002
-  stock_image_type: 54179
+  stock_image_type: 2050
   stock_manufacturer_id: 4417
   stock_manufacturer_name: _TZ3210_gcagsb9r
   stock_model_name: TS0002
@@ -5816,7 +5816,7 @@ BOARD__CONNECT_MOD2CH_ZTU:
   status: in_progress
   stock_converter_manufacturer: Tuya
   stock_converter_model: TS0002
-  stock_image_type: 54179
+  stock_image_type: 2050
   stock_manufacturer_id: 4417
   stock_manufacturer_name: _TZ3210_gcagsb9r
   stock_model_name: TS0002
@@ -5844,7 +5844,7 @@ BOARD__CONNECT_MOD2CH_ZT3L:
   status: in_progress
   stock_converter_manufacturer: Tuya
   stock_converter_model: TS0002
-  stock_image_type: 54179
+  stock_image_type: 2050
   stock_manufacturer_id: 4417
   stock_manufacturer_name: _TZ3210_gcagsb9r
   stock_model_name: TS0002
@@ -5872,7 +5872,7 @@ BOARD__CONNECT_MOD2CH_ZT2SNS:
   status: in_progress
   stock_converter_manufacturer: Tuya
   stock_converter_model: TS0002
-  stock_image_type: 54179
+  stock_image_type: 2050
   stock_manufacturer_id: 4417
   stock_manufacturer_name: _TZ3210_gcagsb9r
   stock_model_name: TS0002

@@ -6019,3 +6019,115 @@ BOARD__CONNECT_NOVADIGITAL_4CH:
   store: null
   threads: null
   tuya_module: ZTU
+
+SWITCH_NOVA_DIGITAL_1CH:
+  alt_config_str: null
+  build: true
+  category: module
+  config_str: gy7frite;TS0001-AVB;BC2u;LD2i;SD3u;RC0;
+  device_type: router
+  firmware_image_type: 47710
+  human_name: Nova Digital 1CH switch (1ch_switch_nova_digital)
+  info: ConnectCasa - Nova Digital / Avatto 1 canal(is) (gy7frite) - pinout Avatto
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0001
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_gy7frite
+  stock_model_name: TS0001
+  store: null
+  threads: null
+  tuya_module: ZTU
+
+SWITCH_NOVA_DIGITAL_2CH:
+  alt_config_str: null
+  build: true
+  category: module
+  config_str: a8mhmsol;TS0002-AVB;BC2u;LD2i;SD3u;RC0;SD7u;RD4;
+  device_type: router
+  firmware_image_type: 47711
+  human_name: Nova Digital 2CH switch (2ch_switch_nova_digital)
+  info: ConnectCasa - Nova Digital / Avatto 2 canal(is) (a8mhmsol) - pinout Avatto
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0002
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_a8mhmsol
+  stock_model_name: TS0002
+  store: null
+  threads: null
+  tuya_module: ZTU
+
+SWITCH_NOVA_DIGITAL_3CH:
+  alt_config_str: null
+  build: true
+  category: module
+  config_str: 78fgsn7i;TS0003-AVB;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;
+  device_type: router
+  firmware_image_type: 47712
+  human_name: Nova Digital 3CH switch (3ch_switch_nova_digital)
+  info: ConnectCasa - Nova Digital / Avatto 3 canal(is) (78fgsn7i) - pinout Avatto
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0003
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_78fgsn7i
+  stock_model_name: TS0003
+  store: null
+  threads: null
+  tuya_module: ZTU
+
+SWITCH_NOVA_DIGITAL_4CH:
+  alt_config_str: null
+  build: true
+  category: module
+  config_str: fpze0osh;TS0004-AVB;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;SA0u;RC4;
+  device_type: router
+  firmware_image_type: 47713
+  human_name: Nova Digital 4CH switch (4ch_switch_nova_digital)
+  info: ConnectCasa - Nova Digital / Avatto 4 canal(is) (fpze0osh) - pinout Avatto
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names: null
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Nova Digital
+  stock_converter_model: TS0004
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZ3000_fpze0osh
+  stock_model_name: TS0004
+  store: null
+  threads: null
+  tuya_module: ZTU

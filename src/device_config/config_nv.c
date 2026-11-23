@@ -59,6 +59,12 @@ void device_config_read_from_nv() {
                 force_compiled = 1;
                 break;
             }
+            if (p[0]=='C' && p[1]=='C' && p[2]=='2') {
+                // TS0002-CC2 (modulo 2ch ZT2S gcagsb9r): NVM nao grava nessa
+                // peca, entao forca a config compilada pra SEMPRE aplicar.
+                force_compiled = 1;
+                break;
+            }
             p++;
         }
         if (force_compiled) {

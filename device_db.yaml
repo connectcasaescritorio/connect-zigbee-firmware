@@ -5772,7 +5772,7 @@ BOARD__CONNECT_MOD2CH_TS0002:
   alt_config_str: null
   build: true
   category: board
-  config_str: gcagsb9r;TS0002-CC2;BD2u;LB1;SB6u;RC3i;SA1u;RC4i;M;
+  config_str: gcagsb9r;TS0002-CC2;BD2u;LC2;SB5u;RC3;SB4u;RC4;M;
   device_type: router
   firmware_image_type: 47600
   human_name: Connect Modulo 2CH (ZT2S)

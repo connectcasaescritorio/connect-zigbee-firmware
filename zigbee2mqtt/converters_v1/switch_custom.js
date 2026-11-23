@@ -14885,7 +14885,6 @@ const definitions = [
             deviceEndpoints({ endpoints: {"switch_0": 1, "switch_1": 2, "switch_2": 3, "switch_3": 4, "relay_0": 5, "relay_1": 6, "relay_2": 7, "relay_3": 8, } }),
             romasku.deviceConfig("device_config", "switch_0"),
             romasku.multiPressResetCount("multi_press_reset_count", "switch_0"),
-            romasku.networkIndicator("network_led", "switch_0"),
             onOff({ endpointNames: ["relay_0", "relay_1", "relay_2", "relay_3"] }),
             romasku.pressAction("switch_0_press_action", "switch_0"),
             romasku.switchMode("switch_0_mode", "switch_0"),
@@ -14923,14 +14922,6 @@ const definitions = [
             romasku.bindedMode("switch_3_binded_mode", "switch_3"),
             romasku.longPressDuration("switch_3_long_press_duration", "switch_3"),
             romasku.levelMoveRate("switch_3_level_move_rate", "switch_3"),
-            romasku.relayIndicatorMode("relay_0_indicator_mode", "relay_0"),
-            romasku.relayIndicator("relay_0_indicator", "relay_0"),
-            romasku.relayIndicatorMode("relay_1_indicator_mode", "relay_1"),
-            romasku.relayIndicator("relay_1_indicator", "relay_1"),
-            romasku.relayIndicatorMode("relay_2_indicator_mode", "relay_2"),
-            romasku.relayIndicator("relay_2_indicator", "relay_2"),
-            romasku.relayIndicatorMode("relay_3_indicator_mode", "relay_3"),
-            romasku.relayIndicator("relay_3_indicator", "relay_3"),
         ],
         meta: { multiEndpoint: true },
         configure: async (device, coordinatorEndpoint, logger) => {
@@ -15003,38 +14994,6 @@ const definitions = [
                 change: 1,
             });
 
-            await endpoint5.configureReporting("genOnOff", [
-                {
-                    attribute: {ID: 0xff02, type: 0x10}, // Boolean
-                    minimumReportInterval: 0,
-                    maximumReportInterval: constants.repInterval.MAX,
-                    reportableChange: 1,
-                },
-            ]);
-            await endpoint6.configureReporting("genOnOff", [
-                {
-                    attribute: {ID: 0xff02, type: 0x10}, // Boolean
-                    minimumReportInterval: 0,
-                    maximumReportInterval: constants.repInterval.MAX,
-                    reportableChange: 1,
-                },
-            ]);
-            await endpoint7.configureReporting("genOnOff", [
-                {
-                    attribute: {ID: 0xff02, type: 0x10}, // Boolean
-                    minimumReportInterval: 0,
-                    maximumReportInterval: constants.repInterval.MAX,
-                    reportableChange: 1,
-                },
-            ]);
-            await endpoint8.configureReporting("genOnOff", [
-                {
-                    attribute: {ID: 0xff02, type: 0x10}, // Boolean
-                    minimumReportInterval: 0,
-                    maximumReportInterval: constants.repInterval.MAX,
-                    reportableChange: 1,
-                },
-            ]);
 
 
         },

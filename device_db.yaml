@@ -463,7 +463,7 @@ MODULE_AVATTO_A_TS0004:
   - 5ajpkyq6;TS0004-AVB;BC2u;LD2i;SD7u;RB6;SC0u;RD4;SA0u;RC1;SA1u;RC4;
   build: true
   category: module
-  config_str: 5ajpkyq6;TS0004-AVB;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;SA0u;RC4;
+  config_str: 5ajpkyq6;TS0004-AVB;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;SB4u;RC4;
   device_type: router
   firmware_image_type: 43529
   human_name: AVATTO ZWSM16-4 🅰
@@ -6108,7 +6108,7 @@ SWITCH_NOVA_DIGITAL_4CH:
   alt_config_str: null
   build: true
   category: module
-  config_str: fpze0osh;TS0004-AVB;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;SA0u;RC4;
+  config_str: fpze0osh;TS0004-AVB;BC2u;LD2i;SD3u;RC0;SD7u;RD4;SB6u;RC1;SB4u;RC4;
   device_type: router
   firmware_image_type: 47713
   human_name: Nova Digital 4CH switch (4ch_switch_nova_digital)

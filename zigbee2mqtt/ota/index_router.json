@@ -708,5 +708,35 @@
       "TS0004-AVB",
       "5ajpkyq6"
     ]
+  },
+  {
+    "fileName": "tlc_switch-1.9.64-8c8f93e.zigbee",
+    "fileVersion": 425996288,
+    "fileSize": 197842,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.9.64-8c8f93e.zigbee",
+    "imageType": 47150,
+    "manufacturerCode": 4417,
+    "sha512": "d5c59014fdc589858b7ff30ebbeeef613d518eecd02591fc09d783b9b21f56c3f6cfd8e0f3bf2f8c796c2335fdaec75eb506db56f1e4e362aa813dc311b81aa1",
+    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "manufacturerName": [
+      "_TZE284_3kjidznp",
+      "_TZE200_uis34uuc",
+      "3kjidznp"
+    ]
+  },
+  {
+    "fileName": "tlc_switch-1.9.64-8c8f93e-from_tuya.zigbee",
+    "fileVersion": 4294967295,
+    "fileSize": 197842,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.9.64-8c8f93e-from_tuya.zigbee",
+    "imageType": 54179,
+    "manufacturerCode": 4417,
+    "sha512": "76e83a3de7357f12d69c98233c2e1503a6b22a9a4ec8bd586dfd7096eea8a8553f85a8a49b3459585414520e26e8ef27f2679b8073d9d143a7e2c7a8cb2d2cd6",
+    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "manufacturerName": [
+      "_TZE284_3kjidznp",
+      "_TZE200_uis34uuc",
+      "3kjidznp"
+    ]
   }
 ]

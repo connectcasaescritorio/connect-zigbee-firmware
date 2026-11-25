@@ -374,5 +374,20 @@
       "TS0004-AVB",
       "5ajpkyq6"
     ]
+  },
+  {
+    "fileName": "tlc_switch-1.9.64-8c8f93e-forced.zigbee",
+    "fileVersion": 4294967295,
+    "fileSize": 197842,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/BRIDGE_PAINEL_3CH_CENAS/tlc_switch-1.9.64-8c8f93e-forced.zigbee",
+    "imageType": 47150,
+    "manufacturerCode": 4417,
+    "sha512": "eaace8de8322afe03b2e933ce43653eb2cba87b7fce04887511e5025d1ed2f128d5c4b5f4deecf02d28ae44c8d0362617f455df69c4e8e4d8232a9fb77c3d7a1",
+    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "manufacturerName": [
+      "_TZE284_3kjidznp",
+      "_TZE200_uis34uuc",
+      "3kjidznp"
+    ]
   }
 ]

@@ -6131,3 +6131,32 @@ SWITCH_NOVA_DIGITAL_4CH:
   store: null
   threads: null
   tuya_module: ZTU
+
+BRIDGE_PAINEL_3CH_CENAS:
+  alt_config_str: null
+  build: true
+  category: board
+  config_str: 3kjidznp;TS0601-BR;SB4u;RC1;SB5u;RD3;SC0u;RB6;M;P0;
+  device_type: router
+  firmware_image_type: 47150
+  human_name: Connect Painel 3CH + 3 Cenas (ponte TuyaMCU)
+  info: ConnectCasa - painel 3 canais + 3 cenas, ponte DP ZTU + MCU Tuya (NALite TS0601)
+  mcu: TLSR8258
+  mcu_family: Telink
+  neutral: required
+  old_manufacturer_names:
+  - _TZE200_uis34uuc
+  old_zb_models: null
+  output: relay
+  override_z2m_device: null
+  power: mains
+  status: in_progress
+  stock_converter_manufacturer: Tuya
+  stock_converter_model: TS0601
+  stock_image_type: 54179
+  stock_manufacturer_id: 4417
+  stock_manufacturer_name: _TZE284_3kjidznp
+  stock_model_name: TS0601
+  store: null
+  threads: null
+  tuya_module: ZTU

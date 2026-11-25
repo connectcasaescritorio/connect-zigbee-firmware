@@ -244,40 +244,6 @@
     ]
   },
   {
-    "fileName": "tlc_switch-1.1.20-a4ee032-forced.zigbee",
-    "fileVersion": 4294967295,
-    "fileSize": 182306,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/MODULE_AVATTO_A_TS0003/tlc_switch-1.1.20-a4ee032-forced.zigbee",
-    "imageType": 43543,
-    "manufacturerCode": 4417,
-    "sha512": "98b74933744fa5771c5f778e67450a0d5f9a9dd9dd251569ff0f6f05c3cae790850c9c652175aa67c4499f81a4bdb020c3e2c905e89b8e5e1cb33b9fa6739ced",
-    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
-    "manufacturerName": [
-      "_TZ3000_hbic3ka3",
-      "Tuya-TS0003-Avatto-custom",
-      "TS0003-AV-CUS",
-      "TS0003-AVB",
-      "hbic3ka3"
-    ]
-  },
-  {
-    "fileName": "tlc_switch-1.1.20-a4ee032-forced.zigbee",
-    "fileVersion": 4294967295,
-    "fileSize": 182322,
-    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/MODULE_AVATTO_A_TS0004/tlc_switch-1.1.20-a4ee032-forced.zigbee",
-    "imageType": 43529,
-    "manufacturerCode": 4417,
-    "sha512": "89a5b81a464111ecc29607ff49336c26ce29d6d5336e6a4a2546f0fc65635afc8ddbd9a3f3e2fa16841b16d1ed7d7873650ccedcb9b79a7164c20579db7da125",
-    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
-    "manufacturerName": [
-      "_TZ3000_5ajpkyq6",
-      "Tuya-TS0004-Avatto-custom",
-      "TS0004-AV-CUS",
-      "TS0004-AVB",
-      "5ajpkyq6"
-    ]
-  },
-  {
     "fileName": "tlc_switch-1.1.2-8502bc1-forced.zigbee",
     "fileVersion": 4294967295,
     "fileSize": 181010,
@@ -373,6 +339,40 @@
     "manufacturerName": [
       "_TZ3000_fpze0osh",
       "fpze0osh"
+    ]
+  },
+  {
+    "fileName": "tlc_switch-1.9.63-cfc7333-forced.zigbee",
+    "fileVersion": 4294967295,
+    "fileSize": 197842,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/MODULE_AVATTO_A_TS0003/tlc_switch-1.9.63-cfc7333-forced.zigbee",
+    "imageType": 43543,
+    "manufacturerCode": 4417,
+    "sha512": "45591858d9bea146b03d7ba42f02e3f23ecb86ee8c27a6b490d3ff8b4167849ee168beabb05df69dc1e279acbdf0419bdd91025c895349ec1697644769337680",
+    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "manufacturerName": [
+      "_TZ3000_hbic3ka3",
+      "Tuya-TS0003-Avatto-custom",
+      "TS0003-AV-CUS",
+      "TS0003-AVB",
+      "hbic3ka3"
+    ]
+  },
+  {
+    "fileName": "tlc_switch-1.9.63-cfc7333-forced.zigbee",
+    "fileVersion": 4294967295,
+    "fileSize": 197858,
+    "url": "https://github.com/connectcasaescritorio/connect-zigbee-firmware/raw/refs/heads/main/bin/router/MODULE_AVATTO_A_TS0004/tlc_switch-1.9.63-cfc7333-forced.zigbee",
+    "imageType": 43529,
+    "manufacturerCode": 4417,
+    "sha512": "3c5b5005a01171c3ddbea05c3fba970d6fa75f17e2e3a8bfeb56196da6ab775535febdbac22c9ef2d56549b69ee7a0ac1cfcf9cf552b44f45713dd9c7b984ba2",
+    "otaHeaderString": "Telink OTA Image\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "manufacturerName": [
+      "_TZ3000_5ajpkyq6",
+      "Tuya-TS0004-Avatto-custom",
+      "TS0004-AV-CUS",
+      "TS0004-AVB",
+      "5ajpkyq6"
     ]
   }
 ]

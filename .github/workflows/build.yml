@@ -43,10 +43,10 @@ jobs:
         make telink/tools/all
         make setup_venv
 
-    - name: Limpar index OTA (catálogo só com seus devices)
+    - name: Index OTA (acumula entre builds — NAO zera)
       run: |
-        source .venv/bin/activate
-        make tools/clean_z2m_index
+        echo "Index OTA preservado: cada build so adiciona/atualiza a entrada do board compilado."
+        echo "(clean_z2m_index desativado de proposito para manter OTA de todas as pecas ja flashadas)"
 
     - name: Compilar boards selecionadas
       run: |
